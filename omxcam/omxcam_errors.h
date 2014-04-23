@@ -22,6 +22,7 @@ typedef enum {
   OMXCAM_ErrorCameraSettings,
   OMXCAM_ErrorStill,
   OMXCAM_ErrorVideo,
+  OMXCAM_ErrorVideoThread,
   OMXCAM_ErrorBadParameter,
   OMXCAM_ErrorSetupTunnel,
   OMXCAM_ErrorLoaded,

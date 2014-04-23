@@ -4,9 +4,9 @@
 
 #include "omxcam/omxcam.h"
 
-void logError (char* fn, OMXCAM_ERROR error){
-  printf ("ERROR: %s, %s ('%s')\n", fn, OMXCAM_errorToHuman (error),
-      OMXCAM_lastError ());
+int logError (OMXCAM_ERROR error){
+  printf ("ERROR: %s (%s)\n", OMXCAM_errorToHuman (error), OMXCAM_lastError ());
+  return 1;
 }
 
 int fd;
@@ -20,7 +20,7 @@ uint32_t bufferCallbackRGB (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   if (pwrite (fd, buffer, length, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return -1;
+    return 1;
   }
   
   return 0;
@@ -45,20 +45,17 @@ int saveRGB (char* filename, OMXCAM_STILL_SETTINGS* settings){
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
     printf ("ERROR: open\n");
-    return -1;
+    return 1;
   }
   
   OMXCAM_ERROR error;
   
-  if ((error = OMXCAM_still (settings))){
-    logError ("OMXCAM_still", error);
-    return -1;
-  }
+  if ((error = OMXCAM_still (settings))) return logError (error);
   
   //Close the file
   if (close (fd)){
     printf ("ERROR: close\n");
-    return -1;
+    return 1;
   }
   
   return 0;
@@ -70,15 +67,12 @@ int saveYUV (char* filename, OMXCAM_STILL_SETTINGS* settings){
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
     printf ("ERROR: open\n");
-    return -1;
+    return 1;
   }
   
   OMXCAM_ERROR error;
   
-  if ((error = OMXCAM_still (settings))){
-    logError ("OMXCAM_still", error);
-    return -1;
-  }
+  if ((error = OMXCAM_still (settings))) return logError (error);
   
   //Fix the pointers to their initial address
   yBuffer -= yuvPlanes.yLength;
@@ -89,21 +83,21 @@ int saveYUV (char* filename, OMXCAM_STILL_SETTINGS* settings){
   
   if (pwrite (fd, yBuffer, yuvPlanes.yLength, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return -1;
+    return 1;
   }
   if (pwrite (fd, uBuffer, yuvPlanes.uLength, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return -1;
+    return 1;
   }
   if (pwrite (fd, vBuffer, yuvPlanes.vLength, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return -1;
+    return 1;
   }
   
   //Close the file
   if (close (fd)){
     printf ("ERROR: close\n");
-    return -1;
+    return 1;
   }
   
   return 0;
@@ -114,10 +108,7 @@ int main (){
   
   //Initialize the library
   printf ("initializing\n");
-  if ((error = OMXCAM_init ())){
-    logError ("OMXCAM_init", error);
-    return 1;
-  }
+  if ((error = OMXCAM_init ())) return logError (error);
   
   OMXCAM_STILL_SETTINGS still;
   
@@ -182,10 +173,7 @@ int main (){
   
   //Deinitialize the library
   printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())){
-    logError ("OMXCAM_deinit", error);
-    return 1;
-  }
+  if ((error = OMXCAM_deinit ())) return logError (error);
   
   printf ("ok\n");
   

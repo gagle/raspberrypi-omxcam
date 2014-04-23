@@ -4,9 +4,9 @@
 
 #include "omxcam/omxcam.h"
 
-void logError (char* fn, OMXCAM_ERROR error){
-  printf ("ERROR: %s, %s ('%s')\n", fn, OMXCAM_errorToHuman (error),
-      OMXCAM_lastError ());
+int logError (OMXCAM_ERROR error){
+  printf ("ERROR: %s (%s)\n", OMXCAM_errorToHuman (error), OMXCAM_lastError ());
+  return 1;
 }
 
 int fd;
@@ -32,10 +32,7 @@ int save (char* filename, OMXCAM_STILL_SETTINGS* settings){
   
   OMXCAM_ERROR error;
   
-  if ((error = OMXCAM_still (settings))){
-    logError ("OMXCAM_still", error);
-    return -1;
-  }
+  if ((error = OMXCAM_still (settings))) return logError (error);
   
   //Close the file
   if (close (fd)){
@@ -51,10 +48,7 @@ int main (){
   
   //Initialize the library
   printf ("initializing\n");
-  if ((error = OMXCAM_init ())){
-    logError ("OMXCAM_init", error);
-    return 1;
-  }
+  if ((error = OMXCAM_init ())) return logError (error);
   
   OMXCAM_STILL_SETTINGS still;
   
@@ -86,10 +80,7 @@ int main (){
   
   //Deinitialize the library
   printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())){
-    logError ("OMXCAM_deinit", error);
-    return 1;
-  }
+  if ((error = OMXCAM_deinit ())) return logError (error);
   
   printf ("ok\n");
   

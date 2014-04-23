@@ -107,6 +107,8 @@ typedef struct {
   OMXCAM_BOOL frameStabilisation;
   OMXCAM_METERING metering;
   OMXCAM_WHITE_BALANCE whiteBalance;
+  float whiteBalanceRedGain;
+  float whiteBalanceBlueGain;
   OMXCAM_IMAGE_FILTER imageFilter;
   //Used only in video mode
   uint32_t framerate;

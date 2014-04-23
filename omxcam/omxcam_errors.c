@@ -44,6 +44,8 @@ const char* OMXCAM_errorToHuman (OMXCAM_ERROR error){
       return "OMXCAM_ErrorStill";
     case OMXCAM_ErrorVideo:
       return "OMXCAM_ErrorVideo";
+    case OMXCAM_ErrorVideoThread:
+      return "OMXCAM_ErrorVideoThread";
     case OMXCAM_ErrorBadParameter:
       return "OMXCAM_ErrorBadParameter";
     case OMXCAM_ErrorSetupTunnel:

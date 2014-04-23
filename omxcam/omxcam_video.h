@@ -2,7 +2,6 @@
 #define OMXCAM_VIDEO_H
 
 #include <pthread.h>
-#include <syscall.h>
 
 #include "omxcam_omx.h"
 #include "omxcam_errors.h"

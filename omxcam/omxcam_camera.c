@@ -47,30 +47,6 @@ int OMXCAM_loadCameraDrivers (){
   
   //The LED is on
   
-  //Configure camera sensor
-  OMXCAM_trace ("Configuring '%s' sensor\n", OMXCAM_ctx.camera.name);
-  
-  OMX_PARAM_SENSORMODETYPE sensor;
-  OMX_INIT_STRUCTURE (sensor);
-  sensor.nPortIndex = OMX_ALL;
-  OMX_INIT_STRUCTURE (sensor.sFrameSize);
-  sensor.sFrameSize.nPortIndex = OMX_ALL;
-  if ((error = OMX_GetParameter (OMXCAM_ctx.camera.handle,
-      OMX_IndexParamCommonSensorMode, &sensor))){
-    OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamCommonSensorMode: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
-    return -1;
-  }
-  sensor.bOneShot = OMX_TRUE;
-  //sensor.sFrameSize.nWidth and sensor.sFrameSize.nHeight can be ignored,
-  //they are configured with the port definition
-  if ((error = OMX_SetParameter (OMXCAM_ctx.camera.handle,
-      OMX_IndexParamCommonSensorMode, &sensor))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamCommonSensorMode: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
-    return -1;
-  }
-  
   return 0;
 }
 
@@ -129,7 +105,7 @@ void OMXCAM_initCameraSettings (
   settings->shutterSpeed = 125;
   settings->isoAuto = OMXCAM_TRUE;
   settings->iso = 100;
-  settings->exposure = OMXCAM_ExposureOff;
+  settings->exposure = OMXCAM_ExposureAuto;
   settings->exposureCompensation = 0;
   settings->mirror = OMXCAM_MirrorNone;
   settings->rotation = OMXCAM_RotationNone;
@@ -139,7 +115,9 @@ void OMXCAM_initCameraSettings (
   settings->noiseReduction = OMXCAM_TRUE;
   settings->frameStabilisation = OMXCAM_FALSE;
   settings->metering = OMXCAM_MeteringAverage;
-  settings->whiteBalance = OMXCAM_WhiteBalanceOff;
+  settings->whiteBalance = OMXCAM_WhiteBalanceAuto;
+  settings->whiteBalanceRedGain = 0.1;
+  settings->whiteBalanceBlueGain = 0.1;
   settings->imageFilter = OMXCAM_ImageFilterNone;
   settings->framerate = 30;
 }
@@ -251,6 +229,21 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
         "OMX_IndexConfigCommonWhiteBalance: %s", __func__, 
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
+  }
+  
+  //White balance gains (if white balance is set to off)
+  if (!settings->whiteBalance){
+    OMX_CONFIG_CUSTOMAWBGAINSTYPE whiteBalanceGains;
+    OMX_INIT_STRUCTURE (whiteBalanceGains);
+    whiteBalanceGains.xGainR = (OMX_U32)(settings->whiteBalanceRedGain*65536);
+    whiteBalanceGains.xGainB = (OMX_U32)(settings->whiteBalanceBlueGain*65536);
+    if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
+        OMX_IndexConfigCustomAwbGains, &whiteBalanceGains))){
+      OMXCAM_setError ("%s: OMX_SetConfig - "
+          "OMX_IndexConfigCustomAwbGains: %s", __func__, 
+          OMXCAM_dump_OMX_ERRORTYPE (error));
+      return -1;
+    }
   }
   
   //Image filter

@@ -6,13 +6,12 @@ typedef struct {
   OMXCAM_COMPONENT* fillComponent;
 } OMXCAM_THREAD_ARG;
 
-static long mainThreadId;
-static long bgThreadId;
 static int useEncoder;
 static int running = 0;
 static int safeRunning;
 static int bgError;
-static pthread_t thread;
+static pthread_t mainThread;
+static pthread_t bgThread;
 static pthread_mutex_t mutex;
 static OMXCAM_THREAD_ARG threadArg;
 
@@ -37,6 +36,11 @@ int changeVideoState (OMX_STATETYPE state, int useEncoder){
     return -1;
   }
   if (OMXCAM_wait (&OMXCAM_ctx.video_encode, OMXCAM_EventStateSet, 0)){
+    return -1;
+  }
+  if (state == OMX_StateExecuting &&
+      OMXCAM_wait (&OMXCAM_ctx.video_encode, OMXCAM_EventPortSettingsChanged,
+      0)){
     return -1;
   }
   
@@ -123,15 +127,12 @@ void OMXCAM_initVideoSettings (OMXCAM_VIDEO_SETTINGS* settings){
 }
 
 void* capture (void* threadArg){
+  //The return value is not needed
+
   OMXCAM_THREAD_ARG* arg = (OMXCAM_THREAD_ARG*)threadArg;
   int stop = 0;
   OMX_ERRORTYPE error;
   OMXCAM_ERROR err;
-  
-  //Save the thread id
-  bgThreadId = syscall (SYS_gettid);
-  
-  OMXCAM_trace ("Background thread id is %ld\n", bgThreadId);
   
   safeRunning = 1;
   
@@ -141,8 +142,10 @@ void* capture (void* threadArg){
       running = 0;
       bgError = 1;
       err = deinit ();
-      if (arg->errorCallback) arg->errorCallback (err);
-      return (void*)err;
+      if (arg->errorCallback){
+        arg->errorCallback (err ? err : OMXCAM_ErrorVideoThread);
+      }
+      return (void*)0;
     }
     
     stop = !running;
@@ -152,8 +155,10 @@ void* capture (void* threadArg){
       running = 0;
       bgError = 1;
       err = deinit ();
-      if (arg->errorCallback) arg->errorCallback (err);
-      return (void*)err;
+      if (arg->errorCallback){
+        arg->errorCallback (err ? err : OMXCAM_ErrorVideoThread);
+      }
+      return (void*)0;
     }
     
     if (stop) break;
@@ -165,18 +170,21 @@ void* capture (void* threadArg){
       running = 0;
       bgError = 1;
       err = deinit ();
-      if (arg->errorCallback) arg->errorCallback (err);
-      return (void*)err;
+      if (arg->errorCallback){
+        arg->errorCallback (err ? err : OMXCAM_ErrorVideoThread);
+      }
+      return (void*)0;
     }
     
     //Wait until it's filled
     if (OMXCAM_wait (arg->fillComponent, OMXCAM_EventFillBufferDone, 0)){
-      if (arg->errorCallback) arg->errorCallback (OMXCAM_ErrorVideo);
       running = 0;
       bgError = 1;
       err = deinit ();
-      if (arg->errorCallback) arg->errorCallback (err);
-      return (void*)err;
+      if (arg->errorCallback){
+        arg->errorCallback (err ? err : OMXCAM_ErrorVideoThread);
+      }
+      return (void*)0;
     }
     
     //Emit the buffer
@@ -189,7 +197,7 @@ void* capture (void* threadArg){
     }
   }
   
-  return (void*)OMXCAM_ErrorNone;
+  return (void*)0;
 }
 
 OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
@@ -206,6 +214,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
   OMX_COLOR_FORMATTYPE colorFormat;
   OMX_U32 stride;
   OMXCAM_COMPONENT* fillComponent;
+  OMX_ERRORTYPE error;
   
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
@@ -213,21 +222,21 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
   switch (settings->format){
     case OMXCAM_FormatRGB888:
       OMXCAM_ctx.camera.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_FALSE;
+      useEncoder = 0;
       colorFormat = OMX_COLOR_Format24bitRGB888;
       stride = settings->camera.width*3;
       fillComponent = &OMXCAM_ctx.camera;
       break;
     case OMXCAM_FormatYUV420:
       OMXCAM_ctx.camera.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_FALSE;
+      useEncoder = 0;
       colorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
       stride = settings->camera.width;
       fillComponent = &OMXCAM_ctx.camera;
       break;
     case OMXCAM_FormatH264:
       OMXCAM_ctx.video_encode.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_TRUE;
+      useEncoder = 1;
       colorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
       stride = settings->camera.width;
       fillComponent = &OMXCAM_ctx.video_encode;
@@ -255,16 +264,8 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
     return OMXCAM_ErrorInitCamera;
   }
   
-  //Change to Idle
-  if (changeVideoState (OMX_StateIdle, useEncoder)){
-    running = 0;
-    return OMXCAM_ErrorIdle;
-  }
-  
   //Configure camera port definition
   OMXCAM_trace ("Configuring '%s' port definition\n", OMXCAM_ctx.camera.name);
-  
-  OMX_ERRORTYPE error;
   
   OMX_PARAM_PORTDEFINITIONTYPE portDefinition;
   OMX_INIT_STRUCTURE (portDefinition);
@@ -274,7 +275,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
     OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
         __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
     running = 0;
-    return OMXCAM_ErrorStill;
+    return OMXCAM_ErrorVideo;
   }
   
   portDefinition.format.video.nFrameWidth = settings->camera.width;
@@ -348,6 +349,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
       running = 0;
       return OMXCAM_ErrorStill;
     }
+    
     portDefinition.format.video.nFrameWidth = settings->camera.width;
     portDefinition.format.video.nFrameHeight = settings->camera.height;
     portDefinition.format.video.xFramerate = settings->camera.framerate << 16;
@@ -356,6 +358,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
     //Despite being configured later, these two fields need to be set
     portDefinition.format.video.nBitrate = settings->h264.bitrate;
     portDefinition.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
+    
     if ((error = OMX_SetParameter (OMXCAM_ctx.video_encode.handle,
         OMX_IndexParamPortDefinition, &portDefinition))){
       OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamPortDefinition: "
@@ -393,6 +396,12 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
         OMXCAM_dump_OMX_ERRORTYPE (error));
     running = 0;
     return OMXCAM_ErrorSetupTunnel;
+  }
+  
+  //Change to Idle
+  if (changeVideoState (OMX_StateIdle, useEncoder)){
+    running = 0;
+    return OMXCAM_ErrorIdle;
   }
   
   //Enable the ports
@@ -461,9 +470,8 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
   }
   
   //Save the thread id
-  mainThreadId = syscall (SYS_gettid);
+  mainThread = pthread_self ();
   
-  OMXCAM_trace ("Main thread id is %ld\n", mainThreadId);
   OMXCAM_trace ("Creating background thread\n");
   
   //Start the background thread
@@ -477,7 +485,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
   threadArg.errorCallback = settings->errorCallback;
   threadArg.fillComponent = fillComponent;
   
-  if (pthread_create (&thread, 0, capture, &threadArg)){
+  if (pthread_create (&bgThread, 0, capture, &threadArg)){
     OMXCAM_setError ("%s: pthread_create", __func__);
     running = 0;
     return OMXCAM_ErrorVideo;
@@ -492,7 +500,7 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
   //Don't return an error if an error occured inside the background thread
   //because the video was already deinitialized automatically, so this call to
   //stop() should be no-op
-  if (bgError) return OMXCAM_ErrorNone;
+  if (bgError) return OMXCAM_ErrorVideoThread;
 
   if (!running){
     OMXCAM_setError ("%s: Video capture is not running", __func__);
@@ -500,10 +508,10 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
   }
   
   //Check whether it's the main or background thread
-  long tid = syscall (SYS_gettid);
+  pthread_t thread = pthread_self ();
   
-  if (tid == mainThreadId){
-    OMXCAM_trace ("Current thread id is %ld (main)\n", tid);
+  if (pthread_equal (thread, mainThread)){
+    OMXCAM_trace ("Stopping from main thread\n");
     
     if (pthread_mutex_lock (&mutex)){
       OMXCAM_setError ("%s: pthread_mutex_lock", __func__);
@@ -517,13 +525,13 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
       return OMXCAM_ErrorVideo;
     }
     
-    if (pthread_join (thread, 0)){
+    if (pthread_join (bgThread, 0)){
       OMXCAM_setError ("%s: pthread_join", __func__);
       return OMXCAM_ErrorVideo;
     }
   }else{
     //Background
-    OMXCAM_trace ("Current thread id is %ld (background)\n", tid);
+    OMXCAM_trace ("Stopping from background thread\n");
     
     //If stop() is called from inside the background thread (from the
     //bufferCallback), there's no need to use mutexes and join(), just set

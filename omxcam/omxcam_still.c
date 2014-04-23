@@ -34,6 +34,7 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   OMX_COLOR_FORMATTYPE colorFormat;
   OMX_U32 stride;
   OMXCAM_COMPONENT* fillComponent;
+  OMX_ERRORTYPE error;
   
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
@@ -72,6 +73,30 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   }
   
   if (OMXCAM_loadCameraDrivers ()) return OMXCAM_ErrorInitCamera;
+  
+  //Configure camera sensor
+  OMXCAM_trace ("Configuring '%s' sensor\n", OMXCAM_ctx.camera.name);
+  
+  OMX_PARAM_SENSORMODETYPE sensor;
+  OMX_INIT_STRUCTURE (sensor);
+  sensor.nPortIndex = OMX_ALL;
+  OMX_INIT_STRUCTURE (sensor.sFrameSize);
+  sensor.sFrameSize.nPortIndex = OMX_ALL;
+  if ((error = OMX_GetParameter (OMXCAM_ctx.camera.handle,
+      OMX_IndexParamCommonSensorMode, &sensor))){
+    OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamCommonSensorMode: "
+        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    return OMXCAM_ErrorInitCamera;
+  }
+  sensor.bOneShot = OMX_TRUE;
+  //sensor.sFrameSize.nWidth and sensor.sFrameSize.nHeight can be ignored,
+  //they are configured with the port definition
+  if ((error = OMX_SetParameter (OMXCAM_ctx.camera.handle,
+      OMX_IndexParamCommonSensorMode, &sensor))){
+    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamCommonSensorMode: "
+        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    return OMXCAM_ErrorInitCamera;
+  }
 
   //Change to Idle
   if (changeStillState (OMX_StateIdle, useEncoder)){
@@ -80,8 +105,6 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   
   //Configure camera port definition
   OMXCAM_trace ("Configuring '%s' port definition\n", OMXCAM_ctx.camera.name);
-  
-  OMX_ERRORTYPE error;
   
   OMX_PARAM_PORTDEFINITIONTYPE def;
   OMX_INIT_STRUCTURE (def);
