@@ -2,6 +2,9 @@
 #define OMXCAM_VIDEO_H
 
 #include <pthread.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "omxcam_omx.h"
 #include "omxcam_errors.h"
@@ -22,5 +25,7 @@ extern OMXCAM_CONTEXT ctx;
 void OMXCAM_initVideoSettings (OMXCAM_VIDEO_SETTINGS* settings);
 OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings);
 OMXCAM_ERROR OMXCAM_stopVideo ();
+OMXCAM_ERROR OMXCAM_sleep (uint32_t ms);
+OMXCAM_ERROR OMXCAM_wake ();
 
 #endif

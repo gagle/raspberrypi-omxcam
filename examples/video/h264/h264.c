@@ -22,7 +22,10 @@ uint32_t bufferCallback (uint8_t* buffer, uint32_t length){
 }
 
 void errorCallback (OMXCAM_ERROR error){
-  printf ("Error: %s\n", OMXCAM_errorToHuman (error));
+  logError (error);
+  
+  //Cancel the sleep
+  if ((error = OMXCAM_wake ())) logError (error);
 }
 
 int save (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
@@ -38,8 +41,8 @@ int save (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
   
   if ((error = OMXCAM_startVideo (settings))) return logError (error);
   
-  //Wait 3 seconds
-  sleep (3);
+  //Wait 3000ms
+  if ((error = OMXCAM_sleep (3000))) return logError (error);
   
   if ((error = OMXCAM_stopVideo ())) return logError (error);
   

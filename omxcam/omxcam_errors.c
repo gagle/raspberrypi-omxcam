@@ -7,6 +7,7 @@ void OMXCAM_setError (const char* fmt, ...){
   va_start (args, fmt);
   vsprintf (lastError, fmt, args);
   va_end (args);
+  
   OMXCAM_trace ("ERROR: %s\n", lastError);
 }
 
@@ -58,6 +59,10 @@ const char* OMXCAM_errorToHuman (OMXCAM_ERROR error){
       return "OMXCAM_ErrorExecuting";
     case OMXCAM_ErrorFormat:
       return "OMXCAM_ErrorFormat";
+    case OMXCAM_ErrorSleep:
+      return "OMXCAM_ErrorSleep";
+    case OMXCAM_ErrorWake:
+      return "OMXCAM_ErrorWake";
     default:
       return "unknown";
   }

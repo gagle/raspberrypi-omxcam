@@ -28,7 +28,9 @@ typedef enum {
   OMXCAM_ErrorLoaded,
   OMXCAM_ErrorIdle,
   OMXCAM_ErrorExecuting,
-  OMXCAM_ErrorFormat
+  OMXCAM_ErrorFormat,
+  OMXCAM_ErrorSleep,
+  OMXCAM_ErrorWake
 } OMXCAM_ERROR;
 
 void OMXCAM_setError (const char* fmt, ...);

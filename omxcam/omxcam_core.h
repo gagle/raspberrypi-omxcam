@@ -67,7 +67,7 @@ OMX_ERRORTYPE FillBufferDone (
     OMX_IN OMX_PTR pAppData,
     OMX_IN OMX_BUFFERHEADERTYPE* pBuffer);
 
-void OMXCAM_wake (OMXCAM_COMPONENT* component, VCOS_UNSIGNED event);
+void OMXCAM_continue (OMXCAM_COMPONENT* component, VCOS_UNSIGNED event);
 int OMXCAM_wait (
     OMXCAM_COMPONENT* component,
     VCOS_UNSIGNED events,

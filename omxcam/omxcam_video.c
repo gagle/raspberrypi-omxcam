@@ -9,6 +9,7 @@ typedef struct {
 static int useEncoder;
 static int running = 0;
 static int safeRunning;
+static int sleeping = 0;
 static int bgError;
 static pthread_t mainThread;
 static pthread_t bgThread;
@@ -508,9 +509,7 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
   }
   
   //Check whether it's the main or background thread
-  pthread_t thread = pthread_self ();
-  
-  if (pthread_equal (thread, mainThread)){
+  if (pthread_equal (pthread_self (), mainThread)){
     OMXCAM_trace ("Stopping from main thread\n");
     
     if (pthread_mutex_lock (&mutex)){
@@ -543,4 +542,103 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
   }
   
   return deinit ();
+}
+
+static void signalHandler (int signal){
+  //No-op
+  OMXCAM_trace ("Received SIGALRM\n");
+}
+
+OMXCAM_ERROR OMXCAM_sleep (uint32_t ms){
+  OMXCAM_trace ("Sleeping for %d ms\n", ms);
+
+  //The function must be called when the video capture is running and from the
+  //main thread
+  if (!running){
+    OMXCAM_setError ("%s: Video capture is not running", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  if (pthread_equal (pthread_self (), bgThread)){
+    OMXCAM_setError ("%s: Cannot sleep from the background thread", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  
+  struct sigaction sa;
+  sa.sa_handler = &signalHandler;
+  sa.sa_flags = SA_RESETHAND;
+  
+  if (sigfillset (&sa.sa_mask)){
+    OMXCAM_setError ("%s: sigfillset", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  if (sigaction (SIGALRM, &sa, 0)){
+    OMXCAM_setError ("%s: sigaction", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  
+  sigset_t mask;
+  
+  if (sigprocmask (0, 0, &mask)){
+    OMXCAM_setError ("%s: sigprocmask", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  if (sigdelset (&mask, SIGALRM)){
+    OMXCAM_setError ("%s: sigdelset", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  
+  struct itimerval timer;
+  timer.it_value.tv_sec = (time_t)(ms/1000);
+  timer.it_value.tv_usec = (suseconds_t)((ms%1000)*1000);
+  timer.it_interval.tv_sec = (time_t)0;
+  timer.it_interval.tv_usec = (suseconds_t)0;
+  
+  if (setitimer (ITIMER_REAL, &timer, 0)){
+    OMXCAM_setError ("%s: setitimer", __func__);
+    return OMXCAM_ErrorSleep;
+  }
+  
+  sleeping = 1;
+  
+  sigsuspend (&mask);
+  
+  sleeping = 0;
+  
+  return OMXCAM_ErrorNone;
+}
+
+OMXCAM_ERROR OMXCAM_wake (){
+  OMXCAM_trace ("Waking up from sleep\n");
+  
+  //The function must be called when the video capture is running and from the
+  //background thread
+  if (!running && !bgError){
+    OMXCAM_setError ("%s: Video capture is not running", __func__);
+    return OMXCAM_ErrorWake;
+  }
+  if (pthread_equal (pthread_self (), mainThread)){
+    OMXCAM_setError ("%s: Cannot sleep from the background thread", __func__);
+    return OMXCAM_ErrorWake;
+  }
+  if (!sleeping){
+    OMXCAM_setError ("%s: The main thread is not sleeping", __func__);
+    return OMXCAM_ErrorWake;
+  }
+  
+  //Cancel the timer
+  struct itimerval timer;
+  timer.it_value.tv_sec = 0;
+  timer.it_value.tv_usec = 0;
+  
+  if (setitimer (ITIMER_REAL, &timer, 0)){
+    OMXCAM_setError ("%s: setitimer", __func__);
+    return OMXCAM_ErrorWake;
+  }
+  
+  if (pthread_kill (mainThread, SIGALRM)){
+    OMXCAM_setError ("%s: pthread_kill", __func__);
+    return OMXCAM_ErrorWake;
+  }
+
+  return OMXCAM_ErrorNone;
 }
