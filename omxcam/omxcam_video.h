@@ -27,5 +27,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings);
 OMXCAM_ERROR OMXCAM_stopVideo ();
 OMXCAM_ERROR OMXCAM_sleep (uint32_t ms);
 OMXCAM_ERROR OMXCAM_wake ();
+OMXCAM_ERROR OMXCAM_lock ();
+OMXCAM_ERROR OMXCAM_unlock ();
 
 #endif

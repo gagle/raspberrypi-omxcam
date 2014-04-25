@@ -63,6 +63,10 @@ const char* OMXCAM_errorToHuman (OMXCAM_ERROR error){
       return "OMXCAM_ErrorSleep";
     case OMXCAM_ErrorWake:
       return "OMXCAM_ErrorWake";
+    case OMXCAM_ErrorLock:
+      return "OMXCAM_ErrorLock";
+    case OMXCAM_ErrorUnlock:
+      return "OMXCAM_ErrorUnlock";
     default:
       return "unknown";
   }

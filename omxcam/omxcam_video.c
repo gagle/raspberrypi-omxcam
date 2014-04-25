@@ -10,10 +10,13 @@ static int useEncoder;
 static int running = 0;
 static int safeRunning;
 static int sleeping = 0;
+static int locked = 0;
 static int bgError;
 static pthread_t mainThread;
 static pthread_t bgThread;
-static pthread_mutex_t mutex;
+static pthread_mutex_t runningMutex;
+static pthread_mutex_t lockMutex;
+static pthread_cond_t lockCondition;
 static OMXCAM_THREAD_ARG threadArg;
 
 int changeVideoState (OMX_STATETYPE state, int useEncoder){
@@ -51,7 +54,7 @@ int changeVideoState (OMX_STATETYPE state, int useEncoder){
 static OMXCAM_ERROR deinit (){
   OMXCAM_trace ("deinitializing video\n");
 
-  if (pthread_mutex_destroy (&mutex)){
+  if (pthread_mutex_destroy (&runningMutex)){
     OMXCAM_setError ("%s: pthread_mutex_init", __func__);
     return OMXCAM_ErrorVideo;
   }
@@ -138,7 +141,7 @@ void* capture (void* threadArg){
   safeRunning = 1;
   
   while (safeRunning){
-    if (pthread_mutex_lock (&mutex)){
+    if (pthread_mutex_lock (&runningMutex)){
       OMXCAM_setError ("%s: pthread_mutex_lock", __func__);
       running = 0;
       bgError = 1;
@@ -151,7 +154,7 @@ void* capture (void* threadArg){
     
     stop = !running;
     
-    if (pthread_mutex_unlock (&mutex)){
+    if (pthread_mutex_unlock (&runningMutex)){
       OMXCAM_setError ("%s: pthread_mutex_unlock", __func__);
       running = 0;
       bgError = 1;
@@ -476,7 +479,7 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings){
   OMXCAM_trace ("Creating background thread\n");
   
   //Start the background thread
-  if (pthread_mutex_init (&mutex, 0)){
+  if (pthread_mutex_init (&runningMutex, 0)){
     OMXCAM_setError ("%s: pthread_mutex_init", __func__);
     running = 0;
     return OMXCAM_ErrorVideo;
@@ -512,14 +515,14 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
   if (pthread_equal (pthread_self (), mainThread)){
     OMXCAM_trace ("Stopping from main thread\n");
     
-    if (pthread_mutex_lock (&mutex)){
+    if (pthread_mutex_lock (&runningMutex)){
       OMXCAM_setError ("%s: pthread_mutex_lock", __func__);
       return OMXCAM_ErrorVideo;
     }
     
     running = 0;
     
-    if (pthread_mutex_unlock (&mutex)){
+    if (pthread_mutex_unlock (&runningMutex)){
       OMXCAM_setError ("%s: pthread_mutex_unlock", __func__);
       return OMXCAM_ErrorVideo;
     }
@@ -604,6 +607,8 @@ OMXCAM_ERROR OMXCAM_sleep (uint32_t ms){
   
   sleeping = 0;
   
+  OMXCAM_trace ("Main thread woken up\n");
+  
   return OMXCAM_ErrorNone;
 }
 
@@ -617,7 +622,7 @@ OMXCAM_ERROR OMXCAM_wake (){
     return OMXCAM_ErrorWake;
   }
   if (pthread_equal (pthread_self (), mainThread)){
-    OMXCAM_setError ("%s: Cannot sleep from the background thread", __func__);
+    OMXCAM_setError ("%s: Cannot wake up from the main thread", __func__);
     return OMXCAM_ErrorWake;
   }
   if (!sleeping){
@@ -640,5 +645,104 @@ OMXCAM_ERROR OMXCAM_wake (){
     return OMXCAM_ErrorWake;
   }
 
+  return OMXCAM_ErrorNone;
+}
+
+OMXCAM_ERROR OMXCAM_lock (){
+  OMXCAM_trace ("Locking main thread\n");
+
+  //The function must be called when the video capture is running and from the
+  //main thread
+  if (!running){
+    OMXCAM_setError ("%s: Video capture is not running", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  if (pthread_equal (pthread_self (), bgThread)){
+    OMXCAM_setError ("%s: Cannot lock from the background thread", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  if (pthread_mutex_init (&lockMutex, 0)){
+    OMXCAM_setError ("%s: pthread_mutex_init", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  if (pthread_cond_init (&lockCondition, 0)){
+    OMXCAM_setError ("%s: pthread_cond_init", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  //Lock the mutex and wait to be signaled by the background thread
+  
+  if (pthread_mutex_lock (&lockMutex)){
+    OMXCAM_setError ("%s: pthread_mutex_lock", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  locked = 1;
+  
+  if (pthread_cond_wait (&lockCondition, &lockMutex)){
+    OMXCAM_setError ("%s: pthread_cond_wait", __func__);
+    locked = 0;
+    return OMXCAM_ErrorLock;
+  }
+  
+  locked = 0;
+  
+  if (pthread_mutex_unlock (&lockMutex)){
+    OMXCAM_setError ("%s: pthread_mutex_unlock", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  if (pthread_mutex_destroy (&lockMutex)){
+    OMXCAM_setError ("%s: pthread_mutex_init", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  if (pthread_cond_destroy (&lockCondition)){
+    OMXCAM_setError ("%s: pthread_cond_destroy", __func__);
+    return OMXCAM_ErrorLock;
+  }
+  
+  OMXCAM_trace ("Main thread unlocked\n");
+  
+  return OMXCAM_ErrorNone;
+}
+
+OMXCAM_ERROR OMXCAM_unlock (){
+  OMXCAM_trace ("Unlocking main thread\n");
+  
+  //The function must be called when the video capture is running and from the
+  //background thread
+  if (!running && !bgError){
+    OMXCAM_setError ("%s: Video capture is not running", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  if (pthread_equal (pthread_self (), mainThread)){
+    OMXCAM_setError ("%s: Cannot ulock from the main thread", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  if (!locked){
+    OMXCAM_setError ("%s: The main thread is not locked", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  
+  //Signal the unlock
+  
+  if (pthread_mutex_lock (&lockMutex)){
+    OMXCAM_setError ("%s: pthread_mutex_lock", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  
+  if (pthread_cond_signal (&lockCondition)){
+    OMXCAM_setError ("%s: pthread_cond_signal", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  
+  if (pthread_mutex_unlock (&lockMutex)){
+    OMXCAM_setError ("%s: pthread_mutex_unlock", __func__);
+    return OMXCAM_ErrorUnlock;
+  }
+  
   return OMXCAM_ErrorNone;
 }
