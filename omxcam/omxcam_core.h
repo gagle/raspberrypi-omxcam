@@ -31,6 +31,7 @@ typedef enum {
 
 typedef enum {
   OMXCAM_FormatRGB888,
+  OMXCAM_FormatRGBA8888,
   OMXCAM_FormatYUV420,
   OMXCAM_FormatJPEG,
   OMXCAM_FormatH264
@@ -41,7 +42,7 @@ typedef struct {
   OMX_HANDLETYPE handle;
   VCOS_EVENT_FLAGS_T flags;
   OMX_STRING name;
-  uint32_t (*bufferCallback)(uint8_t* buffer, uint32_t length);
+  void (*bufferCallback)(uint8_t* buffer, uint32_t length);
 } OMXCAM_COMPONENT;
 
 //Application's context

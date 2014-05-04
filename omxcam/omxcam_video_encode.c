@@ -6,7 +6,7 @@ void OMXCAM_initH264Settings (OMXCAM_H264_SETTINGS* settings){
 }
 
 int OMXCAM_setH264Settings (OMXCAM_H264_SETTINGS* settings){
-  OMXCAM_trace ("Configuring '%s' settings\n", OMXCAM_ctx.video_encode.name);
+  OMXCAM_trace ("Configuring '%s' settings", OMXCAM_ctx.video_encode.name);
   
   OMX_ERRORTYPE error;
   
@@ -18,8 +18,8 @@ int OMXCAM_setH264Settings (OMXCAM_H264_SETTINGS* settings){
   bitrate.nPortIndex = 201;
   if ((error = OMX_SetParameter (OMXCAM_ctx.video_encode.handle,
       OMX_IndexParamVideoBitrate, &bitrate))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamVideoBitrate: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamVideoBitrate: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -31,8 +31,8 @@ int OMXCAM_setH264Settings (OMXCAM_H264_SETTINGS* settings){
   format.eCompressionFormat = OMX_VIDEO_CodingAVC;
   if ((error = OMX_SetParameter (OMXCAM_ctx.video_encode.handle,
       OMX_IndexParamVideoPortFormat, &format))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamVideoPortFormat: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamVideoPortFormat: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -42,15 +42,15 @@ int OMXCAM_setH264Settings (OMXCAM_H264_SETTINGS* settings){
   idr.nPortIndex = 201;
   if ((error = OMX_GetConfig (OMXCAM_ctx.video_encode.handle,
       OMX_IndexConfigVideoAVCIntraPeriod, &idr))){
-    OMXCAM_setError ("%s: OMX_GetConfig - OMX_IndexConfigVideoAVCIntraPeriod: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_GetConfig - OMX_IndexConfigVideoAVCIntraPeriod: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   idr.nIDRPeriod = settings->idrPeriod;
   if ((error = OMX_SetConfig (OMXCAM_ctx.video_encode.handle,
       OMX_IndexConfigVideoAVCIntraPeriod, &idr))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigVideoAVCIntraPeriod: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigVideoAVCIntraPeriod: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   

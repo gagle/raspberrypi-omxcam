@@ -38,8 +38,8 @@ int OMXCAM_addTag (char* key, char* value){
   
   if ((error = OMX_SetConfig (OMXCAM_ctx.image_encode.handle,
       OMX_IndexConfigMetadataItem, &item))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigMetadataItem: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigMetadataItem: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -47,7 +47,7 @@ int OMXCAM_addTag (char* key, char* value){
 }
 
 int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
-  OMXCAM_trace ("Configuring '%s' settings\n", OMXCAM_ctx.image_encode.name);
+  OMXCAM_trace ("Configuring '%s' settings", OMXCAM_ctx.image_encode.name);
 
   OMX_ERRORTYPE error;
   
@@ -58,8 +58,8 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
   quality.nQFactor = settings->quality;
   if ((error = OMX_SetParameter (OMXCAM_ctx.image_encode.handle,
       OMX_IndexParamQFactor, &quality))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamQFactor: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamQFactor: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -69,8 +69,8 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
   exif.bEnabled = settings->exifEnable ? OMXCAM_FALSE : OMXCAM_TRUE;
   if ((error = OMX_SetParameter (OMXCAM_ctx.image_encode.handle,
       OMX_IndexParamBrcmDisableEXIF, &exif))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamBrcmDisableEXIF: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamBrcmDisableEXIF: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -87,8 +87,7 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
     memcpy (raw.uri.contentURI, dummy, 5);
     if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
         OMX_IndexConfigCaptureRawImageURI, &raw))){
-      OMXCAM_setError ("%s: OMX_SetConfig - "
-          "OMX_IndexConfigCaptureRawImageURI: %s", __func__, 
+      OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCaptureRawImageURI: %s",
           OMXCAM_dump_OMX_ERRORTYPE (error));
       return -1;
     }
@@ -101,9 +100,8 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
   ijg.bEnabled = settings->ijg;
   if ((error = OMX_SetParameter (OMXCAM_ctx.image_encode.handle,
       OMX_IndexParamBrcmEnableIJGTableScaling, &ijg))){
-    OMXCAM_setError ("%s: OMX_SetParameter - "
-        "OMX_IndexParamBrcmEnableIJGTableScaling: %s", __func__, 
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamBrcmEnableIJGTableScaling: "
+        "%s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -140,8 +138,8 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
   thumbnail.nHeight = settings->thumbnailHeight;
   if ((error = OMX_SetParameter (OMXCAM_ctx.image_encode.handle,
       OMX_IndexParamBrcmThumbnail, &thumbnail))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamBrcmThumbnail: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamBrcmThumbnail: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
 

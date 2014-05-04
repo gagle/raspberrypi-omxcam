@@ -7,6 +7,8 @@
 #include "omxcam_omx.h"
 #include "omxcam_debug.h"
 
+#define OMXCAM_error(message,...) OMXCAM_setError(message,__func__,__FILE__,__LINE__,##__VA_ARGS__)
+
 typedef enum {
   OMXCAM_ErrorNone,
   OMXCAM_ErrorInit,
@@ -22,7 +24,7 @@ typedef enum {
   OMXCAM_ErrorCameraSettings,
   OMXCAM_ErrorStill,
   OMXCAM_ErrorVideo,
-  OMXCAM_ErrorVideoThread,
+  OMXCAM_ErrorVideoCapture,
   OMXCAM_ErrorBadParameter,
   OMXCAM_ErrorSetupTunnel,
   OMXCAM_ErrorLoaded,
@@ -35,7 +37,12 @@ typedef enum {
   OMXCAM_ErrorUnlock
 } OMXCAM_ERROR;
 
-void OMXCAM_setError (const char* fmt, ...);
+void OMXCAM_setError (
+    const char* fmt,
+    const char* fn,
+    const char* file,
+    int line,
+    ...);
 char* OMXCAM_lastError ();
 const char* OMXCAM_errorToHuman (OMXCAM_ERROR error);
 const char* OMXCAM_dump_OMX_ERRORTYPE (OMX_ERRORTYPE error);

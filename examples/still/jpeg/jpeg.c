@@ -11,14 +11,13 @@ int logError (OMXCAM_ERROR error){
 
 int fd;
 
-uint32_t bufferCallback (uint8_t* buffer, uint32_t length){
+void bufferCallback (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   if (pwrite (fd, buffer, length, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return -1;
+    //OMXCAM_ERROR error;
+    //if ((error = OMXCAM_cancelStill ())) logError (error);
   }
-  
-  return 0;
 }
 
 int save (char* filename, OMXCAM_STILL_SETTINGS* settings){
@@ -52,7 +51,7 @@ int main (){
   
   OMXCAM_STILL_SETTINGS still;
   
-  //Capture an image with the default settings
+  //Capture an image with default settings
   OMXCAM_initStillSettings (&still);
   still.bufferCallback = bufferCallback;
   
@@ -62,7 +61,7 @@ int main (){
   OMXCAM_initStillSettings (&still);
   still.bufferCallback = bufferCallback;
   still.camera.shutterSpeedAuto = OMXCAM_FALSE;
-  //Shutter speed in milliseconds
+  //Shutter speed in milliseconds (1/8 by default: 125)
   still.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
   still.camera.exposureCompensation = -10;
   

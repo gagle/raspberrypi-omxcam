@@ -11,8 +11,7 @@ OMXCAM_ERROR OMXCAM_init (){
   OMX_ERRORTYPE error;
   
   if ((error = OMX_Init ())){
-    OMXCAM_setError ("%s: OMX_Init: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_Init: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorInit;
   }
   
@@ -23,8 +22,7 @@ OMXCAM_ERROR OMXCAM_deinit (){
   OMX_ERRORTYPE error;
   
   if ((error = OMX_Deinit ())){
-    OMXCAM_setError ("%s: OMX_Deinit: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_Deinit: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorDeinit;
   }
 

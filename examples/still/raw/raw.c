@@ -10,33 +10,30 @@ int logError (OMXCAM_ERROR error){
 }
 
 int fd;
+
 OMXCAM_YUV_PLANES yuvPlanes;
 OMXCAM_YUV_PLANES yuvPlanesSlice;
 uint8_t* yBuffer;
 uint8_t* uBuffer;
 uint8_t* vBuffer;
 
-uint32_t bufferCallbackRGB (uint8_t* buffer, uint32_t length){
+void bufferCallbackRGB (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   if (pwrite (fd, buffer, length, 0) == -1){
     printf ("ERROR: pwrite\n");
-    return 1;
+    //OMXCAM_ERROR error;
+    //if ((error = OMXCAM_cancelStill ())) logError (error);
   }
-  
-  return 0;
 }
 
-uint32_t bufferCallbackYUV (uint8_t* buffer, uint32_t length){
-  //Append the data to the yuv buffers
-  
+void bufferCallbackYUV (uint8_t* buffer, uint32_t length){
+  //Append the data to the buffers
   memcpy (yBuffer, buffer + yuvPlanesSlice.yOffset, yuvPlanesSlice.yLength);
   yBuffer += yuvPlanesSlice.yLength;
   memcpy (uBuffer, buffer + yuvPlanesSlice.uOffset, yuvPlanesSlice.uLength);
   uBuffer += yuvPlanesSlice.uLength;
   memcpy (vBuffer, buffer + yuvPlanesSlice.vOffset, yuvPlanesSlice.vLength);
   vBuffer += yuvPlanesSlice.vLength;
-  
-  return 0;
 }
 
 int saveRGB (char* filename, OMXCAM_STILL_SETTINGS* settings){
@@ -62,70 +59,6 @@ int saveRGB (char* filename, OMXCAM_STILL_SETTINGS* settings){
 }
 
 int saveYUV (char* filename, OMXCAM_STILL_SETTINGS* settings){
-  printf ("capturing %s\n", filename);
-
-  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
-  if (fd == -1){
-    printf ("ERROR: open\n");
-    return 1;
-  }
-  
-  OMXCAM_ERROR error;
-  
-  if ((error = OMXCAM_still (settings))) return logError (error);
-  
-  //Fix the pointers to their initial address
-  yBuffer -= yuvPlanes.yLength;
-  uBuffer -= yuvPlanes.uLength;
-  vBuffer -= yuvPlanes.vLength;
-  
-  //Store the YUV planes
-  
-  if (pwrite (fd, yBuffer, yuvPlanes.yLength, 0) == -1){
-    printf ("ERROR: pwrite\n");
-    return 1;
-  }
-  if (pwrite (fd, uBuffer, yuvPlanes.uLength, 0) == -1){
-    printf ("ERROR: pwrite\n");
-    return 1;
-  }
-  if (pwrite (fd, vBuffer, yuvPlanes.vLength, 0) == -1){
-    printf ("ERROR: pwrite\n");
-    return 1;
-  }
-  
-  //Close the file
-  if (close (fd)){
-    printf ("ERROR: close\n");
-    return 1;
-  }
-  
-  return 0;
-}
-
-int main (){
-  OMXCAM_ERROR error;
-  
-  //Initialize the library
-  printf ("initializing\n");
-  if ((error = OMXCAM_init ())) return logError (error);
-  
-  OMXCAM_STILL_SETTINGS still;
-  
-  //Capture a raw RGB image
-  OMXCAM_initStillSettings (&still);
-  still.bufferCallback = bufferCallbackRGB;
-  still.camera.shutterSpeedAuto = OMXCAM_FALSE;
-  still.format = OMXCAM_FormatRGB888;
-  
-  if (saveRGB ("still.rgb", &still)) return 1;
-  
-  //Capture a raw YUV420 image
-  OMXCAM_initStillSettings (&still);
-  still.bufferCallback = bufferCallbackYUV;
-  still.camera.shutterSpeedAuto = OMXCAM_FALSE;
-  still.format = OMXCAM_FormatYUV420;
-  
   /*
   The camera returns YUV420PackedPlanar buffers/slices
   Packed means that each slice has y + u + v planes
@@ -152,9 +85,16 @@ int main (){
     "bufferCallback" function.
   */
   
-  //The width and the height can be modified because they must be divisible by
+  printf ("capturing %s\n", filename);
+  
+  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
+  if (fd == -1){
+    printf ("ERROR: open\n");
+    return 1;
+  }
+  
+  //The width and the height might be modified because they must be divisible by
   //16. For example, 1944 is not divisible by 16, it is incremented to 1952
-  //2592x1944 are the default values
   yuvPlanes.width = yuvPlanesSlice.width = 2592;
   yuvPlanes.height = yuvPlanesSlice.height = 1944;
   OMXCAM_getYUVPlanes (&yuvPlanes);
@@ -165,11 +105,69 @@ int main (){
   uBuffer = (uint8_t*)malloc (sizeof (uint8_t)*yuvPlanes.uLength);
   vBuffer = (uint8_t*)malloc (sizeof (uint8_t)*yuvPlanes.vLength);
   
-  if (saveYUV ("still.yuv", &still)) return 1;
+  OMXCAM_ERROR error;
+  
+  if ((error = OMXCAM_still (settings))) return logError (error);
+  
+  //Reset the pointers to their initial address
+  yBuffer -= yuvPlanes.yLength;
+  uBuffer -= yuvPlanes.uLength;
+  vBuffer -= yuvPlanes.vLength;
+  
+  //Store the YUV planes
+  
+  if (pwrite (fd, yBuffer, yuvPlanes.yLength, 0) == -1){
+    printf ("ERROR: pwrite\n");
+    return 1;
+  }
+  if (pwrite (fd, uBuffer, yuvPlanes.uLength, 0) == -1){
+    printf ("ERROR: pwrite\n");
+    return 1;
+  }
+  if (pwrite (fd, vBuffer, yuvPlanes.vLength, 0) == -1){
+    printf ("ERROR: pwrite\n");
+    return 1;
+  }
   
   free (yBuffer);
   free (uBuffer);
   free (vBuffer);
+  
+  //Close the file
+  if (close (fd)){
+    printf ("ERROR: close\n");
+    return 1;
+  }
+  
+  return 0;
+}
+
+int main (){
+  OMXCAM_ERROR error;
+  
+  //Initialize the library
+  printf ("initializing\n");
+  if ((error = OMXCAM_init ())) return logError (error);
+  
+  OMXCAM_STILL_SETTINGS still;
+  
+  //2592x1944 by default
+  
+  //Capture a raw RGB image
+  OMXCAM_initStillSettings (&still);
+  still.bufferCallback = bufferCallbackRGB;
+  still.camera.shutterSpeedAuto = OMXCAM_FALSE;
+  //Shutter speed in milliseconds (1/8 by default: 125)
+  still.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
+  still.format = OMXCAM_FormatRGB888;
+  
+  if (saveRGB ("still.rgb", &still)) return 1;
+  
+  //Capture a raw YUV420 image
+  still.bufferCallback = bufferCallbackYUV;
+  still.format = OMXCAM_FormatYUV420;
+  
+  if (saveYUV ("still.yuv", &still)) return 1;
   
   //Deinitialize the library
   printf ("deinitializing\n");

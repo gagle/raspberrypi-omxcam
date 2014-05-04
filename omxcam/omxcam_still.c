@@ -28,7 +28,12 @@ void OMXCAM_initStillSettings (OMXCAM_STILL_SETTINGS* settings){
 }
 
 OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
-  OMXCAM_trace ("Capturing still\n");
+  OMXCAM_trace ("Capturing still");
+  
+  if (!settings->bufferCallback){
+    OMXCAM_error ("The 'bufferCallback' field must be defined");
+    return OMXCAM_ErrorBadParameter;
+  }
   
   int useEncoder;
   OMX_COLOR_FORMATTYPE colorFormat;
@@ -42,21 +47,28 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   switch (settings->format){
     case OMXCAM_FormatRGB888:
       OMXCAM_ctx.camera.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_FALSE;
+      useEncoder = 0;
       colorFormat = OMX_COLOR_Format24bitRGB888;
       stride = settings->camera.width*3;
       fillComponent = &OMXCAM_ctx.camera;
       break;
+    case OMXCAM_FormatRGBA8888:
+      OMXCAM_ctx.camera.bufferCallback = settings->bufferCallback;
+      useEncoder = 0;
+      colorFormat = OMX_COLOR_Format32bitABGR8888;
+      stride = settings->camera.width*4;
+      fillComponent = &OMXCAM_ctx.camera;
+      break;
     case OMXCAM_FormatYUV420:
       OMXCAM_ctx.camera.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_FALSE;
+      useEncoder = 0;
       colorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
       stride = settings->camera.width;
       fillComponent = &OMXCAM_ctx.camera;
       break;
     case OMXCAM_FormatJPEG:
       OMXCAM_ctx.image_encode.bufferCallback = settings->bufferCallback;
-      useEncoder = OMXCAM_TRUE;
+      useEncoder = 1;
       colorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
       stride = settings->camera.width;
       fillComponent = &OMXCAM_ctx.image_encode;
@@ -75,7 +87,7 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   if (OMXCAM_loadCameraDrivers ()) return OMXCAM_ErrorInitCamera;
   
   //Configure camera sensor
-  OMXCAM_trace ("Configuring '%s' sensor\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Configuring '%s' sensor", OMXCAM_ctx.camera.name);
   
   OMX_PARAM_SENSORMODETYPE sensor;
   OMX_INIT_STRUCTURE (sensor);
@@ -84,8 +96,8 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   sensor.sFrameSize.nPortIndex = OMX_ALL;
   if ((error = OMX_GetParameter (OMXCAM_ctx.camera.handle,
       OMX_IndexParamCommonSensorMode, &sensor))){
-    OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamCommonSensorMode: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_GetParameter - OMX_IndexParamCommonSensorMode: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorInitCamera;
   }
   sensor.bOneShot = OMX_TRUE;
@@ -93,8 +105,8 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   //they are configured with the port definition
   if ((error = OMX_SetParameter (OMXCAM_ctx.camera.handle,
       OMX_IndexParamCommonSensorMode, &sensor))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamCommonSensorMode: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamCommonSensorMode: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorInitCamera;
   }
 
@@ -104,15 +116,15 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   }
   
   //Configure camera port definition
-  OMXCAM_trace ("Configuring '%s' port definition\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Configuring '%s' port definition", OMXCAM_ctx.camera.name);
   
   OMX_PARAM_PORTDEFINITIONTYPE def;
   OMX_INIT_STRUCTURE (def);
   def.nPortIndex = 72;
   if ((error = OMX_GetParameter (OMXCAM_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &def))){
-    OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorStill;
   }
   
@@ -125,8 +137,8 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   def.format.image.nStride = stride;
   if ((error = OMX_SetParameter (OMXCAM_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &def))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return OMXCAM_ErrorBadParameter;
   }
   
@@ -136,15 +148,15 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
   }
   
   if (useEncoder){
-    OMXCAM_trace ("Configuring '%s' port definition\n",
+    OMXCAM_trace ("Configuring '%s' port definition",
         OMXCAM_ctx.image_encode.name);
     
     OMX_INIT_STRUCTURE (def);
     def.nPortIndex = 341;
     if ((error = OMX_GetParameter (OMXCAM_ctx.image_encode.handle,
         OMX_IndexParamPortDefinition, &def))){
-      OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamPortDefinition: "
-          "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+      OMXCAM_error ("OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
+          OMXCAM_dump_OMX_ERRORTYPE (error));
       return OMXCAM_ErrorStill;
     }
     def.format.image.nFrameWidth = settings->camera.width;
@@ -153,8 +165,8 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     def.format.image.eColorFormat = OMX_COLOR_FormatUnused;
     if ((error = OMX_SetParameter (OMXCAM_ctx.image_encode.handle,
         OMX_IndexParamPortDefinition, &def))){
-      OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamPortDefinition: "
-          "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+      OMXCAM_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
+          OMXCAM_dump_OMX_ERRORTYPE (error));
       return OMXCAM_ErrorBadParameter;
     }
     
@@ -164,13 +176,12 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     }
     
     //Setup tunnel: camera (still) -> image_encode
-    OMXCAM_trace ("Configuring tunnel '%s' -> '%s'\n", OMXCAM_ctx.camera.name,
+    OMXCAM_trace ("Configuring tunnel '%s' -> '%s'", OMXCAM_ctx.camera.name,
         OMXCAM_ctx.image_encode.name);
     
     if ((error = OMX_SetupTunnel (OMXCAM_ctx.camera.handle, 72,
         OMXCAM_ctx.image_encode.handle, 340))){
-      OMXCAM_setError ("%s: OMX_SetupTunnel: %s", __func__,
-          OMXCAM_dump_OMX_ERRORTYPE (error));
+      OMXCAM_error ("OMX_SetupTunnel: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
       return OMXCAM_ErrorSetupTunnel;
     }
   }
@@ -222,7 +233,7 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     //Get the buffer data (a slice of the image)
     if ((error = OMX_FillThisBuffer (fillComponent->handle,
         OMXCAM_ctx.outputBuffer))){
-      OMXCAM_setError ("%s: OMX_FillThisBuffer: %s", __func__,
+      OMXCAM_error ("OMX_FillThisBuffer: %s",
           OMXCAM_dump_OMX_ERRORTYPE (error));
       return OMXCAM_ErrorStill;
     }
@@ -234,11 +245,9 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     }
     
     //Emit the buffer
-    if (settings->bufferCallback &&
-        OMXCAM_ctx.outputBuffer->nFilledLen &&
-        settings->bufferCallback (OMXCAM_ctx.outputBuffer->pBuffer,
-        OMXCAM_ctx.outputBuffer->nFilledLen)){
-      return OMXCAM_ErrorStill;
+    if (OMXCAM_ctx.outputBuffer->nFilledLen){
+      settings->bufferCallback (OMXCAM_ctx.outputBuffer->pBuffer,
+          OMXCAM_ctx.outputBuffer->nFilledLen);
     }
     
     //When it's the end of the stream, an OMX_EventBufferFlag is emitted in all

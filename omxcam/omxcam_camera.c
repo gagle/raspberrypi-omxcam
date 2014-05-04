@@ -13,7 +13,7 @@ int OMXCAM_loadCameraDrivers (){
   The red LED of the camera will be turned on after this call.
   */
   
-  OMXCAM_trace ("Loading '%s' drivers\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Loading '%s' drivers", OMXCAM_ctx.camera.name);
   
   OMX_ERRORTYPE error;
 
@@ -24,8 +24,8 @@ int OMXCAM_loadCameraDrivers (){
   cbs.bEnable = OMX_TRUE;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigRequestCallback, &cbs))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigRequestCallback: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigRequestCallback: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -36,8 +36,8 @@ int OMXCAM_loadCameraDrivers (){
   device.nU32 = 0;
   if ((error = OMX_SetParameter (OMXCAM_ctx.camera.handle,
       OMX_IndexParamCameraDeviceNumber, &device))){
-    OMXCAM_setError ("%s: OMX_SetParameter - OMX_IndexParamCameraDeviceNumber: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetParameter - OMX_IndexParamCameraDeviceNumber: "
+        "%s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -53,7 +53,7 @@ int OMXCAM_loadCameraDrivers (){
 int OMXCAM_setCapturePort (OMX_U32 port){
   //The camera needs to know which output port is going to be used to consume
   //the data. Still: 72, Video: 71
-  OMXCAM_trace ("Setting '%s' capture port\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Setting '%s' capture port", OMXCAM_ctx.camera.name);
   
   OMX_ERRORTYPE error;
   
@@ -63,8 +63,8 @@ int OMXCAM_setCapturePort (OMX_U32 port){
   cameraCapturePort.bEnabled = OMX_TRUE;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigPortCapturing, &cameraCapturePort))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigPortCapturing: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigPortCapturing: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -72,7 +72,7 @@ int OMXCAM_setCapturePort (OMX_U32 port){
 }
 
 int OMXCAM_resetCapturePort (OMX_U32 port){
-  OMXCAM_trace ("Resetting '%s' capture port\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Resetting '%s' capture port", OMXCAM_ctx.camera.name);
   
   OMX_ERRORTYPE error;
   
@@ -82,8 +82,8 @@ int OMXCAM_resetCapturePort (OMX_U32 port){
   cameraCapturePort.bEnabled = OMX_FALSE;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigPortCapturing, &cameraCapturePort))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigPortCapturing: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigPortCapturing: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -123,7 +123,7 @@ void OMXCAM_initCameraSettings (
 }
 
 int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
-  OMXCAM_trace ("Configuring '%s' settings\n", OMXCAM_ctx.camera.name);
+  OMXCAM_trace ("Configuring '%s' settings", OMXCAM_ctx.camera.name);
 
   OMX_ERRORTYPE error;
   
@@ -134,8 +134,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   sharpness.nSharpness = settings->sharpness;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonSharpness, &sharpness))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonSharpness: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonSharpness: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -146,8 +146,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   contrast.nContrast = settings->contrast;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonContrast, &contrast))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonContrast: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonContrast: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -158,8 +158,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   saturation.nSaturation = settings->saturation;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonSaturation, &saturation))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonSaturation: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonSaturation: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -170,8 +170,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   brightness.nBrightness = settings->brightness;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonBrightness, &brightness))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonBrightness: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonBrightness: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -188,8 +188,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   exposureValue.bAutoSensitivity = settings->isoAuto;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonExposureValue, &exposureValue))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonExposureValue: "
-        "%s", __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonExposureValue: "
+        "%s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -200,8 +200,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   exposureControl.eExposureControl = settings->exposure;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonExposure, &exposureControl))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonExposure: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonExposure: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -212,8 +212,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   frameStabilisation.bStab = settings->frameStabilisation;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonFrameStabilisation, &frameStabilisation))){
-    OMXCAM_setError ("%s: OMX_SetConfig - "
-        "OMX_IndexConfigCommonFrameStabilisation: %s", __func__, 
+    OMXCAM_error ("OMX_SetConfig - "
+        "OMX_IndexConfigCommonFrameStabilisation: %s",
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -225,8 +225,7 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   whiteBalance.eWhiteBalControl = settings->whiteBalance;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonWhiteBalance, &whiteBalance))){
-    OMXCAM_setError ("%s: OMX_SetConfig - "
-        "OMX_IndexConfigCommonWhiteBalance: %s", __func__, 
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonWhiteBalance: %s",
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -239,8 +238,7 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
     whiteBalanceGains.xGainB = (OMX_U32)(settings->whiteBalanceBlueGain*65536);
     if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
         OMX_IndexConfigCustomAwbGains, &whiteBalanceGains))){
-      OMXCAM_setError ("%s: OMX_SetConfig - "
-          "OMX_IndexConfigCustomAwbGains: %s", __func__, 
+      OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCustomAwbGains: %s",
           OMXCAM_dump_OMX_ERRORTYPE (error));
       return -1;
     }
@@ -253,8 +251,7 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   imageFilter.eImageFilter = settings->imageFilter;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonImageFilter, &imageFilter))){
-    OMXCAM_setError ("%s: OMX_SetConfig - "
-        "OMX_IndexConfigCommonImageFilter: %s", __func__, 
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonImageFilter: %s",
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -266,8 +263,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   mirror.eMirror = settings->mirror;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonMirror, &mirror))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonMirror: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonMirror: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -278,8 +275,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   rotation.nRotation = settings->rotation;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonRotate, &rotation))){
-    OMXCAM_setError ("%s: OMX_SetConfig - OMX_IndexConfigCommonRotate: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SetConfig - OMX_IndexConfigCommonRotate: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -292,8 +289,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   colorEnhancement.nCustomizedV = settings->colorV;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigCommonColorEnhancement, &colorEnhancement))){
-    OMXCAM_setError ("%s: OMX_SetConfig - "
-        "OMX_IndexConfigCommonColorEnhancement: %s", __func__, 
+    OMXCAM_error ("OMX_SetConfig - "
+        "OMX_IndexConfigCommonColorEnhancement: %s",
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -304,8 +301,8 @@ int OMXCAM_setCameraSettings (OMXCAM_CAMERA_SETTINGS* settings){
   denoise.bEnabled = settings->noiseReduction;
   if ((error = OMX_SetConfig (OMXCAM_ctx.camera.handle,
       OMX_IndexConfigStillColourDenoiseEnable, &denoise))){
-    OMXCAM_setError ("%s: OMX_SetConfig - "
-        "OMX_IndexConfigStillColourDenoiseEnable: %s", __func__, 
+    OMXCAM_error ("OMX_SetConfig - "
+        "OMX_IndexConfigStillColourDenoiseEnable: %s",
         OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }

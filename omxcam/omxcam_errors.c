@@ -2,13 +2,19 @@
 
 static char lastError[256];
 
-void OMXCAM_setError (const char* fmt, ...){
+void OMXCAM_setError (
+    const char* fmt,
+    const char* fn,
+    const char* file,
+    int line,
+    ...){
   va_list args;
-  va_start (args, fmt);
+  va_start (args, line);
   vsprintf (lastError, fmt, args);
   va_end (args);
   
-  OMXCAM_trace ("ERROR: %s\n", lastError);
+  OMXCAM_trace ("ERROR: %s (function: '%s', file: '%s', line %d)", lastError,
+      fn, file, line);
 }
 
 char* OMXCAM_lastError (){
@@ -45,8 +51,8 @@ const char* OMXCAM_errorToHuman (OMXCAM_ERROR error){
       return "OMXCAM_ErrorStill";
     case OMXCAM_ErrorVideo:
       return "OMXCAM_ErrorVideo";
-    case OMXCAM_ErrorVideoThread:
-      return "OMXCAM_ErrorVideoThread";
+    case OMXCAM_ErrorVideoCapture:
+      return "OMXCAM_ErrorVideoCapture";
     case OMXCAM_ErrorBadParameter:
       return "OMXCAM_ErrorBadParameter";
     case OMXCAM_ErrorSetupTunnel:

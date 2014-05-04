@@ -13,62 +13,62 @@ OMX_ERRORTYPE EventHandler (
     case OMX_EventCmdComplete:
       switch (nData1){
         case OMX_CommandStateSet:
-          OMXCAM_trace ("EVENT: OMX_CommandStateSet, state: %s\n",
+          OMXCAM_trace ("EVENT: OMX_CommandStateSet, state: %s",
               OMXCAM_dump_OMX_STATETYPE (nData2));
           OMXCAM_continue (component, OMXCAM_EventStateSet);
           break;
         case OMX_CommandPortDisable:
-          OMXCAM_trace ("EVENT: OMX_CommandPortDisable, port: %d\n", nData2);
+          OMXCAM_trace ("EVENT: OMX_CommandPortDisable, port: %d", nData2);
           OMXCAM_continue (component, OMXCAM_EventPortDisable);
           break;
         case OMX_CommandPortEnable:
-          OMXCAM_trace ("EVENT: OMX_CommandPortEnable, port: %d\n", nData2);
+          OMXCAM_trace ("EVENT: OMX_CommandPortEnable, port: %d", nData2);
           OMXCAM_continue (component, OMXCAM_EventPortEnable);
           break;
         case OMX_CommandFlush:
-          OMXCAM_trace ("EVENT: OMX_CommandFlush, port: %d\n", nData2);
+          OMXCAM_trace ("EVENT: OMX_CommandFlush, port: %d", nData2);
           OMXCAM_continue (component, OMXCAM_EventFlush);
           break;
         case OMX_CommandMarkBuffer:
-          OMXCAM_trace ("EVENT: OMX_CommandMarkBuffer, port: %d\n", nData2);
+          OMXCAM_trace ("EVENT: OMX_CommandMarkBuffer, port: %d", nData2);
           OMXCAM_continue (component, OMXCAM_EventMarkBuffer);
           break;
       }
       break;
     case OMX_EventError:
-      OMXCAM_trace ("EVENT: %s\n", OMXCAM_dump_OMX_ERRORTYPE (nData1));
-      OMXCAM_setError ("%s: OMX_EventError: %s", __func__,
-          OMXCAM_dump_OMX_ERRORTYPE (nData1));
+      OMXCAM_trace ("EVENT: %s", OMXCAM_dump_OMX_ERRORTYPE (nData1));
+      OMXCAM_error ("OMX_EventError: %s", OMXCAM_dump_OMX_ERRORTYPE (nData1));
       OMXCAM_continue (component, OMXCAM_EventError);
       break;
     case OMX_EventMark:
-      OMXCAM_trace ("EVENT: OMX_EventMark\n");
+      OMXCAM_trace ("EVENT: OMX_EventMark");
       OMXCAM_continue (component, OMXCAM_EventMark);
       break;
     case OMX_EventPortSettingsChanged:
-      OMXCAM_trace ("EVENT: OMX_EventPortSettingsChanged, port: %d\n", nData1);
+      OMXCAM_trace ("EVENT: OMX_EventPortSettingsChanged, port: %d", nData1);
       OMXCAM_continue (component, OMXCAM_EventPortSettingsChanged);
       break;
     case OMX_EventParamOrConfigChanged:
       OMXCAM_trace ("EVENT: OMX_EventParamOrConfigChanged, nData1: %d, nData2: "
-          "%X\n", nData1, nData2);
+          "%X", nData1, nData2);
       OMXCAM_continue (component, OMXCAM_EventParamOrConfigChanged);
       break;
     case OMX_EventBufferFlag:
-      OMXCAM_trace ("EVENT: OMX_EventBufferFlag, port: %d\n", nData1);
+      OMXCAM_trace ("EVENT: OMX_EventBufferFlag, port: %d", nData1);
       OMXCAM_continue (component, OMXCAM_EventBufferFlag);
       break;
     case OMX_EventResourcesAcquired:
-      OMXCAM_trace ("EVENT: OMX_EventResourcesAcquired\n");
+      OMXCAM_trace ("EVENT: OMX_EventResourcesAcquired");
       OMXCAM_continue (component, OMXCAM_EventResourcesAcquired);
       break;
     case OMX_EventDynamicResourcesAvailable:
-      OMXCAM_trace ("EVENT: OMX_EventDynamicResourcesAvailable\n");
+      OMXCAM_trace ("EVENT: OMX_EventDynamicResourcesAvailable");
       OMXCAM_continue (component, OMXCAM_EventDynamicResourcesAvailable);
       break;
     default:
       //This should never execute, just ignore
-      OMXCAM_trace ("EVENT: Unknown (%X)\n", eEvent);
+      OMXCAM_trace ("EVENT: Unknown (%X)", eEvent);
+      OMXCAM_error ("Unkown event: %X", eEvent);
       break;
   }
 
@@ -81,7 +81,7 @@ OMX_ERRORTYPE FillBufferDone (
     OMX_IN OMX_BUFFERHEADERTYPE* pBuffer){
   OMXCAM_COMPONENT* component = (OMXCAM_COMPONENT*)pAppData;
   
-  OMXCAM_trace ("EVENT: FillBufferDone\n");
+  OMXCAM_trace ("EVENT: FillBufferDone");
   OMXCAM_continue (component, OMXCAM_EventFillBufferDone);
   
   return OMX_ErrorNone;
@@ -94,11 +94,11 @@ int OMXCAM_wait (
   VCOS_UNSIGNED set;
   if (vcos_event_flags_get (&component->flags, events | OMXCAM_EventError,
       VCOS_OR_CONSUME, VCOS_SUSPEND, &set)){
-    OMXCAM_setError ("%s: vcos_event_flags_get", __func__);
+    OMXCAM_error ("vcos_event_flags_get");
     return -1;
   }
   if (set == OMXCAM_EventError){
-    //OMXCAM_setError() is set in the OMX's EventHandler
+    //OMXCAM_error() is set in the OMX's EventHandler
     return -1;
   }
   if (retrievedEvents){
@@ -128,12 +128,12 @@ static const char* getPortType (OMX_INDEXTYPE type){
 }
 
 int OMXCAM_initComponent (OMXCAM_COMPONENT* component){
-  OMXCAM_trace ("Initializing component '%s'\n", component->name);
+  OMXCAM_trace ("Initializing component '%s'", component->name);
 
   OMX_ERRORTYPE error;
   
   if (vcos_event_flags_create (&component->flags, "component")){
-    OMXCAM_setError ("%s: vcos_event_flags_create", __func__);
+    OMXCAM_error ("vcos_event_flags_create");
     return -1;
   }
   
@@ -143,8 +143,7 @@ int OMXCAM_initComponent (OMXCAM_COMPONENT* component){
   
   if ((error = OMX_GetHandle (&component->handle, component->name, component,
       &callbacks))){
-    OMXCAM_setError ("%s: OMX_GetHandle: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_GetHandle: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -161,7 +160,7 @@ int OMXCAM_initComponent (OMXCAM_COMPONENT* component){
   int i;
   for (i=0; i<4; i++){
     if ((error = OMX_GetParameter (component->handle, types[i], &ports))){
-      OMXCAM_setError ("%s: OMX_GetParameter - %s: %s", __func__,
+      OMXCAM_error ("OMX_GetParameter - %s: %s",
           OMXCAM_dump_OMX_ERRORTYPE (error), getPortType (types[i]));
       return -1;
     }
@@ -178,15 +177,14 @@ int OMXCAM_initComponent (OMXCAM_COMPONENT* component){
 }
 
 int OMXCAM_deinitComponent (OMXCAM_COMPONENT* component){
-  OMXCAM_trace ("Deinitializing component '%s'\n", component->name);
+  OMXCAM_trace ("Deinitializing component '%s'", component->name);
   
   OMX_ERRORTYPE error;
   
   vcos_event_flags_delete (&component->flags);
 
   if ((error = OMX_FreeHandle (component->handle))){
-    OMXCAM_setError ("%s: OMX_FreeHandle: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_FreeHandle: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -194,15 +192,14 @@ int OMXCAM_deinitComponent (OMXCAM_COMPONENT* component){
 }
 
 int OMXCAM_changeState (OMXCAM_COMPONENT* component, OMX_STATETYPE state){
-  OMXCAM_trace ("Changing '%s' state to %s\n", component->name,
+  OMXCAM_trace ("Changing '%s' state to %s", component->name,
       OMXCAM_dump_OMX_STATETYPE (state));
   
   OMX_ERRORTYPE error;
   
   if ((error = OMX_SendCommand (component->handle, OMX_CommandStateSet, state,
       0))){
-    OMXCAM_setError ("%s: OMX_SendCommand: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SendCommand: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -210,14 +207,13 @@ int OMXCAM_changeState (OMXCAM_COMPONENT* component, OMX_STATETYPE state){
 }
 
 int OMXCAM_enablePort (OMXCAM_COMPONENT* component, OMX_U32 port){
-  OMXCAM_trace ("Enabling port %d ('%s')\n", port, component->name);
+  OMXCAM_trace ("Enabling port %d ('%s')", port, component->name);
   
   OMX_ERRORTYPE error;
   
   if ((error = OMX_SendCommand (component->handle, OMX_CommandPortEnable,
       port, 0))){
-    OMXCAM_setError ("%s: OMX_SendCommand: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SendCommand: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -225,14 +221,13 @@ int OMXCAM_enablePort (OMXCAM_COMPONENT* component, OMX_U32 port){
 }
 
 int OMXCAM_disablePort (OMXCAM_COMPONENT* component, OMX_U32 port){
-  OMXCAM_trace ("Disabling port %d ('%s')\n", port, component->name);
+  OMXCAM_trace ("Disabling port %d ('%s')", port, component->name);
   
   OMX_ERRORTYPE error;
   
   if ((error = OMX_SendCommand (component->handle, OMX_CommandPortDisable,
       port, 0))){
-    OMXCAM_setError ("%s: OMX_SendCommand: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_SendCommand: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -240,7 +235,7 @@ int OMXCAM_disablePort (OMXCAM_COMPONENT* component, OMX_U32 port){
 }
 
 int OMXCAM_allocateBuffer (OMXCAM_COMPONENT* component, OMX_U32 port){
-  OMXCAM_trace ("Allocating '%s' output buffer\n", component->name);
+  OMXCAM_trace ("Allocating '%s' output buffer", component->name);
   
   OMX_ERRORTYPE error;
   
@@ -249,15 +244,14 @@ int OMXCAM_allocateBuffer (OMXCAM_COMPONENT* component, OMX_U32 port){
   def.nPortIndex = port;
   if ((error = OMX_GetParameter (component->handle,
       OMX_IndexParamPortDefinition, &def))){
-    OMXCAM_setError ("%s: OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
-        __func__, OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
+        OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
   if ((error = OMX_AllocateBuffer (component->handle,
       &OMXCAM_ctx.outputBuffer, port, 0, def.nBufferSize))){
-    OMXCAM_setError ("%s: OMX_AllocateBuffer: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_AllocateBuffer: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
@@ -265,14 +259,13 @@ int OMXCAM_allocateBuffer (OMXCAM_COMPONENT* component, OMX_U32 port){
 }
 
 int OMXCAM_freeBuffer (OMXCAM_COMPONENT* component, OMX_U32 port){
-  OMXCAM_trace ("Releasing '%s' output buffer\n", component->name);
+  OMXCAM_trace ("Releasing '%s' output buffer", component->name);
   
   OMX_ERRORTYPE error;
   
   if ((error = OMX_FreeBuffer (component->handle, port,
       OMXCAM_ctx.outputBuffer))){
-    OMXCAM_setError ("%s: OMX_FreeBuffer: %s", __func__,
-        OMXCAM_dump_OMX_ERRORTYPE (error));
+    OMXCAM_error ("OMX_FreeBuffer: %s", OMXCAM_dump_OMX_ERRORTYPE (error));
     return -1;
   }
   
