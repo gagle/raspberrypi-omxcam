@@ -1,9 +1,6 @@
 #ifndef OMXCAM_STILL_H
 #define OMXCAM_STILL_H
 
-#include "omxcam_omx.h"
-#include "omxcam_errors.h"
-#include "omxcam_core.h"
 #include "omxcam_camera.h"
 #include "omxcam_image_encode.h"
 

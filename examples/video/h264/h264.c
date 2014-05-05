@@ -85,30 +85,19 @@ int saveLength (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
 }
 
 int main (){
-  OMXCAM_ERROR error;
-  
-  //Initialize the library
-  printf ("initializing\n");
-  if ((error = OMXCAM_init ())) return logError (error);
-  
-  OMXCAM_VIDEO_SETTINGS video;
-  
   //1920x1080 30fps by default
+  OMXCAM_VIDEO_SETTINGS settings;
   
   //Record a video of 3000ms
-  OMXCAM_initVideoSettings (&video);
-  video.bufferCallback = bufferCallbackTime;
+  OMXCAM_initVideoSettings (&settings);
+  settings.bufferCallback = bufferCallbackTime;
   
-  if (saveTime ("video-time.h264", &video)) return 1;
+  if (saveTime ("video-time.h264", &settings)) return 1;
   
   //Record a video of 2MB
-  video.bufferCallback = bufferCallbackLength;
+  settings.bufferCallback = bufferCallbackLength;
   
-  if (saveLength ("video-length.h264", &video)) return 1;
-  
-  //Deinitialize the library
-  printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())) return logError (error);
+  if (saveLength ("video-length.h264", &settings)) return 1;
   
   printf ("ok\n");
   

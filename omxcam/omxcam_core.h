@@ -7,6 +7,7 @@
 #include "omxcam_dump.h"
 #include "omxcam_errors.h"
 #include "omxcam_debug.h"
+#include "omxcam_utils.h"
 
 typedef enum {
   OMXCAM_FALSE,
@@ -80,5 +81,7 @@ int OMXCAM_enablePort (OMXCAM_COMPONENT* component, OMX_U32 port);
 int OMXCAM_disablePort (OMXCAM_COMPONENT* component, OMX_U32 port);
 int OMXCAM_allocateBuffer (OMXCAM_COMPONENT* component, OMX_U32 port);
 int OMXCAM_freeBuffer (OMXCAM_COMPONENT* component, OMX_U32 port);
+OMXCAM_ERROR OMXCAM_init ();
+OMXCAM_ERROR OMXCAM_deinit ();
 
 #endif

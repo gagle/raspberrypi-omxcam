@@ -15,6 +15,10 @@ int logError (OMXCAM_ERROR error){
 
 int fd;
 
+//We want to capture: 640x480, RGB (3 bytes per pixel), 10 frames
+uint32_t rgbCurrent = 0;
+uint32_t rgbTotal = 640*480*3*10;
+
 //We want to capture: 640x480, YUV420, 10 frames
 uint32_t yuvCurrent = 0;
 uint32_t yuvFrames = 0;
@@ -24,10 +28,6 @@ OMXCAM_YUV_PLANES yuvPlanesSlice;
 uint8_t* yBuffer;
 uint8_t* uBuffer;
 uint8_t* vBuffer;
-
-//We want to capture: 640x480, RGB (3 bytes per pixel), 10 frames
-uint32_t rgbCurrent = 0;
-uint32_t rgbTotal = 640*480*3*10;
 
 void bufferCallbackRGB (uint8_t* buffer, uint32_t length){
   int stop = 0;
@@ -210,32 +210,23 @@ int saveYUV (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
 }
 
 int main (){
-  OMXCAM_ERROR error;
-  
-  //Initialize the library
-  printf ("initializing\n");
-  if ((error = OMXCAM_init ())) return logError (error);
-  
-  OMXCAM_VIDEO_SETTINGS video;
+  //1920x1080 30fps by default
+  OMXCAM_VIDEO_SETTINGS settings;
   
   //Capture a raw RGB video
-  OMXCAM_initVideoSettings (&video);
-  video.bufferCallback = bufferCallbackRGB;
-  video.format = OMXCAM_FormatRGB888;
-  video.camera.width = 640;
-  video.camera.height = 480;
+  OMXCAM_initVideoSettings (&settings);
+  settings.bufferCallback = bufferCallbackRGB;
+  settings.format = OMXCAM_FormatRGB888;
+  settings.camera.width = 640;
+  settings.camera.height = 480;
   
-  if (saveRGB ("video.rgb", &video)) return 1;
+  if (saveRGB ("video.rgb", &settings)) return 1;
   
   //Capture a raw YUV420 video
-  video.bufferCallback = bufferCallbackYUV;
-  video.format = OMXCAM_FormatYUV420;
+  settings.bufferCallback = bufferCallbackYUV;
+  settings.format = OMXCAM_FormatYUV420;
   
-  if (saveYUV ("video.yuv", &video)) return 1;
-  
-  //Deinitialize the library
-  printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())) return logError (error);
+  if (saveYUV ("video.yuv", &settings)) return 1;
   
   printf ("ok\n");
   

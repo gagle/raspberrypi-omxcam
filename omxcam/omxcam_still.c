@@ -35,6 +35,10 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     return OMXCAM_ErrorBadParameter;
   }
   
+  OMXCAM_ERROR err;
+  
+  if ((err = OMXCAM_init ())) return err;
+  
   int useEncoder;
   OMX_COLOR_FORMATTYPE colorFormat;
   OMX_U32 stride;
@@ -317,5 +321,5 @@ OMXCAM_ERROR OMXCAM_still (OMXCAM_STILL_SETTINGS* settings){
     return OMXCAM_ErrorDeinitImageEncoder;
   }
   
-  return OMXCAM_ErrorNone;
+  return OMXCAM_deinit ();
 }

@@ -598,6 +598,8 @@ OMXCAM_ERROR OMXCAM_startVideo (OMXCAM_VIDEO_SETTINGS* settings, uint32_t ms){
   bgError = 0;
   OMXCAM_ERROR error;
   
+  if ((error = OMXCAM_init ())) return error;
+  
   if ((error = initOMX (settings))) return error;
   
   //Start the background thread
@@ -705,5 +707,5 @@ OMXCAM_ERROR OMXCAM_stopVideo (){
     }
   }
   
-  return OMXCAM_ErrorNone;
+  return OMXCAM_deinit ();
 }

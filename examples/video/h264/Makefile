@@ -32,7 +32,7 @@ $(APP): $(OBJS)
 .PHONY: clean rebuild
 
 clean:
-	rm -f $(APP) $(APP).o $(OMXCAM_SRC)/*o
+	rm -f $(APP) $(APP).o $(OMXCAM_SRC)/*.o
 
 rebuild:
 	make clean && make

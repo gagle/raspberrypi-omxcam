@@ -143,35 +143,24 @@ int saveYUV (char* filename, OMXCAM_STILL_SETTINGS* settings){
 }
 
 int main (){
-  OMXCAM_ERROR error;
-  
-  //Initialize the library
-  printf ("initializing\n");
-  if ((error = OMXCAM_init ())) return logError (error);
-  
-  OMXCAM_STILL_SETTINGS still;
-  
   //2592x1944 by default
+  OMXCAM_STILL_SETTINGS settings;
   
   //Capture a raw RGB image
-  OMXCAM_initStillSettings (&still);
-  still.bufferCallback = bufferCallbackRGB;
-  still.camera.shutterSpeedAuto = OMXCAM_FALSE;
+  OMXCAM_initStillSettings (&settings);
+  settings.bufferCallback = bufferCallbackRGB;
+  settings.camera.shutterSpeedAuto = OMXCAM_FALSE;
   //Shutter speed in milliseconds (1/8 by default: 125)
-  still.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
-  still.format = OMXCAM_FormatRGB888;
+  settings.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
+  settings.format = OMXCAM_FormatRGB888;
   
-  if (saveRGB ("still.rgb", &still)) return 1;
+  if (saveRGB ("still.rgb", &settings)) return 1;
   
   //Capture a raw YUV420 image
-  still.bufferCallback = bufferCallbackYUV;
-  still.format = OMXCAM_FormatYUV420;
+  settings.bufferCallback = bufferCallbackYUV;
+  settings.format = OMXCAM_FormatYUV420;
   
-  if (saveYUV ("still.yuv", &still)) return 1;
-  
-  //Deinitialize the library
-  printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())) return logError (error);
+  if (saveYUV ("still.yuv", &settings)) return 1;
   
   printf ("ok\n");
   

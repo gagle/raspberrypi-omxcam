@@ -3,8 +3,6 @@
 
 #include <time.h>
 
-#include "omxcam_omx.h"
-#include "omxcam_errors.h"
 #include "omxcam_core.h"
 
 typedef struct {

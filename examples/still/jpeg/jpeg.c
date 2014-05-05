@@ -43,27 +43,22 @@ int save (char* filename, OMXCAM_STILL_SETTINGS* settings){
 }
 
 int main (){
-  OMXCAM_ERROR error;
-  
-  //Initialize the library
-  printf ("initializing\n");
-  if ((error = OMXCAM_init ())) return logError (error);
-  
-  OMXCAM_STILL_SETTINGS still;
+  //2592x1944 by default
+  OMXCAM_STILL_SETTINGS settings;
   
   //Capture an image with default settings
-  OMXCAM_initStillSettings (&still);
-  still.bufferCallback = bufferCallback;
+  OMXCAM_initStillSettings (&settings);
+  settings.bufferCallback = bufferCallback;
   
-  if (save ("still-default.jpg", &still)) return 1;
+  if (save ("still-default.jpg", &settings)) return 1;
   
   //Capture an image with shutter speed 1/8, EV -10 and some EXIF tags
-  OMXCAM_initStillSettings (&still);
-  still.bufferCallback = bufferCallback;
-  still.camera.shutterSpeedAuto = OMXCAM_FALSE;
+  OMXCAM_initStillSettings (&settings);
+  settings.bufferCallback = bufferCallback;
+  settings.camera.shutterSpeedAuto = OMXCAM_FALSE;
   //Shutter speed in milliseconds (1/8 by default: 125)
-  still.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
-  still.camera.exposureCompensation = -10;
+  settings.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
+  settings.camera.exposureCompensation = -10;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags
@@ -72,14 +67,10 @@ int main (){
     //Manufacturer
     { "IFD0.Make", "Raspberry Pi" }
   };
-  still.jpeg.exifTags = exifTags;
-  still.jpeg.exifValidTags = 1;
+  settings.jpeg.exifTags = exifTags;
+  settings.jpeg.exifValidTags = 1;
   
-  if (save ("still.jpg", &still)) return 1;
-  
-  //Deinitialize the library
-  printf ("deinitializing\n");
-  if ((error = OMXCAM_deinit ())) return logError (error);
+  if (save ("still.jpg", &settings)) return 1;
   
   printf ("ok\n");
   

@@ -6,9 +6,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "omxcam_omx.h"
-#include "omxcam_errors.h"
-#include "omxcam_core.h"
 #include "omxcam_camera.h"
 #include "omxcam_video_encode.h"
 

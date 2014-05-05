@@ -1,8 +1,6 @@
 #ifndef OMXCAM_CAMERA_H
 #define OMXCAM_CAMERA_H
 
-#include "omxcam_omx.h"
-#include "omxcam_errors.h"
 #include "omxcam_core.h"
 
 typedef enum {

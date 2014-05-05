@@ -1,8 +1,6 @@
 #ifndef OMXCAM_VIDEO_ENCODE_H
 #define OMXCAM_VIDEO_ENCODE_H
 
-#include "omxcam_omx.h"
-#include "omxcam_errors.h"
 #include "omxcam_core.h"
 
 typedef struct {
