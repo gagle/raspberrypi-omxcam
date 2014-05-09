@@ -43,8 +43,8 @@ void OMXCAM_setError (
     const char* file,
     int line,
     ...);
-char* OMXCAM_lastError ();
-const char* OMXCAM_errorToHuman (OMXCAM_ERROR error);
+char* OMXCAM_strError ();
+const char* OMXCAM_errorName (OMXCAM_ERROR error);
 const char* OMXCAM_dump_OMX_ERRORTYPE (OMX_ERRORTYPE error);
 
 #endif

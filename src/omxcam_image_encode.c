@@ -122,7 +122,7 @@ int OMXCAM_setJpegSettings (OMXCAM_JPEG_SETTINGS* settings){
   if (OMXCAM_addTag ("EXIF.DateTimeDigitized", timestamp)) return -1;
   if (OMXCAM_addTag ("IFD0.DateTime", timestamp)) return -1;
   
-  int i;
+  uint32_t i;
   for (i=0; i<settings->exifValidTags; i++){
     if (OMXCAM_addTag (settings->exifTags[i].key, settings->exifTags[i].value)){
       return -1;

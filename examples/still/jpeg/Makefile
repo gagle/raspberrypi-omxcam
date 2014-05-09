@@ -3,23 +3,23 @@ APP = jpeg
 # Directory where the omxcam library is located
 OMXCAM_HOME = ../../..
 
-OMXCAM_SRC = $(OMXCAM_HOME)/omxcam
-OMXCAM_SRC_FILES = $(wildcard $(OMXCAM_SRC)/*.c)
+OMXCAM_SRC_DIR = $(OMXCAM_HOME)/src
+OMXCAM_SRC_FILES = $(wildcard $(OMXCAM_SRC_DIR)/*.c)
 
 CC = gcc
 # Add -DOMXCAM_DEBUG for debugging purposes
 CFLAGS = -DSTANDALONE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS \
 		-DTARGET_POSIX -D_LINUX -DPIC -D_REENTRANT -D_LARGEFILE64_SOURCE \
 		-D_FILE_OFFSET_BITS=64 -U_FORTIFY_SOURCE -DHAVE_LIBOPENMAX=2 -DOMX \
-		-DOMX_SKIP64BIT -ftree-vectorize -pipe -DUSE_EXTERNAL_OMX \
-		-DHAVE_LIBBCM_HOST -DUSE_EXTERNAL_LIBBCM_HOST -DUSE_VCHIQ_ARM -fPIC \
-		-ftree-vectorize -pipe -Werror -g -Wall -O2 -DOMXCAM_DEBUG
+		-DOMX_SKIP64BIT -ftree-vectorize -DUSE_EXTERNAL_OMX -DHAVE_LIBBCM_HOST \
+		-DUSE_EXTERNAL_LIBBCM_HOST -DUSE_VCHIQ_ARM -fPIC -ftree-vectorize -pipe \
+		-Werror -g -Wall -O2 -DOMXCAM_DEBUG
 LDFLAGS = -L/opt/vc/lib -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread
 INCLUDES = -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads \
-		-I/opt/vc/include/interface/vmcs_host/linux -I./$(OMXCAM_HOME)
+		-I/opt/vc/include/interface/vmcs_host/linux -I./$(OMXCAM_SRC_DIR)
 
 SRC = $(APP).c $(OMXCAM_SRC_FILES)
-OBJS = $(APP).o $(patsubst $(OMXCAM_SRC)/%.c,$(OMXCAM_SRC)/%.o,$(OMXCAM_SRC_FILES))
+OBJS = $(APP).o $(patsubst $(OMXCAM_SRC_DIR)/%.c,$(OMXCAM_SRC_DIR)/%.o,$(OMXCAM_SRC_FILES))
 
 all: $(APP) $(SRC)
 
@@ -32,7 +32,7 @@ $(APP): $(OBJS)
 .PHONY: clean rebuild
 
 clean:
-	rm -f $(APP) $(APP).o $(OMXCAM_SRC)/*.o
+	rm -f $(APP) $(APP).o $(OMXCAM_SRC_DIR)/*.o
 
 rebuild:
 	make clean && make

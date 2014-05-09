@@ -17,11 +17,11 @@ void OMXCAM_setError (
       fn, file, line);
 }
 
-char* OMXCAM_lastError (){
+char* OMXCAM_strError (){
   return lastError;
 }
 
-const char* OMXCAM_errorToHuman (OMXCAM_ERROR error){
+const char* OMXCAM_errorName (OMXCAM_ERROR error){
   switch (error){
     case OMXCAM_ErrorNone:
       return "OMXCAM_ErrorNone";

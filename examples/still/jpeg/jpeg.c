@@ -5,7 +5,7 @@
 #include "omxcam/omxcam.h"
 
 int logError (OMXCAM_ERROR error){
-  printf ("ERROR: %s (%s)\n", OMXCAM_errorToHuman (error), OMXCAM_lastError ());
+  printf ("ERROR: %s (%s)\n", OMXCAM_errorName (error), OMXCAM_strError ());
   return 1;
 }
 

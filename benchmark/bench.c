@@ -31,8 +31,6 @@ int main (){
   long ms;
   int diff;
   
-  if ((error = OMXCAM_init ())) return logError (error);
-  
   int frames = 30;
   int width = 640;
   int height = 480;
@@ -50,8 +48,6 @@ int main (){
   if ((error = yuv (frames, width, height))) return logError (error);
   diff = now () - ms;
   printf ("yuv: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
-  
-  if ((error = OMXCAM_deinit ())) return logError (error);
   
   return 0;
 }
