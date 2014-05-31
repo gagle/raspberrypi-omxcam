@@ -1,0 +1,5 @@
+APP = h264
+OMXCAM_HOME = ../../..
+CLEAN = video-time.h264 video-length.h264
+
+include ../../Makefile-shared-common

@@ -1,0 +1,25 @@
+CC = gcc
+CFLAGS = -Werror -g -Wall -O2
+LDFLAGS = -L/opt/vc/lib -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread \
+		-L./$(OMXCAM_HOME)/lib -lomxcam -Wl,-rpath=$(OMXCAM_HOME)/lib
+INCLUDES = -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads \
+		-I/opt/vc/include/interface/vmcs_host/linux -I./$(OMXCAM_HOME)/include
+
+SRC := $(SRC) $(APP).c
+OBJS := $(OBJS) $(APP).o
+
+all: $(APP) $(SRC)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ -Wno-deprecated-declarations
+
+$(APP): $(OBJS)
+	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+
+.PHONY: clean rebuild
+
+clean:
+	rm -f $(APP) $(APP).o $(CLEAN)
+
+rebuild:
+	make -f Makefile-shared clean && make -f Makefile-shared

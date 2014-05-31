@@ -1,0 +1,5 @@
+APP = jpeg
+OMXCAM_HOME = ../../..
+CLEAN = still-default.jpg still.jpg
+
+include ../../Makefile-shared-common
