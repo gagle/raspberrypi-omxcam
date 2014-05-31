@@ -20,10 +20,6 @@ extern "C" {
 
 #include "omxcam_version.h"
 
-#ifdef OMXCAM_DEBUG
-#define NDEBUG
-#endif
-
 #if __GNUC__ >= 4
 # define OMXCAM_EXTERN __attribute__ ((visibility ("default")))
 #else
