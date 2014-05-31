@@ -692,7 +692,7 @@ int omxcam_video_start (
   }
   
   //Block the main thread
-  if (ms == OMXCAM_RECORD_FOREVER){
+  if (ms == OMXCAM_CAPTURE_FOREVER){
     if (omxcam_thread_lock ()){
       omxcam_set_last_error (OMXCAM_ERROR_LOCK);
       return -1;
