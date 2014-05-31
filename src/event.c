@@ -1,7 +1,7 @@
 #include "omxcam.h"
 
 void omxcam_event_error (omxcam_component_t* component){
-  component->event.error = 1;
+  component->event.error = -1;
 }
 
 int omxcam_event_create (omxcam_component_t* component){
