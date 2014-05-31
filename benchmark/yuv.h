@@ -1,3 +1,8 @@
-#include "omxcam/omxcam.h"
+#ifndef BENCH_YUV_H
+#define BENCH_YUV_H
 
-OMXCAM_ERROR yuv (int frames, int width, int height);
+#include "omxcam.h"
+
+int yuv (int frames, int width, int height);
+
+#endif

@@ -1,3 +1,8 @@
-#include "omxcam/omxcam.h"
+#ifndef BENCH_RGB_H
+#define BENCH_RGB_H
 
-OMXCAM_ERROR rgb (int frames, int width, int height);
+#include "omxcam.h"
+
+int rgb (int frames, int width, int height);
+
+#endif

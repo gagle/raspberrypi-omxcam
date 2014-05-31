@@ -2,40 +2,41 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "omxcam/omxcam.h"
+#include "omxcam.h"
 
-int logError (OMXCAM_ERROR error){
-  printf ("ERROR: %s (%s)\n", OMXCAM_errorName (error), OMXCAM_strError ());
+int log_error (){
+  omxcam_perror ();
   return 1;
 }
 
 int fd;
 
-void bufferCallback (uint8_t* buffer, uint32_t length){
+void buffer_callback (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
+  //Note: Writing the data directly to disk will slow down the capture speed
+  //due to the I/O access. A posible workaround is to save the buffers into
+  //memory, similar to the still/raw.c (YUV) example, and then write the
+  //whole image to disk
   if (pwrite (fd, buffer, length, 0) == -1){
-    printf ("ERROR: pwrite\n");
-    //OMXCAM_ERROR error;
-    //if ((error = OMXCAM_cancelStill ())) logError (error);
+    fprintf (stderr, "error: pwrite\n");
+    if (omxcam_still_stop ()) log_error ();
   }
 }
 
-int save (char* filename, OMXCAM_STILL_SETTINGS* settings){
+int save (char* filename, omxcam_still_settings_t* settings){
   printf ("capturing %s\n", filename);
 
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
-    printf ("ERROR: open\n");
+    fprintf (stderr, "error: open\n");
     return -1;
   }
   
-  OMXCAM_ERROR error;
-  
-  if ((error = OMXCAM_still (settings))) return logError (error);
+  if (omxcam_still_start (settings)) return log_error ();
   
   //Close the file
   if (close (fd)){
-    printf ("ERROR: close\n");
+    fprintf (stderr, "error: close\n");
     return -1;
   }
   
@@ -44,31 +45,32 @@ int save (char* filename, OMXCAM_STILL_SETTINGS* settings){
 
 int main (){
   //2592x1944 by default
-  OMXCAM_STILL_SETTINGS settings;
+  omxcam_still_settings_t settings;
   
   //Capture an image with default settings
-  OMXCAM_initStillSettings (&settings);
-  settings.bufferCallback = bufferCallback;
+  omxcam_still_init (&settings);
+  settings.buffer_callback = buffer_callback;
   
   if (save ("still-default.jpg", &settings)) return 1;
   
   //Capture an image with shutter speed 1/8, EV -10 and some EXIF tags
-  OMXCAM_initStillSettings (&settings);
-  settings.bufferCallback = bufferCallback;
-  settings.camera.shutterSpeedAuto = OMXCAM_FALSE;
+  omxcam_still_init (&settings);
+  settings.buffer_callback = buffer_callback;
+  settings.camera.shutter_speed_auto = OMXCAM_FALSE;
   //Shutter speed in milliseconds (1/8 by default: 125)
-  settings.camera.shutterSpeed = (uint32_t)((1.0/8.0)*1000);
-  settings.camera.exposureCompensation = -10;
+  settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
+  //Values of color_u and color_v are 128 by default, gray image
+  settings.camera.color_enable = OMXCAM_TRUE;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags
   //for valid keys and their description
-  OMXCAM_EXIF_TAG exifTags[] = {
+  omxcam_exif_tag_t exif_tags[] = {
     //Manufacturer
     { "IFD0.Make", "Raspberry Pi" }
   };
-  settings.jpeg.exifTags = exifTags;
-  settings.jpeg.exifValidTags = 1;
+  settings.jpeg.exif_tags = exif_tags;
+  settings.jpeg.exif_valid_tags = 1;
   
   if (save ("still.jpg", &settings)) return 1;
   

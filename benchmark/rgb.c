@@ -2,29 +2,28 @@
 
 static uint32_t current = 0;
 static uint32_t total;
-static OMXCAM_ERROR bgError;
+static int bg_error = 0;
 
-static void bufferCallback (uint8_t* buffer, uint32_t length){
+static void buffer_callback (uint8_t* buffer, uint32_t length){
   current += length;
   
   if (current >= total){
-    bgError = OMXCAM_stopVideo ();
+    bg_error = omxcam_video_stop ();
   }
 }
 
-OMXCAM_ERROR rgb (int frames, int width, int height){
-  OMXCAM_VIDEO_SETTINGS settings;
+int rgb (int frames, int width, int height){
+  omxcam_video_settings_t settings;
   
-  OMXCAM_initVideoSettings (&settings);
-  settings.bufferCallback = bufferCallback;
-  settings.format = OMXCAM_FormatRGB888;
+  omxcam_video_init (&settings);
+  settings.buffer_callback = buffer_callback;
+  settings.format = OMXCAM_FORMAT_RGB888;
   settings.camera.width = width;
   settings.camera.height = height;
   
-  bgError = OMXCAM_ErrorNone;
   total = width*height*3*frames;
   
-  OMXCAM_ERROR error = OMXCAM_startVideo (&settings, 0);
+  int error = omxcam_video_start (&settings, 0);
   
-  return error ? error : bgError;
+  return error ? error : bg_error;
 }

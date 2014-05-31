@@ -2,102 +2,104 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "omxcam/omxcam.h"
+#include "omxcam.h"
 
 /*
-This examples captures two videos (RGB and YUV) of 10 frames each one.
+This example captures two videos (RGB and YUV) of 10 frames each one.
 */
 
-int logError (OMXCAM_ERROR error){
-  printf ("ERROR: %s (%s)\n", OMXCAM_errorName (error), OMXCAM_strError ());
+int log_error (){
+  omxcam_perror ();
   return 1;
 }
 
 int fd;
 
 //We want to capture: 640x480, RGB (3 bytes per pixel), 10 frames
-uint32_t rgbCurrent = 0;
-uint32_t rgbTotal = 640*480*3*10;
+uint32_t rgb_current = 0;
+uint32_t rgb_total = 640*480*3*10;
 
 //We want to capture: 640x480, YUV420, 10 frames
-uint32_t yuvCurrent = 0;
-uint32_t yuvFrames = 0;
-uint32_t yuvFrame;
-OMXCAM_YUV_PLANES yuvPlanes;
-OMXCAM_YUV_PLANES yuvPlanesSlice;
-uint8_t* yBuffer;
-uint8_t* uBuffer;
-uint8_t* vBuffer;
+uint32_t yuv_current = 0;
+uint32_t yuv_frames = 0;
+uint32_t yuv_frame;
+omxcam_yuv_planes_t yuv_planes;
+omxcam_yuv_planes_t yuv_planes_slice;
+uint8_t* y_buffer;
+uint8_t* u_buffer;
+uint8_t* v_buffer;
 
-void bufferCallbackRGB (uint8_t* buffer, uint32_t length){
+void buffer_callback_rgb (uint8_t* buffer, uint32_t length){
   int stop = 0;
-  rgbCurrent += length;
+  rgb_current += length;
   
-  if (rgbCurrent >= rgbTotal){
-    length -= rgbCurrent - rgbTotal;
+  if (rgb_current >= rgb_total){
+    length -= rgb_current - rgb_total;
     stop = 1;
   }
   
-  OMXCAM_ERROR error;
-  
   //Append the buffer to the file
   if (pwrite (fd, buffer, length, 0) == -1){
-    printf ("ERROR: pwrite\n");
-    if ((error = OMXCAM_stopVideo ())) logError (error);
+    fprintf (stderr, "error: pwrite\n");
+    if (omxcam_video_stop ()) log_error ();
     return;
   }
   
   if (stop){
-    if ((error = OMXCAM_stopVideo ())) logError (error);
+    if (omxcam_video_stop ()) log_error ();
   }
 }
 
-void bufferCallbackYUV (uint8_t* buffer, uint32_t length){
-  yuvCurrent += length;
-  OMXCAM_ERROR error;
+void buffer_callback_yuv (uint8_t* buffer, uint32_t length){
+  yuv_current += length;
   
   //Append the data to the buffers
-  memcpy (yBuffer, buffer + yuvPlanesSlice.yOffset, yuvPlanesSlice.yLength);
-  yBuffer += yuvPlanesSlice.yLength;
-  memcpy (uBuffer, buffer + yuvPlanesSlice.uOffset, yuvPlanesSlice.uLength);
-  uBuffer += yuvPlanesSlice.uLength;
-  memcpy (vBuffer, buffer + yuvPlanesSlice.vOffset, yuvPlanesSlice.vLength);
-  vBuffer += yuvPlanesSlice.vLength;
+  memcpy (y_buffer, buffer + yuv_planes_slice.offset_y,
+      yuv_planes_slice.length_y);
+  y_buffer += yuv_planes_slice.length_y;
   
-  if (yuvCurrent == yuvFrame){
+  memcpy (u_buffer, buffer + yuv_planes_slice.offset_u,
+      yuv_planes_slice.length_u);
+  u_buffer += yuv_planes_slice.length_u;
+  
+  memcpy (v_buffer, buffer + yuv_planes_slice.offset_v,
+      yuv_planes_slice.length_v);
+  v_buffer += yuv_planes_slice.length_v;
+  
+  if (yuv_current == yuv_frame){
     //An entire YUV frame has been received
-    yuvCurrent = 0;
+    yuv_current = 0;
     
     //Reset the pointers to their initial address
-    yBuffer -= yuvPlanes.yLength;
-    uBuffer -= yuvPlanes.uLength;
-    vBuffer -= yuvPlanes.vLength;
+    y_buffer -= yuv_planes.length_y;
+    u_buffer -= yuv_planes.length_u;
+    v_buffer -= yuv_planes.length_v;
     
     //Store the YUV planes
-    if (pwrite (fd, yBuffer, yuvPlanes.yLength, 0) == -1){
-      printf ("ERROR: pwrite\n");
-      if ((error = OMXCAM_stopVideo ())) logError (error);
+    if (pwrite (fd, y_buffer, yuv_planes.length_y, 0) == -1){
+      fprintf (stderr, "error: pwrite\n");
+      if (omxcam_video_stop ()) log_error ();
       return;
     }
-    if (pwrite (fd, uBuffer, yuvPlanes.uLength, 0) == -1){
-      printf ("ERROR: pwrite\n");
-      if ((error = OMXCAM_stopVideo ())) logError (error);
+    if (pwrite (fd, u_buffer, yuv_planes.length_u, 0) == -1){
+      fprintf (stderr, "error: pwrite\n");
+      if (omxcam_video_stop ()) log_error ();
       return;
     }
-    if (pwrite (fd, vBuffer, yuvPlanes.vLength, 0) == -1){
-      printf ("ERROR: pwrite\n");
-      if ((error = OMXCAM_stopVideo ())) logError (error);
+    if (pwrite (fd, v_buffer, yuv_planes.length_v, 0) == -1){
+      fprintf (stderr, "error: pwrite\n");
+      if (omxcam_video_stop ()) log_error ();
       return;
     }
     
-    if (++yuvFrames == 10){
+    if (++yuv_frames == 10){
       //All the frames have been received
-      if ((error = OMXCAM_stopVideo ())) logError (error);
+      if (omxcam_video_stop ()) log_error ();
     }
   }
 }
 
-int saveRGB (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
+int save_rgb (char* filename, omxcam_video_settings_t* settings){
   /*
   The RGB video comes in slices, that is, each buffer is part of a frame:
   buffer != frame -> buffer < frame. Take into account that a buffer can contain
@@ -121,24 +123,22 @@ int saveRGB (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
   
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
-    printf ("ERROR: open\n");
+    fprintf (stderr, "error: open\n");
     return 1;
   }
   
-  OMXCAM_ERROR error;
-  
-  if ((error = OMXCAM_startVideo (settings, 0))) return logError (error);
+  if (omxcam_video_start (settings, 0)) log_error ();
   
   //Close the file
   if (close (fd)){
-    printf ("ERROR: close\n");
+    fprintf (stderr, "error: close\n");
     return 1;
   }
   
   return 0;
 }
 
-int saveYUV (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
+int save_yuv (char* filename, omxcam_video_settings_t* settings){
   /*
   The camera returns YUV420PackedPlanar buffers/slices
   Packed means that each slice has y + u + v planes
@@ -158,9 +158,9 @@ int saveYUV (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
   Therefore, you need to buffer the entire planes if you want to store them into
   a file. For this purpose you have two functions:
   
-  OMXCAM_getYUVPlanes(): given a width and height, it calculates the offsets and
+  omxcam_yuv_planes(): given a width and height, it calculates the offsets and
     lengths of each plane.
-  OMXCAM_getYUVPlanesSlice(): given a width and height, it calculates the
+  omxcam_yuv_planes_slice(): given a width and height, it calculates the
     offsets and lengths of each plane from a slice returned by the
     "bufferCallback" function.
   
@@ -173,36 +173,32 @@ int saveYUV (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
   
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
-    printf ("ERROR: open\n");
+    fprintf (stderr, "error: open\n");
     return 1;
   }
   
   //The width and the height might be modified because they must be divisible by
   //16. In this case, both the width and the height are divisible by 16.
-  yuvPlanes.width = yuvPlanesSlice.width = 640;
-  yuvPlanes.height = yuvPlanesSlice.height = 480;
-  OMXCAM_getYUVPlanes (&yuvPlanes);
-  OMXCAM_getYUVPlanesSlice (&yuvPlanesSlice);
+  omxcam_yuv_planes (&yuv_planes, 640, 480);
+  omxcam_yuv_planes_slice (&yuv_planes_slice, 640);
   
   //Frame size
-  yuvFrame = yuvPlanes.vOffset + yuvPlanes.vLength;
+  yuv_frame = yuv_planes.offset_v + yuv_planes.length_v;
   
   //Allocate the buffers
-  yBuffer = (uint8_t*)malloc (sizeof (uint8_t)*yuvPlanes.yLength);
-  uBuffer = (uint8_t*)malloc (sizeof (uint8_t)*yuvPlanes.uLength);
-  vBuffer = (uint8_t*)malloc (sizeof (uint8_t)*yuvPlanes.vLength);
+  y_buffer = (uint8_t*)malloc (sizeof (uint8_t)*yuv_planes.length_y);
+  u_buffer = (uint8_t*)malloc (sizeof (uint8_t)*yuv_planes.length_u);
+  v_buffer = (uint8_t*)malloc (sizeof (uint8_t)*yuv_planes.length_v);
   
-  OMXCAM_ERROR error;
+  if (omxcam_video_start (settings, 0)) log_error ();
   
-  if ((error = OMXCAM_startVideo (settings, 0))) return logError (error);
-  
-  free (yBuffer);
-  free (uBuffer);
-  free (vBuffer);
+  free (y_buffer);
+  free (u_buffer);
+  free (v_buffer);
   
   //Close the file
   if (close (fd)){
-    printf ("ERROR: close\n");
+    fprintf (stderr, "error: close\n");
     return 1;
   }
   
@@ -211,22 +207,22 @@ int saveYUV (char* filename, OMXCAM_VIDEO_SETTINGS* settings){
 
 int main (){
   //1920x1080 30fps by default
-  OMXCAM_VIDEO_SETTINGS settings;
+  omxcam_video_settings_t settings;
   
   //Capture a raw RGB video
-  OMXCAM_initVideoSettings (&settings);
-  settings.bufferCallback = bufferCallbackRGB;
-  settings.format = OMXCAM_FormatRGB888;
+  omxcam_video_init (&settings);
+  settings.buffer_callback = buffer_callback_rgb;
+  settings.format = OMXCAM_FORMAT_RGB888;
   settings.camera.width = 640;
   settings.camera.height = 480;
   
-  if (saveRGB ("video.rgb", &settings)) return 1;
+  if (save_rgb ("video.rgb", &settings)) return 1;
   
   //Capture a raw YUV420 video
-  settings.bufferCallback = bufferCallbackYUV;
-  settings.format = OMXCAM_FormatYUV420;
+  settings.buffer_callback = buffer_callback_yuv;
+  settings.format = OMXCAM_FORMAT_YUV420;
   
-  if (saveYUV ("video.yuv", &settings)) return 1;
+  if (save_yuv ("video.yuv", &settings)) return 1;
   
   printf ("ok\n");
   

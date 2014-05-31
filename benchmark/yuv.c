@@ -1,43 +1,39 @@
-#include "omxcam/omxcam.h"
+#include "yuv.h"
 
-static OMXCAM_YUV_PLANES planes;
+static omxcam_yuv_planes_t planes;
 static uint32_t current = 0;
 static uint32_t frames = 0;
 static uint32_t frame;
-static int totalFrames;
-static OMXCAM_ERROR bgError;
+static int total_frames;
+static int bg_error = 0;
 
-static void bufferCallback (uint8_t* buffer, uint32_t length){
+static void buffer_callback (uint8_t* buffer, uint32_t length){
   current += length;
   
   if (current == frame){
     current = 0;
     
-    if (++frames == totalFrames){
-      bgError = OMXCAM_stopVideo ();
+    if (++frames == total_frames){
+      bg_error = omxcam_video_stop ();
     }
   }
 }
 
-OMXCAM_ERROR yuv (int frames, int width, int height){
-  OMXCAM_VIDEO_SETTINGS settings;
+int yuv (int frames, int width, int height){
+  omxcam_video_settings_t settings;
   
-  OMXCAM_initVideoSettings (&settings);
-  settings.bufferCallback = bufferCallback;
-  settings.format = OMXCAM_FormatYUV420;
+  omxcam_video_init (&settings);
+  settings.buffer_callback = buffer_callback;
+  settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = width;
   settings.camera.height = height;
   
-  planes.width = width;
-  planes.height = height;
-  OMXCAM_getYUVPlanes (&planes);
+  omxcam_yuv_planes (&planes, width, height);
   
-  frame = planes.vOffset + planes.vLength;
-  totalFrames = frames;
+  frame = planes.offset_v + planes.length_v;
+  total_frames = frames;
   
-  bgError = OMXCAM_ErrorNone;
+  int error = omxcam_video_start (&settings, 0);
   
-  OMXCAM_ERROR error = OMXCAM_startVideo (&settings, 0);
-  
-  return error ? error : bgError;
+  return error ? error : bg_error;
 }
