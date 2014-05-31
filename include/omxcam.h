@@ -41,7 +41,7 @@ extern "C" {
 #define OMXCAM_NULL_SINK_NAME "OMX.broadcom.null_sink"
 
 //Handy way to sleep forever while recording a video
-#define OMXCAM_RECORD_FOREVER 0
+#define OMXCAM_CAPTURE_FOREVER 0
 
 //Error definitions, expand if necessary
 #define OMXCAM_ERRNO_MAP(XX) \

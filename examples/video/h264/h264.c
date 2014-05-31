@@ -45,7 +45,7 @@ int save_time (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  //Wait 3000ms
+  //Capture ~3000ms
   if (omxcam_video_start (settings, 3000)) return log_error ();
   
   //Close the file
@@ -66,8 +66,10 @@ int save_length (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  //Wait indefinitely
-  if (omxcam_video_start (settings, OMXCAM_RECORD_FOREVER)) return log_error ();
+  //Capture indefinitely
+  if (omxcam_video_start (settings, OMXCAM_CAPTURE_FOREVER)){
+    return log_error ();
+  }
   
   //Close the file
   if (close (fd)){

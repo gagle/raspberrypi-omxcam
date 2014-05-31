@@ -129,11 +129,6 @@ int omxcam_component_init (omxcam_component_t* component){
   
   if (omxcam_event_create (component)) return -1;
   
-  /*if (vcos_event_flags_create (&component->flags, "component")){
-    omxcam_error ("vcos_event_flags_create");
-    return -1;
-  }*/
-  
   OMX_CALLBACKTYPE callbacks;
   callbacks.EventHandler = event_handler;
   callbacks.FillBufferDone = fill_buffer_done;
@@ -182,7 +177,6 @@ int omxcam_component_deinit (omxcam_component_t* component){
   
   OMX_ERRORTYPE error;
   
-  //vcos_event_flags_delete (&component->flags);
   if (omxcam_event_destroy (component)) return -1;
 
   if ((error = OMX_FreeHandle (component->handle))){

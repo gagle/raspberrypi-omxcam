@@ -53,9 +53,6 @@ int omxcam_event_wake (omxcam_component_t* component, omxcam_event event){
   }
   
   return 0;
-  
-  
-  //vcos_event_flags_set (&component->flags, event, VCOS_OR);
 }
 
 int omxcam_event_wait (
@@ -96,22 +93,4 @@ int omxcam_event_wait (
   }
   
   return component->event.error;
-  
-  /*omxcam_event set;
-  if (vcos_event_flags_get (&component->flags, events | OMXCAM_EVENT_ERROR,
-      VCOS_OR_CONSUME, VCOS_SUSPEND, &set)){
-    omxcam_error ("vcos_event_flags_get");
-    return -1;
-  }
-  
-  if (set == OMXCAM_EVENT_ERROR){
-    //omxcam_error() is set in the EventHandler
-    return -1;
-  }
-  
-  if (current_events){
-    *current_events = set;
-  }
-  
-  return 0;*/
 }
