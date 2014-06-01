@@ -161,7 +161,7 @@ int main (){
   settings.buffer_callback = buffer_callback_yuv;
   settings.format = OMXCAM_FORMAT_YUV420;
   
-  //if (save_yuv ("still.yuv", &settings)) return 1;
+  if (save_yuv ("still.yuv", &settings)) return 1;
   
   printf ("ok\n");
   
