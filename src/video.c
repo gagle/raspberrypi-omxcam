@@ -94,6 +94,9 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
       return -1;
   }
   
+  omxcam_trace ("settings: %dx%d @%dfps", settings->camera.width,
+      settings->camera.height, settings->camera.framerate);
+  
   thread_arg.buffer_callback = settings->buffer_callback;
   thread_arg.fill_component = fill_component;
   
@@ -141,7 +144,9 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
         omxcam_dump_OMX_ERRORTYPE (error));
-    omxcam_set_last_error (OMXCAM_ERROR_VIDEO);
+    omxcam_set_last_error (error ==  OMX_ErrorBadParameter
+        ? OMXCAM_ERROR_BAD_PARAMETER
+        : OMXCAM_ERROR_VIDEO);
     return -1;
   }
   
@@ -660,7 +665,7 @@ int omxcam_video_start (
     return -1;
   }
   if (running){
-    omxcam_error ("Video capture is already running");
+    omxcam_error ("video capture is already running");
     omxcam_set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
@@ -706,7 +711,7 @@ int omxcam_video_start (
   
   if (bg_error){
     //The video was already stopped due to an error
-    omxcam_trace ("Video stopped due to an error");
+    omxcam_trace ("video stopped due to an error");
     
     int error = bg_error;
     bg_error = 0;
@@ -724,8 +729,8 @@ int omxcam_video_start (
   }
   
   if (!running){
-    //The video was already stopped by the client
-    omxcam_trace ("video stopped by the client");
+    //The video was already stopped by the user
+    omxcam_trace ("video already stopped by the user");
     
     if (pthread_join (bg_thread, 0)){
       omxcam_error ("pthread_join");

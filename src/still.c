@@ -44,6 +44,11 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam_set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
     return -1;
   }
+  if (settings->camera.width < settings->camera.height){
+    omxcam_error ("'camera.width' must be >= than 'camera.height'");
+    omxcam_set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
   
   if (omxcam_init ()){
     omxcam_set_last_error (OMXCAM_ERROR_STILL);
@@ -92,6 +97,9 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       omxcam_set_last_error (OMXCAM_ERROR_FORMAT);
       return -1;
   }
+  
+  omxcam_trace ("settings: %dx%d", settings->camera.width,
+      settings->camera.height);
   
   if (omxcam_component_init (&omxcam_ctx.camera)){
     omxcam_set_last_error (OMXCAM_ERROR_INIT_CAMERA);
@@ -162,7 +170,9 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
         omxcam_dump_OMX_ERRORTYPE (error));
-    omxcam_set_last_error (OMXCAM_ERROR_STILL);
+    omxcam_set_last_error (error ==  OMX_ErrorBadParameter
+        ? OMXCAM_ERROR_BAD_PARAMETER
+        : OMXCAM_ERROR_STILL);
     return -1;
   }
   

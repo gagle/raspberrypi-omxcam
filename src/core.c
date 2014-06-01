@@ -1,11 +1,5 @@
 #include "omxcam.h"
 
-#define OMXCAM_EVENT_WAKE(x) \
-  if (omxcam_event_wake (component, x)){ \
-    omxcam_event_error (component); \
-    return OMX_ErrorNone; \
-  }
-
 OMX_ERRORTYPE event_handler (
     OMX_IN OMX_HANDLETYPE comp,
     OMX_IN OMX_PTR app_data,
@@ -14,6 +8,7 @@ OMX_ERRORTYPE event_handler (
     OMX_IN OMX_U32 data2,
     OMX_IN OMX_PTR event_data){
   omxcam_component_t* component = (omxcam_component_t*)app_data;
+  omxcam_event evt = -1;
   
   switch (event){
     case OMX_EventCmdComplete:
@@ -21,60 +16,64 @@ OMX_ERRORTYPE event_handler (
         case OMX_CommandStateSet:
           omxcam_trace ("event: OMX_CommandStateSet, state: %s",
               omxcam_dump_OMX_STATETYPE (data2));
-          OMXCAM_EVENT_WAKE (OMXCAM_EVENT_STATE_SET);
+          evt = OMXCAM_EVENT_STATE_SET;
           break;
         case OMX_CommandPortDisable:
           omxcam_trace ("event: OMX_CommandPortDisable, port: %d", data2);
-          OMXCAM_EVENT_WAKE (OMXCAM_EVENT_PORT_DISABLE);
+          evt = OMXCAM_EVENT_PORT_DISABLE;
           break;
         case OMX_CommandPortEnable:
           omxcam_trace ("event: OMX_CommandPortEnable, port: %d", data2);
-          OMXCAM_EVENT_WAKE (OMXCAM_EVENT_PORT_ENABLE);
+          evt = OMXCAM_EVENT_PORT_ENABLE;
           break;
         case OMX_CommandFlush:
           omxcam_trace ("event: OMX_CommandFlush, port: %d", data2);
-          OMXCAM_EVENT_WAKE (OMXCAM_EVENT_FLUSH);
+          evt = OMXCAM_EVENT_FLUSH;
           break;
         case OMX_CommandMarkBuffer:
           omxcam_trace ("event: OMX_CommandMarkBuffer, port: %d", data2);
-          OMXCAM_EVENT_WAKE (OMXCAM_EVENT_MARK_BUFFER);
+          evt = OMXCAM_EVENT_MARK_BUFFER;
           break;
       }
       break;
     case OMX_EventError:
       omxcam_trace ("event: %s", omxcam_dump_OMX_ERRORTYPE (data1));
       omxcam_error ("OMX_EventError: %s", omxcam_dump_OMX_ERRORTYPE (data1));
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_ERROR);
+      evt = OMXCAM_EVENT_ERROR;
       break;
     case OMX_EventMark:
       omxcam_trace ("event: OMX_EventMark");
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_MARK);
+      evt = OMXCAM_EVENT_MARK;
       break;
     case OMX_EventPortSettingsChanged:
       omxcam_trace ("event: OMX_EventPortSettingsChanged, port: %d", data1);
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_PORT_SETTINGS_CHANGED);
+      evt = OMXCAM_EVENT_PORT_SETTINGS_CHANGED;
       break;
     case OMX_EventParamOrConfigChanged:
       omxcam_trace ("event: OMX_EventParamOrConfigChanged, data1: %d, data2: "
           "%X", data1, data2);
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_PARAM_OR_CONFIG_CHANGED);
+      evt = OMXCAM_EVENT_PARAM_OR_CONFIG_CHANGED;
       break;
     case OMX_EventBufferFlag:
       omxcam_trace ("event: OMX_EventBufferFlag, port: %d", data1);
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_BUFFER_FLAG);
+      evt = OMXCAM_EVENT_BUFFER_FLAG;
       break;
     case OMX_EventResourcesAcquired:
       omxcam_trace ("event: OMX_EventResourcesAcquired");
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_RESOURCES_ACQUIRED);
+      evt = OMXCAM_EVENT_RESOURCES_ACQUIRED;
       break;
     case OMX_EventDynamicResourcesAvailable:
       omxcam_trace ("event: OMX_EventDynamicResourcesAvailable");
-      OMXCAM_EVENT_WAKE (OMXCAM_EVENT_DYNAMIC_RESOURCES_AVAILABLE);
+      evt = OMXCAM_EVENT_DYNAMIC_RESOURCES_AVAILABLE;
       break;
     default:
       //This should never execute, log and ignore
       omxcam_error ("event: unknown (%X)", event);
-      break;
+      return OMX_ErrorNone;
+  }
+  
+  if (omxcam_event_wake (component, evt)){
+    omxcam_event_error (component);
   }
 
   return OMX_ErrorNone;
@@ -87,7 +86,9 @@ OMX_ERRORTYPE fill_buffer_done (
   omxcam_component_t* component = (omxcam_component_t*)app_data;
   
   omxcam_trace ("event: FillBufferDone");
-  OMXCAM_EVENT_WAKE (OMXCAM_EVENT_FILL_BUFFER_DONE);
+  if (omxcam_event_wake (component, OMXCAM_EVENT_FILL_BUFFER_DONE)){
+    omxcam_event_error (component);
+  }
   
   return OMX_ErrorNone;
 }

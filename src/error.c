@@ -47,6 +47,6 @@ void omxcam_set_last_error (omxcam_errno error){
 }
 
 void omxcam_perror (){
-  fprintf (stderr, "omxcam %s: %s\n", omxcam_error_name (last_error),
+  fprintf (stderr, "omxcam: %s: %s\n", omxcam_error_name (last_error),
       omxcam_strerror (last_error));
 }

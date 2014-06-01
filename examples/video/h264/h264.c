@@ -45,8 +45,8 @@ int save_time (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  //Capture ~3000ms
-  if (omxcam_video_start (settings, 3000)) return log_error ();
+  //Capture ~2000ms (capture time, not file duration)
+  if (omxcam_video_start (settings, 2000)) return log_error ();
   
   //Close the file
   if (close (fd)){
@@ -81,19 +81,23 @@ int save_length (char* filename, omxcam_video_settings_t* settings){
 }
 
 int main (){
-  //1920x1080 30fps by default
+  //1920x1080 @30fps by default
   omxcam_video_settings_t settings;
   
-  //Record a video of 3000ms
+  //Capture a video of ~2000ms (capture time, not file duration)
   omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_time;
+  //http://picamera.readthedocs.org/en/release-1.4/fov.html#camera-modes
+  settings.camera.width = 640;
+  settings.camera.height = 480;
+  settings.camera.framerate = 90;
   
   if (save_time ("video-time.h264", &settings)) return 1;
   
-  //Record a video of 2MB
+  //Capture a video of 2MB
   settings.buffer_callback = buffer_callback_length;
   
-  if (save_length ("video-length.h264", &settings)) return 1;
+  //if (save_length ("video-length.h264", &settings)) return 1;
   
   printf ("ok\n");
   
