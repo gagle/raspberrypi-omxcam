@@ -32,6 +32,7 @@ void omxcam_still_init (omxcam_still_settings_t* settings){
   settings->format = OMXCAM_FORMAT_JPEG;
   omxcam_jpeg_init (&settings->jpeg);
   settings->buffer_callback = 0;
+  settings->slice_height = 16;
 }
 
 int omxcam_still_start (omxcam_still_settings_t* settings){
@@ -98,7 +99,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
   }
   
-  omxcam_trace ("settings: %dx%d", settings->camera.width,
+  omxcam_trace ("%dx%d", settings->camera.width,
       settings->camera.height);
   
   if (omxcam_component_init (&omxcam_ctx.camera)){

@@ -20,20 +20,3 @@ void omxcam_yuv_planes (
   planes->offset_v = planes->length_y + planes->length_u;
   planes->length_v = planes->length_u;
 }
-
-void omxcam_yuv_planes_slice (
-    omxcam_yuv_planes_t* planes,
-    uint32_t width){
-  //The width must be divisible by 16
-  width = omxcam_round (width, 16);
-  
-  //slice height = 16 for stills
-  //TODO: see if video slices are also 16
-  planes->offset_y = 0;
-  planes->length_y = width << 4;
-  planes->offset_u = planes->length_y;
-  //(width/2)*(sliceHeight/2)
-  planes->length_u = width << 2;
-  planes->offset_v = planes->length_y + planes->length_u;
-  planes->length_v = planes->length_u;
-}

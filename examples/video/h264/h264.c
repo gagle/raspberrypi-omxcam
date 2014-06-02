@@ -4,13 +4,13 @@
 
 #include "omxcam.h"
 
+int fd;
+uint32_t current = 0;
+
 int log_error (){
   omxcam_perror ();
   return 1;
 }
-
-int fd;
-uint32_t current = 0;
 
 void buffer_callback_time (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
@@ -84,17 +84,18 @@ int main (){
   //1920x1080 @30fps by default
   omxcam_video_settings_t settings;
   
-  //Capture a video of ~2000ms (capture time, not file duration)
+  //Capture a video of ~2000ms (capture time, not file duration), 640x480 @90fps
   omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_time;
   //http://picamera.readthedocs.org/en/release-1.4/fov.html#camera-modes
   settings.camera.width = 640;
   settings.camera.height = 480;
-  settings.camera.framerate = 90;
+  settings.camera.framerate = 30;
   
   if (save_time ("video-time.h264", &settings)) return 1;
   
-  //Capture a video of 2MB
+  //Capture a video of 2MB, 1920x1080 @30fps
+  omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_length;
   
   //if (save_length ("video-length.h264", &settings)) return 1;

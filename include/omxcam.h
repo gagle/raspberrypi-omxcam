@@ -239,7 +239,6 @@ typedef struct {
  */
 typedef struct {
   OMX_HANDLETYPE handle;
-  //VCOS_EVENT_FLAGS_T flags;
   omxcam_event_t event;
   OMX_STRING name;
   void (*buffer_callback)(uint8_t* buffer, uint32_t length);
@@ -478,24 +477,18 @@ typedef struct {
 } omxcam_yuv_planes_t;
 
 /*
- * Given a frame width and height, returns the offsets and lengths of each of
- * the yuv planes. Both the width and height need to be divisible by 16, they
- * are rounded internally.
+ * Given a width and height, returns the offsets and lengths of each of
+ * the yuv planes. Both the width and height need to be multiple of 16, they
+ * are rounded internally though.
+ *
+ * It can be also used to get the offsets and length of the yuv planes in a
+ * buffer slice returned by the "buffer_callback". Simply pass the
+ * "settings.slice_height" value as the height parameter.
  */
 OMXCAM_EXTERN void omxcam_yuv_planes (
     omxcam_yuv_planes_t* planes,
     uint32_t width,
     uint32_t height);
-
-/*
- * Given a frame width, returns the offsets and lengths of each of
- * the yuv planes of a slice. A slice is the buffer returned by the
- * buffer_callback() function. The width needs to be divisible by 16, it is
- * rounded internally.
- */
-OMXCAM_EXTERN void omxcam_yuv_planes_slice (
-    omxcam_yuv_planes_t* planes,
-    uint32_t width);
 
 typedef struct {
   char* key;
@@ -541,11 +534,15 @@ void omxcam_h264_init (omxcam_h264_settings_t* settings);
  */
 int omxcam_h264_configure_omx (omxcam_h264_settings_t* settings);
 
+#define OMXCAM_COMMON_SETTINGS \
+  omxcam_camera_settings_t camera; \
+  omxcam_format format; \
+  void (*buffer_callback)(uint8_t* buffer, uint32_t length); \
+  uint32_t slice_height;
+
 typedef struct {
-  omxcam_camera_settings_t camera;
-  omxcam_format format;
+  OMXCAM_COMMON_SETTINGS
   omxcam_jpeg_settings_t jpeg;
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
 } omxcam_still_settings_t;
 
 /*
@@ -562,10 +559,8 @@ OMXCAM_EXTERN int omxcam_still_start (omxcam_still_settings_t* settings);
 OMXCAM_EXTERN int omxcam_still_stop ();
 
 typedef struct {
-  omxcam_camera_settings_t camera;
-  omxcam_format format;
+  OMXCAM_COMMON_SETTINGS
   omxcam_h264_settings_t h264;
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
 } omxcam_video_settings_t;
 
 /*
