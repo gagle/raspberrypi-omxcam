@@ -62,6 +62,10 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   omxcam_component_t* fill_component;
   OMX_ERRORTYPE error;
   
+  OMX_U32 width = /*settings->camera.width;*/omxcam_round (settings->camera.width, 32);
+  OMX_U32 height = /*settings->camera.height;*/omxcam_round (settings->camera.height, 16);
+  OMX_U32 slice_height = omxcam_round (settings->slice_height, 16);
+  
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
   
@@ -70,28 +74,28 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
-      stride = settings->camera.width*3;
+      stride = width*3;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
-      stride = settings->camera.width*4;
+      stride = width*4;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = settings->camera.width;
+      stride = width;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_JPEG:
       omxcam_ctx.image_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = settings->camera.width;
+      stride = width;
       fill_component = &omxcam_ctx.image_encode;
       break;
     default:
@@ -99,8 +103,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
   }
   
-  omxcam_trace ("%dx%d", settings->camera.width,
-      settings->camera.height);
+  omxcam_trace ("%dx%d", width, height);
   
   if (omxcam_component_init (&omxcam_ctx.camera)){
     omxcam_set_last_error (OMXCAM_ERROR_INIT_CAMERA);
@@ -160,13 +163,15 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     return -1;
   }
   
-  port_st.format.image.nFrameWidth = settings->camera.width;
-  port_st.format.image.nFrameHeight = settings->camera.height;
+  port_st.format.image.nFrameWidth = width;
+  port_st.format.image.nFrameHeight = height;
   port_st.format.image.eCompressionFormat = OMX_IMAGE_CodingUnused;
   port_st.format.image.eColorFormat = color_format;
-  
-  //TODO: stride, sliceHeight? http://www.raspberrypi.org/phpBB3/viewtopic.php?f=28&t=22019
   port_st.format.image.nStride = stride;
+  //The nSliceHeight parameter should be read-only as stated in the OpenMAX IL
+  //specification, but it can be configured. With this parameter the size of the
+  //buffer payload can be controlled. It must be multiple of 16. Default is 16.
+  port_st.format.video.nSliceHeight = slice_height;
   if ((error = OMX_SetParameter (omxcam_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
@@ -188,7 +193,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   port_st.format.video.eColorFormat = color_format;
   //15fps, 15 << 16 -> 983040
   port_st.format.video.xFramerate = 983040;
-  port_st.format.video.nStride = stride;
+  port_st.format.video.nStride = 1920;
   if ((error = OMX_SetParameter (omxcam_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
@@ -216,10 +221,12 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       omxcam_set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }
-    port_st.format.image.nFrameWidth = settings->camera.width;
-    port_st.format.image.nFrameHeight = settings->camera.height;
+    port_st.format.image.nFrameWidth = width;
+    port_st.format.image.nFrameHeight = height;
     port_st.format.image.eCompressionFormat = OMX_IMAGE_CodingJPEG;
     port_st.format.image.eColorFormat = OMX_COLOR_FormatUnused;
+    port_st.format.image.nStride = stride;
+    //ort_st.format.image.nSliceHeight = slice_height;
     if ((error = OMX_SetParameter (omxcam_ctx.image_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){
       omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",

@@ -1,5 +1,5 @@
 APP = raw
 OMXCAM_HOME = ../../..
-CLEAN = still.rgb still.yuv
+CLEAN = still.rgb still-1312x736.yuv still-1312x976.yuv
 
 include ../../Makefile-common

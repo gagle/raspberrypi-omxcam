@@ -123,14 +123,15 @@ int save_rgb (char* filename, omxcam_video_settings_t* settings){
 
 int save_yuv (char* filename, omxcam_video_settings_t* settings){
   /*
-  The camera returns YUV420PackedPlanar buffers/slices
-  Packed means that each slice has y + u + v planes
-  Planar means that each YUV component is located in a different plane/array
+  The camera returns YUV420PackedPlanar buffers/slices.
+  Packed means that each slice has a little portion of y + u + v planes.
+  Planar means that each YUV component is located in a different plane/array,
+  that is, it's not interleaved.
   PackedPlannar allows you to process each plane at the same time, that is,
   you don't need to wait to receive the entire Y plane to begin processing
-  the U plane. This is good if you want to stream the buffers, but when you
-  need to store the data into a file, you need to store the entire planes
-  one after the other, that is:
+  the U plane. This is good if you want to stream and manipulate the buffers,
+  but when you need to store the data into a file, you need to store the entire
+  planes one after the other, that is:
   
   WRONG: store the buffers as they come
     (y+u+v) + (y+u+v) + (y+u+v) + (y+u+v) + ...
@@ -138,8 +139,7 @@ int save_yuv (char* filename, omxcam_video_settings_t* settings){
   RIGHT: save the slices in different buffers and then store the entire planes
     (y+y+y+y+...) + (u+u+u+u+...) + (v+v+v+v+...)
   
-  Therefore, you need to buffer the entire planes if you want to store them into
-  a file. For this purpose you have two functions:
+  To ease the planes manipulation you have the following function:
   
   omxcam_yuv_planes(): given a width and height, it calculates the offsets and
     lengths of each plane.
@@ -203,10 +203,10 @@ int main (){
   settings.buffer_callback = buffer_callback_yuv;
   settings.format = OMXCAM_FORMAT_YUV420;
   //Just for showing different parameters, the slice height (the buffer height)
-  //will be the same as the file height, therefore in this case, a buffer has
-  //the same size as a frame, you will receive 10 buffers (10 frames)
-  //The buffer height must be multiple of 16 (it is rounded up internally to
-  //the nearest multiple of 16).
+  //it's configured to be the same as the file height, therefore in this case,
+  //a buffer has the same size as a frame, you will receive 10 buffers (10
+  //frames). The buffer height must be multiple of 16 (it is rounded up
+  //internally to the nearest multiple of 16).
   settings.slice_height = settings.camera.height;
   
   if (save_yuv ("video.yuv", &settings)) return 1;

@@ -51,7 +51,7 @@ int main (){
   omxcam_still_init (&settings);
   settings.buffer_callback = buffer_callback;
   
-  if (save ("still-default.jpg", &settings)) return 1;
+  //if (save ("still-default.jpg", &settings)) return 1;
   
   //Capture an image with shutter speed 1/8, EV -10 and some EXIF tags
   omxcam_still_init (&settings);
@@ -61,6 +61,7 @@ int main (){
   settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
   //Values of color_u and color_v are 128 by default, gray image
   settings.camera.color_enable = OMXCAM_TRUE;
+  settings.camera.height = 1944;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags

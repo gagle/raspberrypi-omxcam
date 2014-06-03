@@ -98,7 +98,7 @@ int main (){
   omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_length;
   
-  //if (save_length ("video-length.h264", &settings)) return 1;
+  if (save_length ("video-length.h264", &settings)) return 1;
   
   printf ("ok\n");
   

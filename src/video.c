@@ -142,9 +142,9 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
   port_st.format.video.eColorFormat = color_format;
   port_st.format.video.xFramerate = settings->camera.framerate << 16;
   port_st.format.video.nStride = stride;
-  //It should be read-only parameter as stated in the OpenMAX IL specification,
-  //but it can be configured. With this parameter the size of the buffer payload
-  //can be controlled. It must be multiple of 16. Default is 16
+  //The nSliceHeight parameter should be read-only as stated in the OpenMAX IL
+  //specification, but it can be configured. With this parameter the size of the
+  //buffer payload can be controlled. It must be multiple of 16. Default is 16.
   port_st.format.video.nSliceHeight = slice_height;
   if ((error = OMX_SetParameter (omxcam_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
@@ -153,17 +153,6 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
     omxcam_set_last_error (error ==  OMX_ErrorBadParameter
         ? OMXCAM_ERROR_BAD_PARAMETER
         : OMXCAM_ERROR_VIDEO);
-    return -1;
-  }
-  
-  OMX_PARAM_PORTDEFINITIONTYPE asd;
-  OMXCAM_INIT_STRUCTURE (asd);
-  asd.nPortIndex = 71;
-  if ((error = OMX_GetParameter (omxcam_ctx.camera.handle,
-      OMX_IndexParamPortDefinition, &asd))){
-    omxcam_error ("OMX_GetParameter - OMX_IndexParamPortDefinition: %s",
-        omxcam_dump_OMX_ERRORTYPE (error));
-    omxcam_set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
   
@@ -227,7 +216,7 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
     port_st.format.video.nFrameHeight = height;
     port_st.format.video.xFramerate = settings->camera.framerate << 16;
     port_st.format.video.nStride = stride;
-    port_st.format.video.nSliceHeight = height;
+    port_st.format.video.nSliceHeight = slice_height;
     
     //Despite being configured later, these two fields need to be set now
     port_st.format.video.nBitrate = settings->h264.bitrate;
@@ -469,25 +458,26 @@ static int omxcam_thread_sleep (uint32_t ms){
   time.tv_sec = (time_t)(end/1e6);
   time.tv_nsec = (end%(uint64_t)1e6)*1000;
   
-  int error;
-  
   if (pthread_mutex_lock (&mutex_cond)){
     omxcam_error ("pthread_mutex_lock");
     return -1;
   }
   
   sleeping = 1;
+  int error = 0;
   
-  if ((error = pthread_cond_timedwait (&cond, &mutex_cond, &time)) &&
-      error != ETIMEDOUT){
-    omxcam_error ("pthread_cond_timedwait");
-    sleeping = 0;
-    error = 1;
-  }else{
-    error = 0;
+  //Spurious wakeup guard
+  while (sleeping){
+    if ((error = pthread_cond_timedwait (&cond, &mutex_cond, &time))){
+      sleeping = 0;
+      if (error == ETIMEDOUT){
+        error = 0;
+      }else{
+        omxcam_error ("pthread_cond_timedwait");
+        error = 1;
+      }
+    }
   }
-  
-  sleeping = 0;
   
   if (pthread_mutex_unlock (&mutex_cond)){
     omxcam_error ("pthread_mutex_unlock");
@@ -518,6 +508,8 @@ static int omxcam_thread_wake (){
     omxcam_error ("pthread_mutex_lock");
     return -1;
   }
+  
+  sleeping = 0;
   
   if (pthread_cond_signal (&cond)){
     omxcam_error ("pthread_cond_signal");
@@ -552,13 +544,14 @@ static int omxcam_thread_lock (){
   
   locked = 1;
   
-  if (pthread_cond_wait (&cond, &mutex_cond)){
-    omxcam_error ("pthread_cond_wait");
-    locked = 0;
-    return -1;
+  //Spurious wakeup guard
+  while (locked){
+    if (pthread_cond_wait (&cond, &mutex_cond)){
+      omxcam_error ("pthread_cond_wait");
+      locked = 0;
+      return -1;
+    }
   }
-  
-  locked = 0;
   
   if (pthread_mutex_unlock (&mutex_cond)){
     omxcam_error ("pthread_mutex_unlock");
@@ -587,6 +580,8 @@ static int omxcam_thread_unlock (){
     omxcam_error ("pthread_mutex_lock");
     return -1;
   }
+  
+  locked = 0;
   
   if (pthread_cond_signal (&cond)){
     omxcam_error ("pthread_cond_signal");

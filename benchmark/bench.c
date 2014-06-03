@@ -5,7 +5,7 @@
 #include "yuv.h"
 
 /*
-Results:
+Results: (the closer to 30fps and 1000ms, the better)
 
 640x480, 30 frames
 rgb: 21.83 fps (1374 ms)

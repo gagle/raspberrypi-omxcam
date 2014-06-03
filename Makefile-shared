@@ -22,6 +22,7 @@ all: $(TARGET_LIB)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ -Wno-deprecated-declarations
 
 $(TARGET_LIB): $(OBJS)
+	@mkdir -p $(@D)
 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
 
 .PHONY: clean rebuild
@@ -30,4 +31,4 @@ clean:
 	rm -f $(TARGET_LIB) src/*.o
 
 rebuild:
-	make clean && make
+	make -f Makefile-shared clean && make -f Makefile-shared

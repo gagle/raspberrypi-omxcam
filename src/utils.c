@@ -8,8 +8,7 @@ void omxcam_yuv_planes (
     omxcam_yuv_planes_t* planes,
     uint32_t width,
     uint32_t height){
-  //The width and height must be divisible by 16
-  width = omxcam_round (width, 16);
+  width = omxcam_round (width, 32);
   height = omxcam_round (height, 16);
   
   planes->offset_y = 0;
