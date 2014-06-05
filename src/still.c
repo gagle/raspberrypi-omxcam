@@ -58,13 +58,15 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   
   int use_encoder;
   OMX_COLOR_FORMATTYPE color_format;
-  OMX_U32 stride;
   omxcam_component_t* fill_component;
   OMX_ERRORTYPE error;
   
-  OMX_U32 width = /*settings->camera.width;*/omxcam_round (settings->camera.width, 32);
-  OMX_U32 height = /*settings->camera.height;*/omxcam_round (settings->camera.height, 16);
+  OMX_U32 width_rounded = omxcam_round (settings->camera.width, 32);
+  OMX_U32 height_rounded = omxcam_round (settings->camera.height, 16);
   OMX_U32 slice_height = omxcam_round (settings->slice_height, 16);
+  OMX_U32 width = width_rounded;
+  OMX_U32 height = height_rounded;
+  OMX_U32 stride = width_rounded;
   
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
@@ -74,28 +76,28 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
-      stride = width*3;
+      stride = stride*3;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
-      stride = width*4;
+      stride = stride*4;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = width;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_JPEG:
       omxcam_ctx.image_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = width;
+      width = settings->camera.width;
+      height = settings->camera.height;
       fill_component = &omxcam_ctx.image_encode;
       break;
     default:
@@ -103,7 +105,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
   }
   
-  omxcam_trace ("%dx%d", width, height);
+  omxcam_trace ("%dx%d", settings->camera.width, settings->camera.height);
   
   if (omxcam_component_init (&omxcam_ctx.camera)){
     omxcam_set_last_error (OMXCAM_ERROR_INIT_CAMERA);
@@ -221,8 +223,8 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       omxcam_set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }
-    port_st.format.image.nFrameWidth = width;
-    port_st.format.image.nFrameHeight = height;
+    port_st.format.image.nFrameWidth = settings->camera.width;
+    port_st.format.image.nFrameHeight = settings->camera.height;
     port_st.format.image.eCompressionFormat = OMX_IMAGE_CodingJPEG;
     port_st.format.image.eColorFormat = OMX_COLOR_FormatUnused;
     port_st.format.image.nStride = stride;

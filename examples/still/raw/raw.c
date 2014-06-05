@@ -144,33 +144,38 @@ int main (){
   //if (save_rgb ("still.rgb", &settings)) return 1;
   
   /*
-  Please note that the original aspect ratio from an image is 4:3. If you set
+  Please note that the original aspect ratio of an image is 4:3. If you set
   dimensions with different ratios, the final image will still have the same
-  aspect ratio but you will notice that it will be cropped to the given
+  aspect ratio (4:3) but you will notice that it will be cropped to the given
   dimensions.
   
   For example:
-  1296x730 (1312x736 rounded up) has a 16:9 aspect ratio, so the image that will
-  be captured will have the dimensions 1296x972 (1296/(4/3) = 972)
-  (1312x976 correctly rounded) after it is resized from 2592x1944, and then it
-  will be cropped to 1312x736. Remember that the width must be multiple of 32
-  (1296->1312) and the height of 16 (730->736).
-  Just to compare, take two YUV images: 1296x730 and 1296x972. This is what will
-  happen:
+  - You want to take an image: 1296x730, 16:9.
+  - The camera captures at 2592x1944, 4:3.
+  - If you're capturing a raw image (no encoder), the width and the height need
+    to be multiple of 32 and 16, respectively. You don't need to ensure that the
+    dimensions are correct when capturing an image, this is done automatically,
+    but you need to know them in order to open the file with the correct
+    dimensions.
+  - To go from 2592x1944 to 1296x730 the image needs to be resized to the
+    "nearest" dimensions of the destination image but maintaining the 4:3 aspect
+    ratio, that is, it is resized to 1296x972 (1296/(4/3) = 972).
+  - The resized image it's cropped to 1312x736 in a centered way as depicted in
+    the following diagram:
+    
+        --    ++++++++++++++++++++    --
+    120 |     +                  +     |
+        +-    +------------------+     |
+        |     +                  +     |
+    736 |     +                  +     | 976 (972 rounded up)
+        |     +                  +     |
+        +-    +------------------+     |
+    120 |     +                  +     |
+        --    ++++++++++++++++++++    --
+                      1312
   
-      --    ++++++++++++++++++++    --
-  120 |     +                  +     |
-      +-    +------------------+     |
-      |     +                  +     |
-  736 |     +                  +     | 976
-      |     +                  +     |
-      +-    +------------------+     |
-  120 |     +                  +     |
-      --    ++++++++++++++++++++    --
-                    1312
-  
-  The inner image is what you get but the outer image is what it's captured by
-  the camera.
+    The inner image is what you get and the outer image is what it's captured by
+    the camera.
   */
   
   //16:9
