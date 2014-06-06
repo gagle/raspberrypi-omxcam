@@ -139,10 +139,12 @@ int save_yuv (char* filename, omxcam_video_settings_t* settings){
   RIGHT: save the slices in different buffers and then store the entire planes
     (y+y+y+y+...) + (u+u+u+u+...) + (v+v+v+v+...)
   
-  To ease the planes manipulation you have the following function:
+  For this purpose you have the following functions:
   
-  omxcam_yuv_planes(): given a width and height, it calculates the offsets and
-    lengths of each plane.
+  omxcam_yuv_planes(): Given the width and height of a frame, returns the offset
+    and length of each of the yuv planes.
+  omxcam_yuv_planes_slice(): Same as 'omxcam_yuv_planes()' but used with the
+    payload buffers.
   
   In contrast to the RGB video, a YUV buffer contains data that belongs only to
   one frame, but you still need to control de storage/transmission of the frames
@@ -160,8 +162,7 @@ int save_yuv (char* filename, omxcam_video_settings_t* settings){
   
   omxcam_yuv_planes (&yuv_planes, settings->camera.width,
       settings->camera.height);
-  omxcam_yuv_planes (&yuv_planes_slice, settings->camera.width,
-      settings->slice_height);
+  omxcam_yuv_planes_slice (&yuv_planes_slice, settings->camera.width);
   
   //Frame size
   yuv_frame_size = yuv_planes.offset_v + yuv_planes.length_v;
@@ -202,12 +203,6 @@ int main (){
   //Capture a raw YUV420 video, 640x480 @30fps (10 frames)
   settings.buffer_callback = buffer_callback_yuv;
   settings.format = OMXCAM_FORMAT_YUV420;
-  //Just for showing different parameters, the slice height (the buffer height)
-  //it's configured to be the same as the file height, therefore in this case,
-  //a buffer has the same size as a frame, you will receive 10 buffers (10
-  //frames). The buffer height must be multiple of 16 (it is rounded up
-  //internally to the nearest multiple of 16).
-  settings.slice_height = settings.camera.height;
   
   if (save_yuv ("video.yuv", &settings)) return 1;
   

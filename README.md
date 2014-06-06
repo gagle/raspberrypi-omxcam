@@ -23,20 +23,95 @@ For a global understanding of the camera module check the documentation of the [
 
 When you start the streaming, a new thread is spawned and it's the responsible of emitting the data. You define a buffer callback and you receive the data when it's ready to be consumed, that's all. You don't even need to `malloc()` and `free()` the buffers, just use them. If you need some kind of inter-thread communication, I recommend a lock-free queue. Look at the [concurrency kit](http://concurrencykit.org/) project for more details, especially the `ck_ring_*()` functions.
 
+- [Build steps](#build_steps)
 - [Error handling](#error_handling)
 - [Camera modes](#camera_modes)
+- [Camera settings](#camera_settings)
 - [Image streaming](#image_streaming)
 - [Video streaming](#video_streaming)
-- [Common settings between image and video](#common_settings)
 - [OpenGL](#opengl)
+- [Utilities](#utilities)
+
+<a name="build_steps"></a>
+#### Build steps ####
+
+Two makefiles are provided with each example: `Makefile` and `Makefile-shared`. If you compile an example with the latter makefile you will also need to execute the makefile `./Makefile-shared` in order to compile the library as a shared library. This will generate the file `lib/libomxcam.so`.
+
+For example, to compile the example `./examples/still/jpeg` with the whole code embedded in the binary file:
+
+```
+$ cd ./examples/still/jpeg
+$ make
+```
+To compile the library as a shared library and link it to the binary file:
+
+```
+$ make -f Makefile-shared
+$ cd ./examples/still/jpeg
+$ make -f Makefile-shared
+```
+
+Please take into account that the shared library needs to be located in the `./lib` directory due to this LDFLAG:
+
+```
+-Wl,-rpath=$(OMXCAM_HOME)/lib
+```
+
+If it needs to be stored in another place, change the path, use `LD_LIBRARY_PATH` or put the library in a common place, e.g. `/usr/lib`.
 
 <a name="error_handling"></a>
 #### Error handling ####
 
+All the functions that have a non-void return, return an `int` type: 0 if the functions succeeds, -1 otherwise. If something fails, you can call to `omxcam_last_error()` to get the last error number. You have additional functions such as `omxcam_error_name(omxcam_errno)` which returns the error name, `omxcam_strerror(omxcam_errno)` which returns the string message describing the error and `omxcam_perror()` which formats and prints the last error to the stderr, something similar to this:
 
+```
+omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
+```
+
+You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library. An even more specific error message should be printed to the stdout, for example:
+
+```
+omxcam: error: OMX_EventError: OMX_ErrorInsufficientResources (function: 'event_handler', file: '../../../src/core.c', line 41)
+```
+
+Copy all the debug messages and open an issue.
+
+All the error codes and their descriptive messages are:
+
+```
+XX (0, ERROR_NONE, "success") \
+XX (1, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component") \
+XX (2, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' component") \
+XX (3, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' component") \
+XX (4, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component") \
+XX (5, ERROR_DRIVERS, "cannot load the camera drivers") \
+XX (6, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component") \
+XX (7, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' component") \
+XX (8, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' component") \
+XX (9, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' component") \
+XX (10, ERROR_CAPTURE, "error while capturing") \
+XX (11, ERROR_STILL, "still error") \
+XX (12, ERROR_VIDEO, "video error") \
+XX (13, ERROR_JPEG, "error configuring jpeg encoder") \
+XX (14, ERROR_H264, "error configuring h264 encoder") \
+XX (15, ERROR_BAD_PARAMETER, "incorrect parameter value") \
+XX (16, ERROR_LOADED, "cannot transition to the Loaded state") \
+XX (17, ERROR_IDLE, "cannot transition to the Idle state") \
+XX (18, ERROR_EXECUTING, "cannot transition to the Executing state") \
+XX (19, ERROR_FORMAT, "invalid encoding format") \
+XX (20, ERROR_SLEEP, "cannot sleep the thread") \
+XX (21, ERROR_WAKE, "cannot wake the thread") \
+XX (22, ERROR_LOCK, "cannot lock the thread") \
+XX (23, ERROR_UNLOCK, "cannot unlock the thread")
+```
 
 <a name="camera_modes"></a>
 #### Camera modes ####
+
+
+
+<a name="camera_settings"></a>
+#### Camera settings ####
 
 
 
@@ -61,6 +136,9 @@ int main (){
   
   //Start the image streaming
   omxcam_still_start (&settings);
+  
+  //Then, from anywhere in your code you can stop the image capture
+  //omxcam_stop_still ();
 }
 ```
 
@@ -95,11 +173,43 @@ int main (){
 }
 ```
 
-<a name="common_settings"></a>
-#### Common settings between image and video ####
-
-
-
 <a name="opengl"></a>
 #### OpenGL ####
 
+
+
+<a name="utilities"></a>
+#### Utilities ####
+
+__Version__
+
+Two functions are available:
+
+- _uint32_t omxcam_version()_  
+  Returns the library version packed into a single integer. 8 bits are used for each component, with the patch number stored in the 8 least significant bits, e.g. version 1.2.3 returns 0x010203.
+
+- _const char* omxcam_version()_  
+  Returns the library version number as a string, e.g. 1.2.3.
+
+__YUV planes__
+
+When capturing YUV images/video, you need to calculate the offset and length of each plane if you want to manipulate them somehow. There are a couple of functions that you can use for that purpose:
+
+- _void omxcam_yuv_planes (omxcam_yuv_planes_t* planes, uint32_t width, uint32_t height)_  
+  Given the width and height of a frame, returns an `omxcam_yuv_planes_t` struct with the offset and length of each plane. The struct definition contains the following fields:
+
+  ```c
+  typedef struct {
+    uint32_t offset_y;
+    uint32_t length_y;
+    uint32_t offset_u;
+    uint32_t length_u;
+    uint32_t offset_v;
+    uint32_t length_v;
+  } omxcam_yuv_planes_t;
+  ```
+
+- _void omxcam_yuv_planes (omxcam_yuv_planes_t* planes, uint32_t width, uint32_t height)_  
+   Same as 'omxcam_yuv_planes()' but used to calculate the offset and length of the planes of a payload buffer.
+
+Look at the [still/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) and [video/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) examples for further details.

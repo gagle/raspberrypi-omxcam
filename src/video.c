@@ -59,7 +59,6 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
   
   OMX_U32 width = omxcam_round (settings->camera.width, 32);
   OMX_U32 height = omxcam_round (settings->camera.height, 16);
-  OMX_U32 slice_height = omxcam_round (settings->slice_height, 16);
   
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
@@ -142,10 +141,6 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
   port_st.format.video.eColorFormat = color_format;
   port_st.format.video.xFramerate = settings->camera.framerate << 16;
   port_st.format.video.nStride = stride;
-  //The nSliceHeight parameter should be read-only as stated in the OpenMAX IL
-  //specification, but it can be configured. With this parameter the size of the
-  //buffer payload can be controlled. It must be multiple of 16. Default is 16.
-  port_st.format.video.nSliceHeight = slice_height;
   if ((error = OMX_SetParameter (omxcam_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
@@ -216,7 +211,6 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
     port_st.format.video.nFrameHeight = height;
     port_st.format.video.xFramerate = settings->camera.framerate << 16;
     port_st.format.video.nStride = stride;
-    port_st.format.video.nSliceHeight = slice_height;
     
     //Despite being configured later, these two fields need to be set now
     port_st.format.video.nBitrate = settings->h264.bitrate;
@@ -665,7 +659,6 @@ void omxcam_video_init (omxcam_video_settings_t* settings){
   settings->format = OMXCAM_FORMAT_H264;
   omxcam_h264_init (&settings->h264);
   settings->buffer_callback = 0;
-  settings->slice_height = 16;
 }
 
 int omxcam_video_start (

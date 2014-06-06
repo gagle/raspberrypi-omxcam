@@ -29,7 +29,7 @@ void buffer_callback_rgb (uint8_t* buffer, uint32_t length){
   }
 }
 
-void buffer_callback_yuv (uint8_t* buffer, uint32_t length){
+void buffer_callback_yuv (uint8_t* buffer, uint32_t length){printf("%d\n", length);
   //Append the data to the buffers
   memcpy (file_buffer + offset_y, buffer + yuv_planes_slice.offset_y,
       yuv_planes_slice.length_y);
@@ -82,10 +82,12 @@ int save_yuv (char* filename, omxcam_still_settings_t* settings){
   RIGHT: save the slices in different buffers and then store the entire planes
     (y+y+y+y+...) + (u+u+u+u+...) + (v+v+v+v+...)
   
-  To ease the planes manipulation you have the following function:
+  For this purpose you have the following functions:
   
-  omxcam_yuv_planes(): given a width and height, it calculates the offsets and
-    lengths of each plane.
+  omxcam_yuv_planes(): Given the width and height of a frame, returns the offset
+    and length of each of the yuv planes.
+  omxcam_yuv_planes_slice(): Same as 'omxcam_yuv_planes()' but used with the
+    payload buffers.
   */
   
   printf ("capturing %s\n", filename);
@@ -98,8 +100,7 @@ int save_yuv (char* filename, omxcam_still_settings_t* settings){
   
   omxcam_yuv_planes (&yuv_planes, settings->camera.width,
       settings->camera.height);
-  omxcam_yuv_planes (&yuv_planes_slice, settings->camera.width,
-      settings->slice_height);
+  omxcam_yuv_planes_slice (&yuv_planes_slice, settings->camera.width);
   
   int yuv_frame_size = yuv_planes.offset_v + yuv_planes.length_v;
   offset_y = yuv_planes.offset_y;

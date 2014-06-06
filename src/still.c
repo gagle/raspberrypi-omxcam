@@ -32,7 +32,6 @@ void omxcam_still_init (omxcam_still_settings_t* settings){
   settings->format = OMXCAM_FORMAT_JPEG;
   omxcam_jpeg_init (&settings->jpeg);
   settings->buffer_callback = 0;
-  settings->slice_height = 16;
 }
 
 int omxcam_still_start (omxcam_still_settings_t* settings){
@@ -63,7 +62,6 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   
   OMX_U32 width_rounded = omxcam_round (settings->camera.width, 32);
   OMX_U32 height_rounded = omxcam_round (settings->camera.height, 16);
-  OMX_U32 slice_height = omxcam_round (settings->slice_height, 16);
   OMX_U32 width = width_rounded;
   OMX_U32 height = height_rounded;
   OMX_U32 stride = width_rounded;
@@ -170,10 +168,6 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   port_st.format.image.eCompressionFormat = OMX_IMAGE_CodingUnused;
   port_st.format.image.eColorFormat = color_format;
   port_st.format.image.nStride = stride;
-  //The nSliceHeight parameter should be read-only as stated in the OpenMAX IL
-  //specification, but it can be configured. With this parameter the size of the
-  //buffer payload can be controlled. It must be multiple of 16. Default is 16.
-  port_st.format.video.nSliceHeight = slice_height;
   if ((error = OMX_SetParameter (omxcam_ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
@@ -228,7 +222,6 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     port_st.format.image.eCompressionFormat = OMX_IMAGE_CodingJPEG;
     port_st.format.image.eColorFormat = OMX_COLOR_FormatUnused;
     port_st.format.image.nStride = stride;
-    //ort_st.format.image.nSliceHeight = slice_height;
     if ((error = OMX_SetParameter (omxcam_ctx.image_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){
       omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",

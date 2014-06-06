@@ -477,18 +477,20 @@ typedef struct {
 } omxcam_yuv_planes_t;
 
 /*
- * Given a width and height, returns the offsets and lengths of each of
- * the yuv planes. Both the width and height need to be multiple of 16, they
- * are rounded internally though.
- *
- * It can be also used to get the offsets and length of the yuv planes in a
- * buffer slice returned by the "buffer_callback". Simply pass the
- * "settings.slice_height" value as the height parameter.
+ * Given the width and height of a frame, returns the offset and length of each
+ * of the yuv planes.
  */
 OMXCAM_EXTERN void omxcam_yuv_planes (
     omxcam_yuv_planes_t* planes,
     uint32_t width,
     uint32_t height);
+/*
+ * Same as 'omxcam_yuv_planes()' but used to calculate the offset and length of
+ * the planes of a payload buffer.
+ */
+OMXCAM_EXTERN void omxcam_yuv_planes_slice (
+    omxcam_yuv_planes_t* planes,
+    uint32_t width);
 
 typedef struct {
   char* key;
@@ -538,7 +540,6 @@ int omxcam_h264_configure_omx (omxcam_h264_settings_t* settings);
   omxcam_camera_settings_t camera; \
   omxcam_format format; \
   void (*buffer_callback)(uint8_t* buffer, uint32_t length); \
-  uint32_t slice_height;
 
 typedef struct {
   OMXCAM_COMMON_SETTINGS
