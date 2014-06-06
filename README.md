@@ -17,7 +17,7 @@ You will notice that the only available encoding algorithms are JPEG and H264. T
 
 If you want to see [SSCCE](http://www.sscce.org/) examples, check these two projects: [jpeg](https://github.com/gagle/raspberrypi-openmax-jpeg) and [h264](https://github.com/gagle/raspberrypi-openmax-h264).
 
-For a global understanding of the camera module check the documentation of the [picamera](picamera.readthedocs.org) project.
+For a global understanding of the camera module check the documentation of the [picamera](http://picamera.readthedocs.org) project.
 
 ### API ###
 
