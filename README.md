@@ -166,7 +166,7 @@ int main (){
   omxcam_video_start (&settings, 3000);
   
   //Capture indefinitely
-  omxcam_video_start ($settings, OMXCAM_CAPTURE_FOREVER);
+  omxcam_video_start (&settings, OMXCAM_CAPTURE_FOREVER);
   
   //Then, from anywhere in your code you can stop the video capture
   //omxcam_stop_video ();
