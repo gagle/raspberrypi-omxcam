@@ -117,7 +117,7 @@ XX (23, ERROR_UNLOCK, "cannot unlock the thread")
 
 The `omxcam_still_settings_t` and `omxcam_video_settings_t` structs have a `camera` field that is used to configure the camera settings. Its type definition is `omxcam_camera_settings_t` and has the following fields:
 
-```c
+```
 type                  name                        default                     range
 ----                  ----                        -------                     -----
 uint32_t              width                       image 2592, video 1920
