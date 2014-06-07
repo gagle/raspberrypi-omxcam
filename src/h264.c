@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 void omxcam_h264_init (omxcam_h264_settings_t* settings){
   settings->bitrate = 10000000;

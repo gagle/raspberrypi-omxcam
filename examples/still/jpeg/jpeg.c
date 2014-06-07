@@ -53,12 +53,12 @@ int main (){
   
   if (save ("still-default.jpg", &settings)) return 1;
   
-  //Capture an image with shutter speed 1/8, EV -10 and some EXIF tags
+  //Capture an image with shutter speed 1/4, EV -10 and some EXIF tags
   omxcam_still_init (&settings);
   settings.buffer_callback = buffer_callback;
   settings.camera.shutter_speed_auto = OMXCAM_FALSE;
-  //Shutter speed in milliseconds (1/8 by default: 125)
-  settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
+  //Shutter speed in milliseconds
+  settings.camera.shutter_speed = 250;
   //Values of color_u and color_v are 128 by default, gray image
   settings.camera.color_enable = OMXCAM_TRUE;
   

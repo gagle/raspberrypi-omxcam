@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 OMX_ERRORTYPE event_handler (
     OMX_IN OMX_HANDLETYPE comp,

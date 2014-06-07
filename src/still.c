@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 static int omxcam_still_change_state (omxcam_state state, int use_encoder){
   if (omxcam_component_change_state (&omxcam_ctx.camera, state)){

@@ -5,11 +5,11 @@ omxcam
 
 [Forum thread](http://www.raspberrypi.org/forums/viewtopic.php?f=43&t=72523)
 
-The Raspberry Pi uses the Bellagio's implementation of the OpenMAX IL specification in order to expose the media codecs (audio/image/video) available for the board. Broadcom, the manufacturer of the SoC, extends it by adding some propietary communication between the components. OpenMAX it's by nature open source. The problem here is the Broadcom's specific implementation which is closed source, so despite being the Raspberry Pi a platform built on top of an open source specification, there are some hidden parts in the interface that you must discover as an IL client by trial and error and with the help of some Broadcom employees.
+The Raspberry Pi uses the Bellagio's implementation of the OpenMAX IL specification in order to expose the media codecs (audio/image/video) available for the board. Broadcom, the manufacturer of the SoC, extends it by adding some propietary communication between the components. OpenMAX it's by nature open source. The problem here is the Broadcom's specific implementation which is closed source, so despite being the Raspberry Pi a platform built on top of an open source specification, there are some hidden parts in the interface that you must discover as an IL client by trial and error and with the little help that some of the Broadcom employees can provide.
 
-Furthermore, there is an extra layer called MMAL (Multi-Media Abstraction Layer) that sits on top of OpenMAX IL but it's also closed source and written by Broadcom. This API it's supposed to be used by the developers to communicate with the media components, including the camera module. But there's a problem with it, it lacks of documentation. It's a hard job to get used by simply looking at the raspistill/raspivid examples. MMAL it's not a camera library, you still need to write how the components interact with each other.
+Furthermore, there is an extra layer called MMAL (Multi-Media Abstraction Layer) that sits on top of OpenMAX IL but it's also closed source and written by Broadcom. This API it's supposed to be used by the developers to communicate with the media components, including the camera module. But there's a problem with it, it lacks of documentation. It's a hard job to get used to it by simply looking at the raspistill/raspivid examples. MMAL it's not a camera library, so you still need to write how the components interact with each other.
 
-This library talks directly with OpenMAX IL and it's just an abstraction layer to ease the camera usage. It's not bloated with a lot of functionalities, it just provides the minimum functions to start and stop the streaming of the media content (image/video). You receive the raw content directly from the OpenMAX IL layer and you decide how you want to process the data.
+This library talks directly with OpenMAX IL and it's just an abstraction layer to ease the camera usage. It's not bloated with a lot of functionalities, it just provides the minimum functions to start and stop the streaming of the media content (image/video). You receive the content directly from the OpenMAX IL layer and you decide how to process the data.
 
 You will notice that the only available encoding algorithms are JPEG and H264. That's for a good reason; they are the only encoders that are hardware-accelerated. Encoding the images/videos with another encoder would take too long.
 
@@ -32,12 +32,14 @@ When you start the streaming, a new thread is spawned and it's the responsible o
 - [OpenGL](#opengl)
 - [Utilities](#utilities)
 
+The [omxcam.h](https://github.com/gagle/raspberrypi-omxcam/blob/master/include/omxcam.h) header file is what you need to include in your projects. All the enumerations, type definitions and prototypes are located here. This README file introduces the library and explains just a few things. For a full reference, please take a look at the header `omxcam.h`.
+
 <a name="build_steps"></a>
 #### Build steps ####
 
-Two makefiles are provided with each example: `Makefile` and `Makefile-shared`. If you compile an example with the latter makefile you will also need to execute the makefile `./Makefile-shared` in order to compile the library as a shared library. This will generate the file `lib/libomxcam.so`.
+Two makefiles are provided with each example: `Makefile` and `Makefile-shared`. If you compile an example with the latter makefile you will also need to execute the makefile [./Makefile-shared](https://github.com/gagle/raspberrypi-omxcam/blob/master/Makefile-shared) in order to compile the library as a shared library. This will generate the file `./lib/libomxcam.so`.
 
-For example, to compile the example `./examples/still/jpeg` with the whole code embedded in the binary file:
+For example, to compile the example [./examples/still/jpeg](https://github.com/gagle/raspberrypi-omxcam/tree/master/examples/still/jpeg) with the whole code embedded in the binary file:
 
 ```
 $ cd ./examples/still/jpeg
@@ -51,18 +53,18 @@ $ cd ./examples/still/jpeg
 $ make -f Makefile-shared
 ```
 
-Please take into account that the shared library needs to be located in the `./lib` directory due to this LDFLAG:
+Please take into account that the shared library needs to be located in the `./lib` directory due to this LDFLAG that you can find in [./examples/Makefile-shared-common](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/Makefile-shared-common):
 
 ```
 -Wl,-rpath=$(OMXCAM_HOME)/lib
 ```
 
-If it needs to be stored in another place, change the path, use `LD_LIBRARY_PATH` or put the library in a common place, e.g. `/usr/lib`.
+If you need to store the library in another place, change the path, use the environment variable `LD_LIBRARY_PATH` or put the library in a common place, e.g. `/usr/lib`.
 
 <a name="error_handling"></a>
 #### Error handling ####
 
-All the functions that have a non-void return, return an `int` type: 0 if the functions succeeds, -1 otherwise. If something fails, you can call to `omxcam_last_error()` to get the last error number. You have additional functions such as `omxcam_error_name(omxcam_errno)` which returns the error name, `omxcam_strerror(omxcam_errno)` which returns the string message describing the error and `omxcam_perror()` which formats and prints the last error to the stderr, something similar to this:
+All the functions that have a non-void return, return an `int` type: `0` if the function succeeds, `-1` otherwise. If something fails, you can call to `omxcam_last_error()` to get the last error number. You have additional functions such as `omxcam_error_name(omxcam_errno)` which returns the error name, `omxcam_strerror(omxcam_errno)` which returns the string message describing the error and `omxcam_perror()` which formats and prints the last error to the stderr, something similar to this:
 
 ```
 omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
@@ -71,7 +73,7 @@ omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
 You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library. An even more specific error message should be printed to the stdout, for example:
 
 ```
-omxcam: error: OMX_EventError: OMX_ErrorInsufficientResources (function: 'event_handler', file: '../../../src/core.c', line 41)
+omxcam: error: OMX_EventError: OMX_ErrorInsufficientResources (function: 'event_handler', file: '../../../src/core.c', line: 41)
 ```
 
 Copy all the debug messages and open an issue.
@@ -113,12 +115,62 @@ XX (23, ERROR_UNLOCK, "cannot unlock the thread")
 <a name="camera_settings"></a>
 #### Camera settings ####
 
+The `omxcam_still_settings_t` and `omxcam_video_settings_t` structs have a `camera` field that is used to configure the camera settings. Its type definition is `omxcam_camera_settings_t` and has the following fields:
 
+```c
+uint32_t width;
+uint32_t height;
+uint32_t sharpness; //-100 .. 100
+uint32_t contrast; //-100 .. 100
+uint32_t brightness;
+uint32_t saturation; //0 .. 100
+omxcam_bool shutter_speed_auto; //-100 .. 100
+uint32_t shutter_speed;
+omxcam_bool iso_auto;
+uint32_t iso; //100 .. 800
+omxcam_exposure exposure;
+int32_t exposure_compensation; //-10 .. 10
+omxcam_mirror mirror;
+omxcam_rotation rotation;
+omxcam_bool color_enable;
+uint32_t color_u; //0 .. 255
+uint32_t color_v; //0 .. 255
+omxcam_bool noise_reduction_enable;
+omxcam_bool frame_stabilisation_enable;
+omxcam_metering metering;
+omxcam_white_balance white_balance;
+//The gains are used if the white balance is set to off
+float white_balance_red_gain; //0.001 .. 7.999
+float white_balance_blue_gain; //0.001 .. 7.999
+omxcam_image_filter image_filter;
+//Used only in video mode
+uint32_t framerate;
+```
+
+For example, if you want to take a gray-scale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:
+
+```c
+omxcam_still_settings_t settings;
+
+omxcam_still_init (&settings);
+
+settings.camera.mirror = OMXCAM_MIRROR_VERTICAL;
+
+settings.camera.shutter_speed_auto = OMXCAM_FALSE;
+//Shutter speed in milliseconds
+settings.camera.shutter_speed = 500;
+
+//When 'camera.color_enable' is enabled, 'camera.color_u' and 'camera.color_v'
+//are used. They default to 128, the values for a gray-scale image
+settings.camera.color_enable = OMXCAM_TRUE;
+```
 
 <a name="image_streaming"></a>
 #### Image streaming ####
 
 ```c
+#include "omxcam.h"
+
 void buffer_callback (uint8_t* buffer, uint32_t length){
   //buffer: the data
   //length: the length of the buffer
@@ -128,7 +180,7 @@ int main (){
   //The settings of the image capture
   omxcam_still_settings_t settings;
   
-  //Initialize the settings with default values
+  //Initialize the settings with default values (jpeg, 2592x1944)
   omxcam_still_init (&settings);
   
   //Set the buffer callback, this is mandatory
@@ -146,6 +198,8 @@ int main (){
 #### Video streaming ####
 
 ```c
+#include "omxcam.h"
+
 void buffer_callback (uint8_t* buffer, uint32_t length){
   //buffer: the data
   //length: the length of the buffer
@@ -155,7 +209,7 @@ int main (){
   //The settings of the video capture
   omxcam_video_settings_t settings;
   
-  //Initialize the settings with default values
+  //Initialize the settings with default values (h264, 1920x1080, 30fps)
   omxcam_video_init (&settings);
   
   //Set the buffer callback, this is mandatory
@@ -185,31 +239,31 @@ __Version__
 
 Two functions are available:
 
-- _uint32_t omxcam_version()_  
-  Returns the library version packed into a single integer. 8 bits are used for each component, with the patch number stored in the 8 least significant bits, e.g. version 1.2.3 returns 0x010203.
+- ___uint32_t omxcam_version()___  
+  Returns the library version packed into a single integer. 8 bits are used for each component, with the patch number stored in the 8 least significant bits, e.g. version 1.2.3 returns `0x010203`.
 
-- _const char* omxcam_version()_  
-  Returns the library version number as a string, e.g. 1.2.3.
+- ___const char* omxcam_version()___  
+  Returns the library version number as a string, e.g. `1.2.3`.
 
 __YUV planes__
 
 When capturing YUV images/video, you need to calculate the offset and length of each plane if you want to manipulate them somehow. There are a couple of functions that you can use for that purpose:
 
-- _void omxcam_yuv_planes (omxcam_yuv_planes_t* planes, uint32_t width, uint32_t height)_  
+- __void omxcam_yuv_planes (uint32_t width, uint32_t height, omxcam_yuv_planes_t* planes)__  
   Given the width and height of a frame, returns an `omxcam_yuv_planes_t` struct with the offset and length of each plane. The struct definition contains the following fields:
 
   ```c
-  typedef struct {
-    uint32_t offset_y;
-    uint32_t length_y;
-    uint32_t offset_u;
-    uint32_t length_u;
-    uint32_t offset_v;
-    uint32_t length_v;
-  } omxcam_yuv_planes_t;
+  uint32_t offset_y;
+  uint32_t length_y;
+  uint32_t offset_u;
+  uint32_t length_u;
+  uint32_t offset_v;
+  uint32_t length_v;
   ```
+  
+  Tip: you can calculate the size of a yuv frame this way: `offset_v + length_v`.
 
-- _void omxcam_yuv_planes_slice (omxcam_yuv_planes_t* planes, uint32_t width)_  
+- ___void omxcam_yuv_planes_slice (uint32_t width, omxcam_yuv_planes_t* planes)___  
    Same as `omxcam_yuv_planes()` but used to calculate the offset and length of the planes of a payload buffer.
 
 Look at the [still/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) and [video/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) examples for further details.

@@ -98,9 +98,9 @@ int save_yuv (char* filename, omxcam_still_settings_t* settings){
     return 1;
   }
   
-  omxcam_yuv_planes (&yuv_planes, settings->camera.width,
-      settings->camera.height);
-  omxcam_yuv_planes_slice (&yuv_planes_slice, settings->camera.width);
+  omxcam_yuv_planes (settings->camera.width, settings->camera.height,
+      &yuv_planes);
+  omxcam_yuv_planes_slice (settings->camera.width, &yuv_planes_slice);
   
   int yuv_frame_size = yuv_planes.offset_v + yuv_planes.length_v;
   offset_y = yuv_planes.offset_y;

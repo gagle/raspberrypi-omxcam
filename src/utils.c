@@ -1,13 +1,14 @@
 #include "omxcam.h"
+#include "internal.h"
 
 uint32_t omxcam_round (uint32_t value, uint32_t divisor){
   return (divisor + value - 1) & ~(divisor - 1);
 }
 
 void omxcam_yuv_planes (
-    omxcam_yuv_planes_t* planes,
     uint32_t width,
-    uint32_t height){
+    uint32_t height,
+    omxcam_yuv_planes_t* planes){
   width = omxcam_round (width, 32);
   height = omxcam_round (height, 16);
   
@@ -21,8 +22,8 @@ void omxcam_yuv_planes (
 }
 
 void omxcam_yuv_planes_slice (
-    omxcam_yuv_planes_t* planes,
-    uint32_t width){
+    uint32_t width,
+    omxcam_yuv_planes_t* planes){
   width = omxcam_round (width, 32);
 
   //slice height = 16 

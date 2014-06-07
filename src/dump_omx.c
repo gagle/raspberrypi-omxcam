@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 #define OMXCAM_DUMP_CASE(x) case x: return #x;
 

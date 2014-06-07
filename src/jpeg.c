@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 void omxcam_jpeg_init (omxcam_jpeg_settings_t* settings){
   settings->quality = 75;

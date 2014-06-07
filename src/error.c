@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 static omxcam_errno last_error = OMXCAM_ERROR_NONE;
 
@@ -14,7 +15,7 @@ void omxcam_error_ (
   vsprintf (buffer, fmt, args);
   va_end (args);
   
-  omxcam_trace ("error: %s (function: '%s', file: '%s', line %d)", buffer,
+  omxcam_trace ("error: %s (function: '%s', file: '%s', line: %d)", buffer,
       fn, file, line);
 }
 

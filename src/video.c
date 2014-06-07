@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 typedef struct {
   void (*buffer_callback)(uint8_t* buffer, uint32_t length);

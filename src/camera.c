@@ -1,4 +1,5 @@
 #include "omxcam.h"
+#include "internal.h"
 
 int omxcam_camera_load_drivers (){
   /*
