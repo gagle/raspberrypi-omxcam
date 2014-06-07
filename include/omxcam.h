@@ -158,7 +158,7 @@ typedef struct {
   omxcam_bool iso_auto;
   uint32_t iso; //100 .. 800
   omxcam_exposure exposure;
-  int32_t exposure_compensation; //-10 .. 10, no real limits
+  int32_t exposure_compensation; //-10 .. 10
   omxcam_mirror mirror;
   omxcam_rotation rotation;
   omxcam_bool color_enable;
@@ -172,6 +172,10 @@ typedef struct {
   float white_balance_red_gain; //0.001 .. 7.999
   float white_balance_blue_gain; //0.001 .. 7.999
   omxcam_image_filter image_filter;
+  float roi_top; //0.0 .. 1.0
+  float roi_left; //0.0 .. 1.0
+  float roi_width; //0.0 .. 1.0
+  float roi_height; //0.0 .. 1.0
   //Used only in video mode
   uint32_t framerate;
 } omxcam_camera_settings_t;

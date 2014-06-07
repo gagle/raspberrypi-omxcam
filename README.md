@@ -118,33 +118,37 @@ XX (23, ERROR_UNLOCK, "cannot unlock the thread")
 The `omxcam_still_settings_t` and `omxcam_video_settings_t` structs have a `camera` field that is used to configure the camera settings. Its type definition is `omxcam_camera_settings_t` and has the following fields:
 
 ```c
-uint32_t width;
-uint32_t height;
-uint32_t sharpness; //-100 .. 100
-uint32_t contrast; //-100 .. 100
-uint32_t brightness;
-uint32_t saturation; //0 .. 100
-omxcam_bool shutter_speed_auto; //-100 .. 100
-uint32_t shutter_speed;
-omxcam_bool iso_auto;
-uint32_t iso; //100 .. 800
-omxcam_exposure exposure;
-int32_t exposure_compensation; //-10 .. 10
-omxcam_mirror mirror;
-omxcam_rotation rotation;
-omxcam_bool color_enable;
-uint32_t color_u; //0 .. 255
-uint32_t color_v; //0 .. 255
-omxcam_bool noise_reduction_enable;
-omxcam_bool frame_stabilisation_enable;
-omxcam_metering metering;
-omxcam_white_balance white_balance;
-//The gains are used if the white balance is set to off
-float white_balance_red_gain; //0.001 .. 7.999
-float white_balance_blue_gain; //0.001 .. 7.999
-omxcam_image_filter image_filter;
-//Used only in video mode
-uint32_t framerate;
+type                  name                        default                     range
+----                  ----                        -------                     -----
+uint32_t              width                       image 2592, video 1920
+uint32_t              height                      image 1944, video 1080
+uint32_t              sharpness                   0                          -100 .. 100
+uint32_t              contrast                    0                          -100 .. 100
+uint32_t              brightness                  50                         0 .. 100
+uint32_t              saturation                  0                          -100 .. 100
+omxcam_bool           shutter_speed_auto          OMXCAM_TRUE
+uint32_t              shutter_speed               125
+omxcam_bool           iso_auto                    OMXCAM_TRUE
+uint32_t              iso                         100                        100 .. 800
+omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
+int32_t               exposure_compensation       0                          -10 .. 10
+omxcam_mirror         mirror                      OMXCAM_MIRROR_NONE
+omxcam_rotation       rotation                    OMXCAM_ROTATION_NONE
+omxcam_bool           color_enable                OMXCAM_FALSE
+uint32_t              color_u                     128                        0 .. 255
+uint32_t              color_v                     128                        0 .. 255
+omxcam_bool           noise_reduction_enable      OMXCAM_TRUE
+omxcam_bool           frame_stabilisation_enable  OMXCAM_FALSE
+omxcam_metering       metering                    OMXCAM_METERING_AVERAGE
+omxcam_white_balance  white_balance               OMXCAM_WHITE_BALANCE_AUTO
+float                 white_balance_red_gain      0.1                        0.001 .. 7.999
+float                 white_balance_blue_gain     0.1                        0.001 .. 7.999
+omxcam_image_filter   image_filter                OMXCAM_IMAGE_FILTER_NONE
+float                 roi_top                     0.0                        0.0 .. 1.0
+float                 roi_left                    0.0                        0.0 .. 1.0
+float                 roi_width                   0.0                        0.0 .. 1.0
+float                 roi_height                  0.0                        0.0 .. 1.0
+uint32_t              framerate                   30
 ```
 
 For example, if you want to take a gray-scale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:

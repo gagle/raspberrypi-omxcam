@@ -102,6 +102,10 @@ void omxcam_camera_init (
   settings->white_balance_red_gain = 0.1;
   settings->white_balance_blue_gain = 0.1;
   settings->image_filter = OMXCAM_IMAGE_FILTER_NONE;
+  settings->roi_top = 0.0;
+  settings->roi_left = 0.0;
+  settings->roi_width = 1.0;
+  settings->roi_height = 1.0;
   settings->framerate = 30;
 }
 
@@ -195,8 +199,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   frame_stabilisation_st.bStab = settings->frame_stabilisation_enable;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
       OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_st))){
-    omxcam_error ("OMX_SetConfig - "
-        "OMX_IndexConfigCommonFrameStabilisation: %s",
+    omxcam_error ("OMX_SetConfig - OMX_IndexConfigCommonFrameStabilisation: %s",
         omxcam_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -274,8 +277,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   color_enhancement_st.nCustomizedV = settings->color_v;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
       OMX_IndexConfigCommonColorEnhancement, &color_enhancement_st))){
-    omxcam_error ("OMX_SetConfig - "
-        "OMX_IndexConfigCommonColorEnhancement: %s",
+    omxcam_error ("OMX_SetConfig - OMX_IndexConfigCommonColorEnhancement: %s",
         omxcam_dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -286,8 +288,22 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   denoise_st.bEnabled = settings->noise_reduction_enable;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
       OMX_IndexConfigStillColourDenoiseEnable, &denoise_st))){
-    omxcam_error ("OMX_SetConfig - "
-        "OMX_IndexConfigStillColourDenoiseEnable: %s",
+    omxcam_error ("OMX_SetConfig - OMX_IndexConfigStillColourDenoiseEnable: %s",
+        omxcam_dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  
+  //ROI
+  OMX_CONFIG_INPUTCROPTYPE roi_st;
+  OMXCAM_INIT_STRUCTURE (roi_st);
+  roi_st.nPortIndex = OMX_ALL;
+  roi_st.xLeft = (OMX_U32)(settings->roi_left*65536);
+  roi_st.xTop = (OMX_U32)(settings->roi_top*65536);
+  roi_st.xWidth = (OMX_U32)(settings->roi_width*65536);
+  roi_st.xHeight = (OMX_U32)(settings->roi_height*65536);
+  if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
+      OMX_IndexConfigInputCropPercentages, &roi_st))){
+    omxcam_error ("OMX_SetConfig - OMX_IndexConfigInputCropPercentages: %s",
         omxcam_dump_OMX_ERRORTYPE (error));
     return -1;
   }
