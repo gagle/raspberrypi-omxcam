@@ -28,7 +28,7 @@ int yuv (int frames, int width, int height){
   settings.camera.width = width;
   settings.camera.height = height;
   
-  omxcam_yuv_planes (&planes, width, height);
+  omxcam_yuv_planes (width, height, &planes);
   
   frame = planes.offset_v + planes.length_v;
   total_frames = frames;

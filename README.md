@@ -70,7 +70,7 @@ All the functions that have a non-void return, return an `int` type: `0` if the 
 omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
 ```
 
-You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library. An even more specific error message should be printed to the stdout, for example:
+You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library (by default it's enabled). An even more specific error message should be printed to the stdout, for example:
 
 ```
 omxcam: error: OMX_EventError: OMX_ErrorInsufficientResources (function: 'event_handler', file: '../../../src/core.c', line: 41)
