@@ -151,7 +151,7 @@ float                 roi_height                  0.0                        0.0
 uint32_t              framerate                   30
 ```
 
-For example, if you want to take a gray-scale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:
+For example, if you want to take a grayscale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:
 
 ```c
 omxcam_still_settings_t settings;
