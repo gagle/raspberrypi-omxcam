@@ -22,29 +22,30 @@ extern "C" {
 //Error definitions, expand if necessary
 #define OMXCAM_ERRNO_MAP(XX) \
   XX (0, ERROR_NONE, "success") \
-  XX (1, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component") \
-  XX (2, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' component") \
-  XX (3, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' component") \
-  XX (4, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component") \
-  XX (5, ERROR_DRIVERS, "cannot load the camera drivers") \
-  XX (6, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component") \
-  XX (7, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' component") \
-  XX (8, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' component") \
-  XX (9, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' component") \
-  XX (10, ERROR_CAPTURE, "error while capturing") \
-  XX (11, ERROR_STILL, "still error") \
-  XX (12, ERROR_VIDEO, "video error") \
-  XX (13, ERROR_JPEG, "error configuring jpeg encoder") \
-  XX (14, ERROR_H264, "error configuring h264 encoder") \
-  XX (15, ERROR_BAD_PARAMETER, "incorrect parameter value") \
-  XX (16, ERROR_LOADED, "cannot transition to the Loaded state") \
-  XX (17, ERROR_IDLE, "cannot transition to the Idle state") \
-  XX (18, ERROR_EXECUTING, "cannot transition to the Executing state") \
-  XX (19, ERROR_FORMAT, "invalid encoding format") \
-  XX (20, ERROR_SLEEP, "cannot sleep the thread") \
-  XX (21, ERROR_WAKE, "cannot wake the thread") \
-  XX (22, ERROR_LOCK, "cannot lock the thread") \
-  XX (23, ERROR_UNLOCK, "cannot unlock the thread")
+  XX (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used") \
+  XX (2, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component") \
+  XX (3, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' component") \
+  XX (4, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' component") \
+  XX (5, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component") \
+  XX (6, ERROR_DRIVERS, "cannot load the camera drivers") \
+  XX (7, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component") \
+  XX (8, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' component") \
+  XX (9, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' component") \
+  XX (10, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' component") \
+  XX (11, ERROR_CAPTURE, "error while capturing") \
+  XX (12, ERROR_STILL, "still error") \
+  XX (13, ERROR_VIDEO, "video error") \
+  XX (14, ERROR_JPEG, "error configuring jpeg encoder") \
+  XX (15, ERROR_H264, "error configuring h264 encoder") \
+  XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value") \
+  XX (17, ERROR_LOADED, "cannot transition to the Loaded state") \
+  XX (18, ERROR_IDLE, "cannot transition to the Idle state") \
+  XX (19, ERROR_EXECUTING, "cannot transition to the Executing state") \
+  XX (20, ERROR_FORMAT, "invalid encoding format") \
+  XX (21, ERROR_SLEEP, "cannot sleep the thread") \
+  XX (22, ERROR_WAKE, "cannot wake the thread") \
+  XX (23, ERROR_LOCK, "cannot lock the thread") \
+  XX (24, ERROR_UNLOCK, "cannot unlock the thread")
 
 typedef enum {
   OMXCAM_FALSE,
@@ -165,7 +166,6 @@ typedef struct {
   uint32_t color_u; //0 .. 255
   uint32_t color_v; //0 .. 255
   omxcam_bool noise_reduction_enable;
-  omxcam_bool frame_stabilisation_enable;
   omxcam_metering metering;
   omxcam_white_balance white_balance;
   //The gains are used if the white balance is set to off
@@ -178,6 +178,8 @@ typedef struct {
   float roi_height; //0.0 .. 1.0
   //Used only in video mode
   uint32_t framerate;
+  //Used only in video mode
+  omxcam_bool frame_stabilisation_enable;
 } omxcam_camera_settings_t;
 
 typedef struct {

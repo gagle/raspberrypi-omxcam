@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <bcm_host.h>
+#include <interface/vmcs_host/vc_vchi_gencmd.h>
 
 #define OMXCAM_INIT_STRUCTURE(x) \
   memset (&(x), 0, sizeof (x)); \
@@ -26,29 +27,14 @@
 #define OMXCAM_VIDEO_ENCODE_NAME "OMX.broadcom.video_encode"
 #define OMXCAM_NULL_SINK_NAME "OMX.broadcom.null_sink"
 
+#define OMXCAM_MIN_GPU_MEM 128 //MB
+
 #ifdef OMXCAM_DEBUG
 #define omxcam_error(message, ...) \
   omxcam_error_(message, __func__, __FILE__, __LINE__, ## __VA_ARGS__)
 #else
 #define omxcam_error(message, ...) //Empty
 #endif
-
-/*
- * Prints an error message to the stdout along with the file, line and function
- * name from where this function is called. It is printed if the cflag
- * OMXCAM_DEBUG is enabled. Use the omxcam_error() macro instead.
- */
-void omxcam_error_ (
-    const char* fmt,
-    const char* fn,
-    const char* file,
-    int line,
-    ...);
-
-/*
- * Sets the last error.
- */
-void omxcam_set_last_error (omxcam_errno error);
 
 /*
  * Component's event flags.
@@ -81,9 +67,6 @@ typedef struct {
   OMX_BUFFERHEADERTYPE* output_buffer;
 } omxcam_context_t;
 
-//Context's global variable
-omxcam_context_t omxcam_ctx;
-
 /*
  * Enumeration with a mapping between all the OpenMAX IL events and a unique
  * number. The id allows them to be bitwise-or'ed, e.g.
@@ -113,6 +96,26 @@ typedef enum {
   OMXCAM_STATE_WAIT_FOR_RESOURCES = OMX_StateWaitForResources,
   OMXCAM_STATE_INVALID = OMX_StateInvalid
 } omxcam_state;
+
+//Context's global variable
+omxcam_context_t omxcam_ctx;
+
+/*
+ * Prints an error message to the stdout along with the file, line and function
+ * name from where this function is called. It is printed if the cflag
+ * OMXCAM_DEBUG is enabled. Use the omxcam_error() macro instead.
+ */
+void omxcam_error_ (
+    const char* fmt,
+    const char* fn,
+    const char* file,
+    int line,
+    ...);
+
+/*
+ * Sets the last error.
+ */
+void omxcam_set_last_error (omxcam_errno error);
 
 /*
  * OpenMAX IL event handlers.
@@ -213,14 +216,14 @@ int omxcam_component_change_state (
     omxcam_state state);
 
 /*
- * Allocates and frees an OpenMAX buffer for a given port for data streaming.
+ * Allocates and frees an OpenMAX buffer for the given port.
  */
 int omxcam_buffer_alloc (omxcam_component_t* component, uint32_t port);
 int omxcam_buffer_free (omxcam_component_t* component, uint32_t port);
 
 /*
  * Initializes and deinitializes OpenMAX IL. They must be the first and last
- * functions to call.
+ * api calls.
  */
 int omxcam_init ();
 int omxcam_deinit ();
@@ -230,6 +233,12 @@ int omxcam_deinit ();
  * OpenMAX IL layer is ready to be configured.
  */
 int omxcam_camera_load_drivers ();
+
+/*
+ * Checks if the camera is ready to be used. It checks the available gpu memory
+ * and whether it is supported and detected.
+ */
+int omxcam_camera_check ();
 
 /*
  * The camera needs to know which output port is going to be used to consume the

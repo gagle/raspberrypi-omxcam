@@ -46,6 +46,40 @@ int omxcam_camera_load_drivers (){
       OMXCAM_EVENT_PARAM_OR_CONFIG_CHANGED, 0);
 }
 
+int omxcam_camera_check (){
+  char buffer[32];
+  int mem_gpu = 0;
+  int supported = 0;
+  int detected = 0;
+  
+  if (!vc_gencmd (buffer, sizeof (buffer), "get_mem gpu")){
+    vc_gencmd_number_property (buffer, "gpu", &mem_gpu);
+  }
+  
+  if (mem_gpu < OMXCAM_MIN_GPU_MEM){
+    omxcam_error ("memory configured for the gpu is smaller than the minimum "
+        "required: current %d, minimum %d", mem_gpu, OMXCAM_MIN_GPU_MEM);
+    return -1;
+  }
+  
+  if (!vc_gencmd (buffer, sizeof (buffer), "get_camera")){
+    vc_gencmd_number_property (buffer, "supported", &supported);
+    vc_gencmd_number_property (buffer, "detected", &detected);
+  }
+  
+  if (!supported){
+    omxcam_error ("camera is not enabled in this build");
+    return -1;
+  }
+  
+  if (!detected){
+    omxcam_error ("camera is not detected");
+    return -1;
+  }
+  
+  return 0;
+}
+
 static int omxcam_config_capture_port (uint32_t port, OMX_BOOL set){
   OMX_ERRORTYPE error;
   

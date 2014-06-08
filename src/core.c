@@ -252,6 +252,11 @@ int omxcam_init (){
   
   bcm_host_init ();
   
+  if (omxcam_camera_check ()){
+    omxcam_set_last_error (OMXCAM_ERROR_CAMERA_MODULE);
+    return -1;
+  }
+  
   OMX_ERRORTYPE error;
   
   if ((error = OMX_Init ())){
