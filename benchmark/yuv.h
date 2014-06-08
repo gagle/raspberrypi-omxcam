@@ -3,6 +3,7 @@
 
 #include "omxcam.h"
 
-int yuv (int frames, int width, int height);
+int yuv_video (int width, int height, int frames);
+int yuv_still (int width, int height);
 
 #endif

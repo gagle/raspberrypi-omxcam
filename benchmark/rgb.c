@@ -4,7 +4,7 @@ static uint32_t current = 0;
 static uint32_t total;
 static int bg_error = 0;
 
-static void buffer_callback (uint8_t* buffer, uint32_t length){
+static void buffer_callback_video (uint8_t* buffer, uint32_t length){
   current += length;
   
   if (current >= total){
@@ -12,11 +12,15 @@ static void buffer_callback (uint8_t* buffer, uint32_t length){
   }
 }
 
-int rgb (int frames, int width, int height){
+static void buffer_callback_still (uint8_t* buffer, uint32_t length){
+  //No-op
+}
+
+int rgb_video (int width, int height, int frames){
   omxcam_video_settings_t settings;
   
   omxcam_video_init (&settings);
-  settings.buffer_callback = buffer_callback;
+  settings.buffer_callback = buffer_callback_video;
   settings.format = OMXCAM_FORMAT_RGB888;
   settings.camera.width = width;
   settings.camera.height = height;
@@ -26,4 +30,16 @@ int rgb (int frames, int width, int height){
   int error = omxcam_video_start (&settings, 0);
   
   return error ? error : bg_error;
+}
+
+int rgb_still (int width, int height){
+  omxcam_still_settings_t settings;
+  
+  omxcam_still_init (&settings);
+  settings.buffer_callback = buffer_callback_still;
+  settings.format = OMXCAM_FORMAT_RGB888;
+  settings.camera.width = width;
+  settings.camera.height = height;
+  
+  return omxcam_still_start (&settings);
 }

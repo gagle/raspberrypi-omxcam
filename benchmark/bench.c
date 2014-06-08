@@ -6,11 +6,14 @@
 #include "yuv.h"
 
 /*
-Results: (the closer to 30fps and 1000ms, the better)
+Results:
 
-640x480, 30 frames
-rgb: 21.83 fps (1374 ms)
-yuv: 21.93 fps (1368 ms)
+In video mode, the closer to 30fps and 1000ms, the better.
+In still mode, the faster, the better.
+
+video rgb: 21.80 fps (1376 ms)
+video yuv: 21.91 fps (1369 ms)
+still yuv: 0.92 fps (1083 ms)
 */
 
 long now (){
@@ -28,21 +31,29 @@ int main (){
   long ms;
   int diff;
   
-  int frames = 30;
   int width = 640;
   int height = 480;
-  
-  printf ("%dx%d, %d frames\n", width, height, frames);
-  
-  ms = now ();
-  if (rgb (frames, width, height)) return log_error ();
-  diff = now () - ms;
-  printf ("rgb: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
+  int frames = 30;
   
   ms = now ();
-  if (yuv (frames, width, height)) return log_error ();
+  if (rgb_video (width, height, frames)) return log_error ();
   diff = now () - ms;
-  printf ("yuv: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
+  printf ("video rgb: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
+  
+  ms = now ();
+  if (yuv_video (width, height, frames)) return log_error ();
+  diff = now () - ms;
+  printf ("video yuv: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
+  
+  /*ms = now ();
+  if (rgb_still (width, height)) return log_error ();
+  diff = now () - ms;
+  printf ("still rgb: %.2f fps (%d ms)\n", 1000.0/diff, diff);*/
+  
+  ms = now ();
+  if (yuv_still (width, height)) return log_error ();
+  diff = now () - ms;
+  printf ("still yuv: %.2f fps (%d ms)\n", 1000.0/diff, diff);
   
   return 0;
 }

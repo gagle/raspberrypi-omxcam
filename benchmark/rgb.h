@@ -3,6 +3,7 @@
 
 #include "omxcam.h"
 
-int rgb (int frames, int width, int height);
+int rgb_video (int width, int height, int frames);
+int rgb_still (int width, int height);
 
 #endif
