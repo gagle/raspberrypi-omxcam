@@ -140,11 +140,10 @@ omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
 int32_t               exposure_compensation       0                          -10 .. 10
 omxcam_mirror         mirror                      OMXCAM_MIRROR_NONE
 omxcam_rotation       rotation                    OMXCAM_ROTATION_NONE
-omxcam_bool           color_enable                OMXCAM_FALSE
+omxcam_bool           color_enhancement           OMXCAM_FALSE
 uint32_t              color_u                     128                        0 .. 255
 uint32_t              color_v                     128                        0 .. 255
-omxcam_bool           noise_reduction_enable      OMXCAM_TRUE
-omxcam_bool           frame_stabilisation_enable  OMXCAM_FALSE
+omxcam_bool           noise_reduction             OMXCAM_TRUE
 omxcam_metering       metering                    OMXCAM_METERING_AVERAGE
 omxcam_white_balance  white_balance               OMXCAM_WHITE_BALANCE_AUTO
 float                 white_balance_red_gain      0.1                        0.001 .. 7.999
@@ -155,6 +154,7 @@ float                 roi_left                    0.0                        0.0
 float                 roi_width                   0.0                        0.0 .. 1.0
 float                 roi_height                  0.0                        0.0 .. 1.0
 uint32_t              framerate                   30
+omxcam_bool           frame_stabilisation         OMXCAM_FALSE
 ```
 
 For example, if you want to take a grayscale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:
@@ -170,9 +170,9 @@ settings.camera.shutter_speed_auto = OMXCAM_FALSE;
 //Shutter speed in milliseconds
 settings.camera.shutter_speed = 500;
 
-//When 'camera.color_enable' is enabled, 'camera.color_u' and 'camera.color_v'
+//When 'camera.color_enhancement' is enabled, 'camera.color_u' and 'camera.color_v'
 //are used. They default to 128, the values for a gray-scale image
-settings.camera.color_enable = OMXCAM_TRUE;
+settings.camera.color_enhancement = OMXCAM_TRUE;
 ```
 
 <a name="image_streaming"></a>

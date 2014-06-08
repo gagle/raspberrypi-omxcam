@@ -126,11 +126,10 @@ void omxcam__camera_init (
   settings->exposure_compensation = 0;
   settings->mirror = OMXCAM_MIRROR_NONE;
   settings->rotation = OMXCAM_ROTATION_NONE;
-  settings->color_enable = OMXCAM_FALSE;
+  settings->color_enhancement = OMXCAM_FALSE;
   settings->color_u = 128;
   settings->color_v = 128;
-  settings->noise_reduction_enable = OMXCAM_TRUE;
-  settings->frame_stabilisation_enable = OMXCAM_FALSE;
+  settings->noise_reduction = OMXCAM_TRUE;
   settings->metering = OMXCAM_METERING_AVERAGE;
   settings->white_balance = OMXCAM_WHITE_BALANCE_AUTO;
   settings->white_balance_red_gain = 0.1;
@@ -141,6 +140,7 @@ void omxcam__camera_init (
   settings->roi_width = 1.0;
   settings->roi_height = 1.0;
   settings->framerate = 30;
+  settings->frame_stabilisation = OMXCAM_FALSE;
 }
 
 int omxcam__camera_configure_omx (
@@ -232,7 +232,7 @@ int omxcam__camera_configure_omx (
   OMX_CONFIG_FRAMESTABTYPE frame_stabilisation_st;
   omxcam__omx_struct_init (frame_stabilisation_st);
   frame_stabilisation_st.nPortIndex = OMX_ALL;
-  frame_stabilisation_st.bStab = settings->frame_stabilisation_enable;
+  frame_stabilisation_st.bStab = settings->frame_stabilisation;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonFrameStabilisation: "
@@ -308,7 +308,7 @@ int omxcam__camera_configure_omx (
   OMX_CONFIG_COLORENHANCEMENTTYPE color_enhancement_st;
   omxcam__omx_struct_init (color_enhancement_st);
   color_enhancement_st.nPortIndex = OMX_ALL;
-  color_enhancement_st.bColorEnhancement = settings->color_enable;
+  color_enhancement_st.bColorEnhancement = settings->color_enhancement;
   color_enhancement_st.nCustomizedU = settings->color_u;
   color_enhancement_st.nCustomizedV = settings->color_v;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
@@ -321,7 +321,7 @@ int omxcam__camera_configure_omx (
   //Denoise
   OMX_CONFIG_BOOLEANTYPE denoise_st;
   omxcam__omx_struct_init (denoise_st);
-  denoise_st.bEnabled = settings->noise_reduction_enable;
+  denoise_st.bEnabled = settings->noise_reduction;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigStillColourDenoiseEnable, &denoise_st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigStillColourDenoiseEnable: "

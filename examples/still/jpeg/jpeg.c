@@ -60,7 +60,7 @@ int main (){
   //Shutter speed in milliseconds
   settings.camera.shutter_speed = 250;
   //Values of color_u and color_v are 128 by default, gray image
-  settings.camera.color_enable = OMXCAM_TRUE;
+  settings.camera.color_enhancement = OMXCAM_TRUE;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags

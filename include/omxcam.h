@@ -167,10 +167,10 @@ typedef struct {
   int32_t exposure_compensation; //-10 .. 10
   omxcam_mirror mirror;
   omxcam_rotation rotation;
-  omxcam_bool color_enable;
+  omxcam_bool color_enhancement;
   uint32_t color_u; //0 .. 255
   uint32_t color_v; //0 .. 255
-  omxcam_bool noise_reduction_enable;
+  omxcam_bool noise_reduction;
   omxcam_metering metering;
   omxcam_white_balance white_balance;
   //The gains are used if the white balance is set to off
@@ -184,7 +184,7 @@ typedef struct {
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode
-  omxcam_bool frame_stabilisation_enable;
+  omxcam_bool frame_stabilisation;
 } omxcam_camera_settings_t;
 
 typedef struct {
