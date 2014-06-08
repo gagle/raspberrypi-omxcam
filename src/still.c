@@ -184,16 +184,16 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   //In theory the fastest resolution and framerate are 1920x1080 @15fps because
   //these are the default settings for the preview port, so the frames don't
   //need to be resized. In practice, this is not true. The fastest way to
-  //produce stills is setting the lowest resolution and the highest framerate,
-  //that is, 640x480 @90fps. The difference between 1920x1080 @15fps and
-  //640x480 @90fps is a speed boost of ~25%, from ~1083ms to ~805ms
+  //produce stills is setting the lowest resolution, that is, 640x480 @15fps.
+  //The difference between 1920x1080 @15fps and 640x480 @15fps is a speed boost
+  //of ~4%, from ~1083ms to ~1039ms
   port_st.nPortIndex = 70;
   port_st.format.video.nFrameWidth = 640;
   port_st.format.video.nFrameHeight = 480;
   port_st.format.video.eCompressionFormat = OMX_IMAGE_CodingUnused;
   port_st.format.video.eColorFormat = color_format;
-  //90 << 16 -> 5898240
-  port_st.format.video.xFramerate = 5898240;
+  //15 << 16 -> 983040
+  port_st.format.video.xFramerate = 983040;
   port_st.format.video.nStride = 640;
   if ((error = OMX_SetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
