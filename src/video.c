@@ -51,7 +51,7 @@ static int omxcam__video_change_state (omxcam__state state, int use_encoder){
   return 0;
 }
 
-static int omxcam__init_omx (omxcam_video_settings_t* settings){
+static int omxcam__omx_init (omxcam_video_settings_t* settings){
   omxcam__trace ("initializing video");
   
   OMX_COLOR_FORMATTYPE color_format;
@@ -331,7 +331,7 @@ static int omxcam__init_omx (omxcam_video_settings_t* settings){
   return 0;
 }
 
-static int omxcam__deinit_omx (){
+static int omxcam__omx_deinit (){
   omxcam__trace ("deinitializing video");
   
   running = 0;
@@ -689,7 +689,7 @@ int omxcam_video_start (
     return -1;
   }
   
-  if (omxcam__init_omx (settings)) return -1;
+  if (omxcam__omx_init (settings)) return -1;
   
   //Start the background thread
   omxcam__trace ("creating background thread");
@@ -805,7 +805,7 @@ int omxcam_video_stop (){
     }
   }
   
-  int error = omxcam__deinit_omx ();
+  int error = omxcam__omx_deinit ();
   
   if (sleeping){
     if (omxcam__thread_wake ()){
