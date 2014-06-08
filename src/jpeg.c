@@ -23,7 +23,7 @@ int omxcam__jpeg_add_tag (char* key, char* value){
     char metadata_padding[value_length];
   } item;
   
-  omxcam__structure_init (item.metadata_st);
+  omxcam__omx_struct_init (item.metadata_st);
   item.metadata_st.nSize = sizeof (item);
   item.metadata_st.eScopeMode = OMX_MetadataScopePortLevel;
   item.metadata_st.nScopeSpecifier = 341;
@@ -54,7 +54,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   
   //Quality
   OMX_IMAGE_PARAM_QFACTORTYPE quality_st;
-  omxcam__structure_init (quality_st);
+  omxcam__omx_struct_init (quality_st);
   quality_st.nPortIndex = 341;
   quality_st.nQFactor = settings->quality;
   if ((error = OMX_SetParameter (omxcam__ctx.image_encode.handle,
@@ -66,7 +66,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   
   //Disable EXIF tags
   OMX_CONFIG_BOOLEANTYPE exif_st;
-  omxcam__structure_init (exif_st);
+  omxcam__omx_struct_init (exif_st);
   exif_st.bEnabled = settings->exif_enable ? OMXCAM_FALSE : OMXCAM_TRUE;
   if ((error = OMX_SetParameter (omxcam__ctx.image_encode.handle,
       OMX_IndexParamBrcmDisableEXIF, &exif_st))){
@@ -84,7 +84,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
       OMX_PARAM_CONTENTURITYPE uri_st;
       char padding[5];
     } raw;
-    omxcam__structure_init (raw.uri_st);
+    omxcam__omx_struct_init (raw.uri_st);
     raw.uri_st.nSize = sizeof (raw);
     memcpy (raw.uri_st.contentURI, dummy, 5);
     if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
@@ -97,7 +97,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   
   //Enable IJG table
   OMX_PARAM_IJGSCALINGTYPE ijg_st;
-  omxcam__structure_init (ijg_st);
+  omxcam__omx_struct_init (ijg_st);
   ijg_st.nPortIndex = 341;
   ijg_st.bEnabled = settings->ijg;
   if ((error = OMX_SetParameter (omxcam__ctx.image_encode.handle,
@@ -134,7 +134,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   
   //Thumbnail
   OMX_PARAM_BRCMTHUMBNAILTYPE thumbnail_st;
-  omxcam__structure_init (thumbnail_st);
+  omxcam__omx_struct_init (thumbnail_st);
   thumbnail_st.bEnable = settings->thumbnail_enable;
   thumbnail_st.bUsePreview = OMX_FALSE;
   thumbnail_st.nWidth = settings->thumbnail_width;

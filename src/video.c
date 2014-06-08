@@ -129,7 +129,7 @@ static int omxcam__init_omx (omxcam_video_settings_t* settings){
   omxcam__trace ("configuring '%s' port definition", omxcam__ctx.camera.name);
   
   OMX_PARAM_PORTDEFINITIONTYPE port_st;
-  omxcam__structure_init (port_st);
+  omxcam__omx_struct_init (port_st);
   port_st.nPortIndex = 71;
   if ((error = OMX_GetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
@@ -170,7 +170,7 @@ static int omxcam__init_omx (omxcam_video_settings_t* settings){
   omxcam__trace ("Configuring %s framerate", omxcam__ctx.camera.name);
   
   OMX_CONFIG_FRAMERATETYPE framerate_st;
-  omxcam__structure_init (framerate_st);
+  omxcam__omx_struct_init (framerate_st);
   framerate_st.nPortIndex = 71;
   framerate_st.xEncodeFramerate = port_st.format.video.xFramerate;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
@@ -201,7 +201,7 @@ static int omxcam__init_omx (omxcam_video_settings_t* settings){
     omxcam__trace ("configuring '%s' port definition",
         omxcam__ctx.video_encode.name);
     
-    omxcam__structure_init (port_st);
+    omxcam__omx_struct_init (port_st);
     port_st.nPortIndex = 201;
     if ((error = OMX_GetParameter (omxcam__ctx.video_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){

@@ -129,9 +129,9 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   omxcam__trace ("configuring '%s' sensor", omxcam__ctx.camera.name);
   
   OMX_PARAM_SENSORMODETYPE sensor_st;
-  omxcam__structure_init (sensor_st);
+  omxcam__omx_struct_init (sensor_st);
   sensor_st.nPortIndex = OMX_ALL;
-  omxcam__structure_init (sensor_st.sFrameSize);
+  omxcam__omx_struct_init (sensor_st.sFrameSize);
   sensor_st.sFrameSize.nPortIndex = OMX_ALL;
   if ((error = OMX_GetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamCommonSensorMode, &sensor_st))){
@@ -155,7 +155,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   omxcam__trace ("configuring '%s' port definition", omxcam__ctx.camera.name);
   
   OMX_PARAM_PORTDEFINITIONTYPE port_st;
-  omxcam__structure_init (port_st);
+  omxcam__omx_struct_init (port_st);
   port_st.nPortIndex = 72;
   if ((error = OMX_GetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
@@ -210,7 +210,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__trace ("configuring '%s' port definition",
         omxcam__ctx.image_encode.name);
     
-    omxcam__structure_init (port_st);
+    omxcam__omx_struct_init (port_st);
     port_st.nPortIndex = 341;
     if ((error = OMX_GetParameter (omxcam__ctx.image_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){

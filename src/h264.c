@@ -13,7 +13,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   
   //Bitrate
   OMX_VIDEO_PARAM_BITRATETYPE bitrate_st;
-  omxcam__structure_init (bitrate_st);
+  omxcam__omx_struct_init (bitrate_st);
   bitrate_st.eControlRate = OMX_Video_ControlRateVariable;
   bitrate_st.nTargetBitrate = settings->bitrate;
   bitrate_st.nPortIndex = 201;
@@ -26,7 +26,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   
   //Codec
   OMX_VIDEO_PARAM_PORTFORMATTYPE format_st;
-  omxcam__structure_init (format_st);
+  omxcam__omx_struct_init (format_st);
   format_st.nPortIndex = 201;
   //H.264/AVC
   format_st.eCompressionFormat = OMX_VIDEO_CodingAVC;
@@ -39,7 +39,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   
   //IDR period
   OMX_VIDEO_CONFIG_AVCINTRAPERIOD idr_st;
-  omxcam__structure_init (idr_st);
+  omxcam__omx_struct_init (idr_st);
   idr_st.nPortIndex = 201;
   if ((error = OMX_GetConfig (omxcam__ctx.video_encode.handle,
       OMX_IndexConfigVideoAVCIntraPeriod, &idr_st))){

@@ -13,7 +13,7 @@
 #include <bcm_host.h>
 #include <interface/vmcs_host/vc_vchi_gencmd.h>
 
-#define omxcam__structure_init(x)                                              \
+#define omxcam__omx_struct_init(x)                                             \
   memset (&(x), 0, sizeof (x));                                                \
   (x).nSize = sizeof (x);                                                      \
   (x).nVersion.nVersion = OMX_VERSION;                                         \
