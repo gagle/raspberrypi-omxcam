@@ -140,7 +140,7 @@ void omxcam__camera_init (
   settings->roi_width = 1.0;
   settings->roi_height = 1.0;
   settings->framerate = 30;
-  settings->frame_stabilisation = OMXCAM_FALSE;
+  settings->video_stabilisation = OMXCAM_FALSE;
 }
 
 int omxcam__camera_configure_omx (
@@ -228,16 +228,18 @@ int omxcam__camera_configure_omx (
     return -1;
   }
   
-  //Frame stabilisation
-  OMX_CONFIG_FRAMESTABTYPE frame_stabilisation_st;
-  omxcam__omx_struct_init (frame_stabilisation_st);
-  frame_stabilisation_st.nPortIndex = OMX_ALL;
-  frame_stabilisation_st.bStab = settings->frame_stabilisation;
-  if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
-      OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_st))){
-    omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonFrameStabilisation: "
-        "%s", omxcam__dump_OMX_ERRORTYPE (error));
-    return -1;
+  if (video){
+    //Frame stabilisation
+    OMX_CONFIG_FRAMESTABTYPE frame_stabilisation_st;
+    omxcam__omx_struct_init (frame_stabilisation_st);
+    frame_stabilisation_st.nPortIndex = OMX_ALL;
+    frame_stabilisation_st.bStab = settings->video_stabilisation;
+    if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
+        OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_st))){
+      omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonFrameStabilisation: "
+          "%s", omxcam__dump_OMX_ERRORTYPE (error));
+      return -1;
+    }
   }
   
   //White balance

@@ -154,7 +154,7 @@ float                 roi_left                    0.0                        0.0
 float                 roi_width                   0.0                        0.0 .. 1.0
 float                 roi_height                  0.0                        0.0 .. 1.0
 uint32_t              framerate                   30
-omxcam_bool           frame_stabilisation         OMXCAM_FALSE
+omxcam_bool           video_stabilisation         OMXCAM_FALSE
 ```
 
 For example, if you want to take a grayscale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:

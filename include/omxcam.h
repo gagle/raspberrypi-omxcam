@@ -184,7 +184,7 @@ typedef struct {
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode
-  omxcam_bool frame_stabilisation;
+  omxcam_bool video_stabilisation;
 } omxcam_camera_settings_t;
 
 typedef struct {
