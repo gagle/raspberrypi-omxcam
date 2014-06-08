@@ -179,7 +179,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     return -1;
   }
   
-  //Configure preview port at capture resolution (better performance)
+  //Configure preview port at full resolution (better performance)
   //1920x1080 15fps
   port_st.nPortIndex = 70;
   //omxcam_round (1920, 32) -> 1920

@@ -54,12 +54,14 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
   omxcam_trace ("initializing video");
   
   OMX_COLOR_FORMATTYPE color_format;
-  OMX_U32 stride;
   omxcam_component_t* fill_component;
   OMX_ERRORTYPE error;
   
-  OMX_U32 width = omxcam_round (settings->camera.width, 32);
-  OMX_U32 height = omxcam_round (settings->camera.height, 16);
+  OMX_U32 width_rounded = omxcam_round (settings->camera.width, 32);
+  OMX_U32 height_rounded = omxcam_round (settings->camera.height, 16);
+  OMX_U32 width = width_rounded;
+  OMX_U32 height = height_rounded;
+  OMX_U32 stride = width_rounded;
   
   //Stride is byte-per-pixel*width
   //See mmal/util/mmal_util.c, mmal_encoding_width_to_stride()
@@ -69,28 +71,28 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
-      stride = width*3;
+      stride = stride*3;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
-      stride = width*4;
+      stride = stride*4;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
       omxcam_ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = width;
       fill_component = &omxcam_ctx.camera;
       break;
     case OMXCAM_FORMAT_H264:
       omxcam_ctx.video_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
-      stride = width;
+      width = settings->camera.width;
+      height = settings->camera.height;
       fill_component = &omxcam_ctx.video_encode;
       break;
     default:
@@ -98,7 +100,7 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
       return -1;
   }
   
-  omxcam_trace ("%dx%d @%dfps", width, height,
+  omxcam_trace ("%dx%d @%dfps", settings->camera.width, settings->camera.height,
       settings->camera.framerate);
   
   thread_arg.buffer_callback = settings->buffer_callback;
@@ -208,15 +210,13 @@ static int omxcam_init_omx (omxcam_video_settings_t* settings){
       return -1;
     }
     
-    port_st.format.video.nFrameWidth = width;
-    port_st.format.video.nFrameHeight = height;
+    port_st.format.video.nFrameWidth = settings->camera.width;
+    port_st.format.video.nFrameHeight = settings->camera.height;
     port_st.format.video.xFramerate = settings->camera.framerate << 16;
     port_st.format.video.nStride = stride;
-    
     //Despite being configured later, these two fields need to be set now
     port_st.format.video.nBitrate = settings->h264.bitrate;
     port_st.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
-    
     if ((error = OMX_SetParameter (omxcam_ctx.video_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){
       omxcam_error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",

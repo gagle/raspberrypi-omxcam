@@ -1,6 +1,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "omxcam.h"
 
@@ -29,7 +31,7 @@ void buffer_callback_rgb (uint8_t* buffer, uint32_t length){
   }
 }
 
-void buffer_callback_yuv (uint8_t* buffer, uint32_t length){printf("%d\n", length);
+void buffer_callback_yuv (uint8_t* buffer, uint32_t length){
   //Append the data to the buffers
   memcpy (file_buffer + offset_y, buffer + yuv_planes_slice.offset_y,
       yuv_planes_slice.length_y);

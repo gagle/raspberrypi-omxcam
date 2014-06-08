@@ -90,6 +90,7 @@ int main (){
   //http://picamera.readthedocs.org/en/release-1.4/fov.html#camera-modes
   settings.camera.width = 640;
   settings.camera.height = 480;
+  settings.camera.framerate = 90;
   
   if (save_time ("video-time.h264", &settings)) return 1;
   
@@ -97,7 +98,7 @@ int main (){
   omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_length;
   
-  //if (save_length ("video-length.h264", &settings)) return 1;
+  if (save_length ("video-length.h264", &settings)) return 1;
   
   printf ("ok\n");
   

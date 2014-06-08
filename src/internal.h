@@ -13,13 +13,13 @@
 #include <bcm_host.h>
 #include <interface/vmcs_host/vc_vchi_gencmd.h>
 
-#define OMXCAM_INIT_STRUCTURE(x) \
-  memset (&(x), 0, sizeof (x)); \
-  (x).nSize = sizeof (x); \
-  (x).nVersion.nVersion = OMX_VERSION; \
-  (x).nVersion.s.nVersionMajor = OMX_VERSION_MAJOR; \
-  (x).nVersion.s.nVersionMinor = OMX_VERSION_MINOR; \
-  (x).nVersion.s.nRevision = OMX_VERSION_REVISION; \
+#define OMXCAM_INIT_STRUCTURE(x)                                               \
+  memset (&(x), 0, sizeof (x));                                                \
+  (x).nSize = sizeof (x);                                                      \
+  (x).nVersion.nVersion = OMX_VERSION;                                         \
+  (x).nVersion.s.nVersionMajor = OMX_VERSION_MAJOR;                            \
+  (x).nVersion.s.nVersionMinor = OMX_VERSION_MINOR;                            \
+  (x).nVersion.s.nRevision = OMX_VERSION_REVISION;                             \
   (x).nVersion.s.nStep = OMX_VERSION_STEP
 
 #define OMXCAM_CAMERA_NAME "OMX.broadcom.camera"
@@ -30,7 +30,7 @@
 #define OMXCAM_MIN_GPU_MEM 128 //MB
 
 #ifdef OMXCAM_DEBUG
-#define omxcam_error(message, ...) \
+#define omxcam_error(message, ...)                                             \
   omxcam_error_(message, __func__, __FILE__, __LINE__, ## __VA_ARGS__)
 #else
 #define omxcam_error(message, ...) //Empty
