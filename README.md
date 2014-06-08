@@ -171,7 +171,7 @@ settings.camera.shutter_speed_auto = OMXCAM_FALSE;
 settings.camera.shutter_speed = 500;
 
 //When 'camera.color_enhancement' is enabled, 'camera.color_u' and 'camera.color_v'
-//are used. They default to 128, the values for a gray-scale image
+//are used. They default to 128, the values for a grayscale image
 settings.camera.color_enhancement = OMXCAM_TRUE;
 ```
 
