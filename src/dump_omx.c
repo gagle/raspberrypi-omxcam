@@ -3,7 +3,7 @@
 
 #define OMXCAM_DUMP_CASE(x) case x: return #x;
 
-const char* omxcam_dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color){
+const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color){
   switch (color){
     OMXCAM_DUMP_CASE (OMX_COLOR_FormatUnused)
     OMXCAM_DUMP_CASE (OMX_COLOR_FormatMonochrome)
@@ -61,7 +61,7 @@ const char* omxcam_dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color){
   }
 }
 
-const char* omxcam_dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format){
+const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format){
   switch (format){
     OMXCAM_DUMP_CASE (OMX_OTHER_FormatTime);
     OMXCAM_DUMP_CASE (OMX_OTHER_FormatPower);
@@ -74,7 +74,7 @@ const char* omxcam_dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format){
   }
 }
 
-const char* omxcam_dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding){
+const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding){
   switch (coding){
     OMXCAM_DUMP_CASE (OMX_AUDIO_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_AUDIO_CodingAutoDetect)
@@ -115,7 +115,7 @@ const char* omxcam_dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding){
   }
 }
 
-const char* omxcam_dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding){
+const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding){
   switch (coding){
     OMXCAM_DUMP_CASE (OMX_VIDEO_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_VIDEO_CodingAutoDetect)
@@ -137,7 +137,7 @@ const char* omxcam_dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding){
   }
 }
 
-const char* omxcam_dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding){
+const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding){
   switch (coding){
     OMXCAM_DUMP_CASE (OMX_IMAGE_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_IMAGE_CodingAutoDetect)
@@ -155,7 +155,7 @@ const char* omxcam_dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding){
   }
 }
 
-const char* omxcam_dump_OMX_STATETYPE (OMX_STATETYPE state){
+const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE state){
   switch (state){
     OMXCAM_DUMP_CASE (OMX_StateInvalid)
     OMXCAM_DUMP_CASE (OMX_StateLoaded)
@@ -167,7 +167,7 @@ const char* omxcam_dump_OMX_STATETYPE (OMX_STATETYPE state){
   }
 }
 
-const char* omxcam_dump_OMX_ERRORTYPE (OMX_ERRORTYPE error){
+const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE error){
   switch (error){
     OMXCAM_DUMP_CASE (OMX_ErrorNone)
     OMXCAM_DUMP_CASE (OMX_ErrorInsufficientResources)
@@ -216,7 +216,7 @@ const char* omxcam_dump_OMX_ERRORTYPE (OMX_ERRORTYPE error){
   }
 }
 
-const char* omxcam_dump_OMX_EVENTTYPE (OMX_EVENTTYPE event){
+const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE event){
   switch (event){
     OMXCAM_DUMP_CASE (OMX_EventCmdComplete)
     OMXCAM_DUMP_CASE (OMX_EventError)
@@ -232,7 +232,7 @@ const char* omxcam_dump_OMX_EVENTTYPE (OMX_EVENTTYPE event){
   }
 }
 
-const char* omxcam_dump_OMX_INDEXTYPE (OMX_INDEXTYPE type){
+const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type){
   switch (type){
     OMXCAM_DUMP_CASE (OMX_IndexParamAudioInit)
     OMXCAM_DUMP_CASE (OMX_IndexParamVideoInit)
@@ -242,7 +242,7 @@ const char* omxcam_dump_OMX_INDEXTYPE (OMX_INDEXTYPE type){
   }
 }
 
-void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
+void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
     OMX_PARAM_PORTDEFINITIONTYPE* port){
   char domain[512];
   char domain_info[512];
@@ -256,7 +256,7 @@ void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
           "    eEncoding: %s\n",
           port->format.video.cMIMEType,
           port->format.image.bFlagErrorConcealment ? "true" : "false",
-          omxcam_dump_OMX_AUDIO_CODINGTYPE (
+          omxcam__dump_OMX_AUDIO_CODINGTYPE (
               port->format.audio.eEncoding));
       break;
     case OMX_PortDomainVideo:
@@ -280,9 +280,9 @@ void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
           port->format.video.nBitrate,
           port->format.video.xFramerate,
           port->format.image.bFlagErrorConcealment ? "true" : "false",
-          omxcam_dump_OMX_VIDEO_CODINGTYPE (
+          omxcam__dump_OMX_VIDEO_CODINGTYPE (
               port->format.video.eCompressionFormat),
-          omxcam_dump_OMX_COLOR_FORMATTYPE (
+          omxcam__dump_OMX_COLOR_FORMATTYPE (
               port->format.video.eColorFormat));
       break;
     case OMX_PortDomainImage:
@@ -302,16 +302,16 @@ void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
           port->format.image.nStride,
           port->format.image.nSliceHeight,
           port->format.image.bFlagErrorConcealment ? "true" : "false",
-          omxcam_dump_OMX_IMAGE_CODINGTYPE (
+          omxcam__dump_OMX_IMAGE_CODINGTYPE (
               port->format.image.eCompressionFormat),
-          omxcam_dump_OMX_COLOR_FORMATTYPE (
+          omxcam__dump_OMX_COLOR_FORMATTYPE (
               port->format.image.eColorFormat));
       break;
     case OMX_PortDomainOther:
       strcpy (domain, "OMX_PortDomainOther");
       sprintf (domain_info,
           "    eFormat: %s\n",
-          omxcam_dump_OMX_OTHER_FORMATTYPE (
+          omxcam__dump_OMX_OTHER_FORMATTYPE (
               port->format.other.eFormat));
       break;
     default:
@@ -348,7 +348,7 @@ void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
       port->nBufferAlignment);
 }
 
-void omxcam_dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
+void omxcam__dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
     OMX_IMAGE_PARAM_PORTFORMATTYPE* port){
   printf (
       "nSize: %d\n"
@@ -359,11 +359,11 @@ void omxcam_dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
       port->nSize,
       port->nPortIndex,
       port->nIndex,
-      omxcam_dump_OMX_IMAGE_CODINGTYPE (port->eCompressionFormat),
-      omxcam_dump_OMX_COLOR_FORMATTYPE (port->eColorFormat));
+      omxcam__dump_OMX_IMAGE_CODINGTYPE (port->eCompressionFormat),
+      omxcam__dump_OMX_COLOR_FORMATTYPE (port->eColorFormat));
 }
 
-void omxcam_dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header){
+void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header){
   long long int timestamp = (long long int)header->nTimeStamp.nHighPart;
   timestamp = timestamp << 32;
   timestamp |= (long long int)header->nTimeStamp.nLowPart;

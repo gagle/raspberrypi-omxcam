@@ -13,7 +13,7 @@
 #include <bcm_host.h>
 #include <interface/vmcs_host/vc_vchi_gencmd.h>
 
-#define omxcam_structure_init(x)                                               \
+#define omxcam__structure_init(x)                                              \
   memset (&(x), 0, sizeof (x));                                                \
   (x).nSize = sizeof (x);                                                      \
   (x).nVersion.nVersion = OMX_VERSION;                                         \
@@ -30,10 +30,10 @@
 #define OMXCAM_MIN_GPU_MEM 128 //MB
 
 #ifdef OMXCAM_DEBUG
-#define omxcam_error(message, ...)                                             \
-  omxcam_error_(message, __func__, __FILE__, __LINE__, ## __VA_ARGS__)
+#define omxcam__error(message, ...)                                            \
+  omxcam__error_(message, __func__, __FILE__, __LINE__, ## __VA_ARGS__)
 #else
-#define omxcam_error(message, ...) //Empty
+#define omxcam__error(message, ...) //Empty
 #endif
 
 /*
@@ -44,28 +44,28 @@ typedef struct {
   pthread_cond_t cond;
   uint32_t flags;
   int error;
-} omxcam_event_t;
+} omxcam__event_t;
 
 /*
  * Wrapper for an OpenMAX IL component.
  */
 typedef struct {
   OMX_HANDLETYPE handle;
-  omxcam_event_t event;
+  omxcam__event_t event;
   OMX_STRING name;
   void (*buffer_callback)(uint8_t* buffer, uint32_t length);
-} omxcam_component_t;
+} omxcam__component_t;
 
 /*
  * Program's global context.
  */
 typedef struct {
-  omxcam_component_t camera;
-  omxcam_component_t image_encode;
-  omxcam_component_t video_encode;
-  omxcam_component_t null_sink;
+  omxcam__component_t camera;
+  omxcam__component_t image_encode;
+  omxcam__component_t video_encode;
+  omxcam__component_t null_sink;
   OMX_BUFFERHEADERTYPE* output_buffer;
-} omxcam_context_t;
+} omxcam__context_t;
 
 /*
  * Enumeration with a mapping between all the OpenMAX IL events and a unique
@@ -86,7 +86,7 @@ typedef enum {
   OMXCAM_EVENT_RESOURCES_ACQUIRED = 0x400,
   OMXCAM_EVENT_DYNAMIC_RESOURCES_AVAILABLE = 0x800,
   OMXCAM_EVENT_FILL_BUFFER_DONE = 0x1000
-} omxcam_event;
+} omxcam__event;
 
 typedef enum {
   OMXCAM_STATE_LOADED = OMX_StateLoaded,
@@ -95,17 +95,17 @@ typedef enum {
   OMXCAM_STATE_PAUSE = OMX_StatePause,
   OMXCAM_STATE_WAIT_FOR_RESOURCES = OMX_StateWaitForResources,
   OMXCAM_STATE_INVALID = OMX_StateInvalid
-} omxcam_state;
+} omxcam__state;
 
 //Context's global variable
-omxcam_context_t omxcam_ctx;
+omxcam__context_t omxcam__ctx;
 
 /*
  * Prints an error message to the stdout along with the file, line and function
  * name from where this function is called. It is printed if the cflag
- * OMXCAM_DEBUG is enabled. Use the omxcam_error() macro instead.
+ * OMXCAM_DEBUG is enabled. Use the omxcam__error() macro instead.
  */
-void omxcam_error_ (
+void omxcam__error_ (
     const char* fmt,
     const char* fn,
     const char* file,
@@ -115,7 +115,7 @@ void omxcam_error_ (
 /*
  * Sets the last error.
  */
-void omxcam_set_last_error (omxcam_errno error);
+void omxcam__set_last_error (omxcam_errno error);
 
 /*
  * OpenMAX IL event handlers.
@@ -135,45 +135,45 @@ OMX_ERRORTYPE fill_buffer_done (
 /*
  * OpenMAX IL miscellaneous dump functions.
  */
-const char* omxcam_dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color);
-const char* omxcam_dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format);
-const char* omxcam_dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding);
-const char* omxcam_dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding);
-const char* omxcam_dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding);
-const char* omxcam_dump_OMX_STATETYPE (OMX_STATETYPE state);
-const char* omxcam_dump_OMX_ERRORTYPE (OMX_ERRORTYPE error);
-const char* omxcam_dump_OMX_EVENTTYPE (OMX_EVENTTYPE event);
-const char* omxcam_dump_OMX_INDEXTYPE (OMX_INDEXTYPE type);
-void omxcam_dump_OMX_PARAM_PORTDEFINITIONTYPE (
+const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color);
+const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format);
+const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding);
+const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding);
+const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding);
+const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE state);
+const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE error);
+const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE event);
+const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type);
+void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
     OMX_PARAM_PORTDEFINITIONTYPE* port);
-void omxcam_dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
+void omxcam__dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
     OMX_IMAGE_PARAM_PORTFORMATTYPE* port);
-void omxcam_dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header);
+void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header);
 
 /*
  * Prints a debug message to the stdout. It is printed if the cflag OMXCAM_DEBUG
  * is enabled. 
  */
-void omxcam_trace (const char* fmt, ...);
+void omxcam__trace (const char* fmt, ...);
 
 /*
  * Sets an error originated from the EventHandler.
  */
-void omxcam_event_error (omxcam_component_t* component);
+void omxcam__event_error (omxcam__component_t* component);
 /*
  * Creates the event flags handler for the component.
  */
-int omxcam_event_create (omxcam_component_t* component);
+int omxcam__event_create (omxcam__component_t* component);
 /*
  * Destroys the event flags handler for the component.
  */
-int omxcam_event_destroy (omxcam_component_t* component);
+int omxcam__event_destroy (omxcam__component_t* component);
 /*
  * Sets some events.
  * 
  * Unlocks the current thread if there are events waiting to the given events.
  */
-int omxcam_event_wake (omxcam_component_t* component, omxcam_event event);
+int omxcam__event_wake (omxcam__component_t* component, omxcam__event event);
 /*
  * Retrieve some events.
  *
@@ -185,60 +185,62 @@ int omxcam_event_wake (omxcam_component_t* component, omxcam_event event);
  *
  * OMXCAM_EVENT_ERROR is automatically handled.
  */
-int omxcam_event_wait (
-    omxcam_component_t* component,
-    omxcam_event events,
-    omxcam_event* current_events);
+int omxcam__event_wait (
+    omxcam__component_t* component,
+    omxcam__event events,
+    omxcam__event* current_events);
 
 /*
  * Enables and disables the port of a component.
  */
-int omxcam_component_port_enable (omxcam_component_t* component, uint32_t port);
-int omxcam_component_port_disable (
-    omxcam_component_t* component,
+int omxcam__component_port_enable (
+    omxcam__component_t* component,
+    uint32_t port);
+int omxcam__component_port_disable (
+    omxcam__component_t* component,
     uint32_t port);
 
 /*
  * Initializes a component. All its ports are enabled and the OpenMAX IL event
  * handlers are configured, plus other things.
  */
-int omxcam_component_init (omxcam_component_t* component);
+int omxcam__component_init (omxcam__component_t* component);
 /*
  * Deinitializes a component. All its ports are disabled, plus other things.
  */
-int omxcam_component_deinit (omxcam_component_t* component);
+int omxcam__component_deinit (omxcam__component_t* component);
 
 /*
  * Changes the state of a component.
  */
-int omxcam_component_change_state (
-    omxcam_component_t* component,
-    omxcam_state state);
+int omxcam__component_change_state (
+    omxcam__component_t* component,
+    omxcam__state state);
 
 /*
  * Allocates and frees an OpenMAX buffer for the given port.
  */
-int omxcam_buffer_alloc (omxcam_component_t* component, uint32_t port);
-int omxcam_buffer_free (omxcam_component_t* component, uint32_t port);
+int omxcam__buffer_alloc (omxcam__component_t* component, uint32_t port);
+int omxcam__buffer_free (omxcam__component_t* component, uint32_t port);
 
 /*
  * Initializes and deinitializes OpenMAX IL. They must be the first and last
  * api calls.
  */
-int omxcam_init ();
-int omxcam_deinit ();
+int omxcam__init ();
+int omxcam__deinit ();
 
 /*
  * Loads the camera drivers. After this call the red led is turned on and the
  * OpenMAX IL layer is ready to be configured.
  */
-int omxcam_camera_load_drivers ();
+int omxcam__camera_load_drivers ();
 
 /*
  * Checks if the camera is ready to be used. It checks the available gpu memory
  * and whether it is supported and detected.
  */
-int omxcam_camera_check ();
+int omxcam__camera_check ();
 
 /*
  * The camera needs to know which output port is going to be used to consume the
@@ -249,13 +251,13 @@ int omxcam_camera_check ();
  * video = 71
  * still = 72
  */
-int omxcam_camera_capture_port_set (uint32_t port);
-int omxcam_camera_capture_port_reset (uint32_t port);
+int omxcam__camera_capture_port_set (uint32_t port);
+int omxcam__camera_capture_port_reset (uint32_t port);
 
 /*
  * Sets the default settings for the camera.
  */
-void omxcam_camera_init (
+void omxcam__camera_init (
     omxcam_camera_settings_t* settings,
     uint32_t width,
     uint32_t height);
@@ -263,28 +265,30 @@ void omxcam_camera_init (
 /*
  * Configures the OpenMAX IL camera component.
  */
-int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video);
+int omxcam__camera_configure_omx (
+    omxcam_camera_settings_t* settings,
+    int video);
 
 /*
  * Sets the default settings for the jpeg encoder.
  */
-void omxcam_jpeg_init (omxcam_jpeg_settings_t* settings);
+void omxcam__jpeg_init (omxcam_jpeg_settings_t* settings);
 /*
  * Adds an exif tag to the jpeg metadata.
  */
-int omxcam_jpeg_add_tag (char* key, char* value);
+int omxcam__jpeg_add_tag (char* key, char* value);
 /*
  * Configures the OpenMAX IL image_encode component with the jpeg settings.
  */
-int omxcam_jpeg_configure_omx (omxcam_jpeg_settings_t* settings);
+int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings);
 
 /*
  * Sets the default settings for the h264 encoder.
  */
-void omxcam_h264_init (omxcam_h264_settings_t* settings);
+void omxcam__h264_init (omxcam_h264_settings_t* settings);
 /*
  * Configures the OpenMAX IL video_encode component with the h264 settings.
  */
-int omxcam_h264_configure_omx (omxcam_h264_settings_t* settings);
+int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings);
 
 #endif

@@ -3,7 +3,7 @@
 
 static omxcam_errno last_error = OMXCAM_ERROR_NONE;
 
-void omxcam_error_ (
+void omxcam__error_ (
     const char* fmt,
     const char* fn,
     const char* file,
@@ -15,7 +15,7 @@ void omxcam_error_ (
   vsprintf (buffer, fmt, args);
   va_end (args);
   
-  omxcam_trace ("error: %s (function: '%s', file: '%s', line: %d)", buffer,
+  omxcam__trace ("error: %s (function: '%s', file: '%s', line: %d)", buffer,
       fn, file, line);
 }
 
@@ -43,7 +43,7 @@ omxcam_errno omxcam_last_error (){
   return last_error;
 }
 
-void omxcam_set_last_error (omxcam_errno error){
+void omxcam__set_last_error (omxcam_errno error){
   last_error = error;
 }
 

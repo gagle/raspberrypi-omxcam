@@ -1,7 +1,7 @@
 #include "omxcam.h"
 #include "internal.h"
 
-void omxcam_trace (const char* fmt, ...){
+void omxcam__trace (const char* fmt, ...){
 #ifdef OMXCAM_DEBUG
   char buffer[256];
   va_list args;
