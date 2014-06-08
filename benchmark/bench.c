@@ -13,7 +13,7 @@ In still mode, the faster, the better.
 
 video rgb: 21.80 fps (1376 ms)
 video yuv: 21.91 fps (1369 ms)
-still yuv: 0.92 fps (1083 ms)
+still yuv: 1.24 fps (805 ms)
 */
 
 long now (){
