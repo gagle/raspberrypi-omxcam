@@ -149,7 +149,7 @@ int omxcam_component_init (omxcam_component_t* component){
     OMX_IndexParamOtherInit
   };
   OMX_PORT_PARAM_TYPE ports_st;
-  OMXCAM_INIT_STRUCTURE (ports_st);
+  omxcam_structure_init (ports_st);
 
   int i;
   for (i=0; i<4; i++){
@@ -212,7 +212,7 @@ int omxcam_buffer_alloc (omxcam_component_t* component, uint32_t port){
   OMX_ERRORTYPE error;
   
   OMX_PARAM_PORTDEFINITIONTYPE def_st;
-  OMXCAM_INIT_STRUCTURE (def_st);
+  omxcam_structure_init (def_st);
   def_st.nPortIndex = port;
   if ((error = OMX_GetParameter (component->handle,
       OMX_IndexParamPortDefinition, &def_st))){

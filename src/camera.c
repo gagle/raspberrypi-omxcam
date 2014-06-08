@@ -19,7 +19,7 @@ int omxcam_camera_load_drivers (){
   OMX_ERRORTYPE error;
 
   OMX_CONFIG_REQUESTCALLBACKTYPE req_st;
-  OMXCAM_INIT_STRUCTURE (req_st);
+  omxcam_structure_init (req_st);
   req_st.nPortIndex = OMX_ALL;
   req_st.nIndex = OMX_IndexParamCameraDeviceNumber;
   req_st.bEnable = OMX_TRUE;
@@ -31,7 +31,7 @@ int omxcam_camera_load_drivers (){
   }
   
   OMX_PARAM_U32TYPE dev_st;
-  OMXCAM_INIT_STRUCTURE (dev_st);
+  omxcam_structure_init (dev_st);
   dev_st.nPortIndex = OMX_ALL;
   //ID for the camera device
   dev_st.nU32 = 0;
@@ -84,7 +84,7 @@ static int omxcam_config_capture_port (uint32_t port, OMX_BOOL set){
   OMX_ERRORTYPE error;
   
   OMX_CONFIG_PORTBOOLEANTYPE port_st;
-  OMXCAM_INIT_STRUCTURE (port_st);
+  omxcam_structure_init (port_st);
   port_st.nPortIndex = port;
   port_st.bEnabled = set;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -150,7 +150,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Sharpness
   OMX_CONFIG_SHARPNESSTYPE sharpness_st;
-  OMXCAM_INIT_STRUCTURE (sharpness_st);
+  omxcam_structure_init (sharpness_st);
   sharpness_st.nPortIndex = OMX_ALL;
   sharpness_st.nSharpness = settings->sharpness;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -162,7 +162,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Contrast
   OMX_CONFIG_CONTRASTTYPE contrast_st;
-  OMXCAM_INIT_STRUCTURE (contrast_st);
+  omxcam_structure_init (contrast_st);
   contrast_st.nPortIndex = OMX_ALL;
   contrast_st.nContrast = settings->contrast;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -174,7 +174,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Saturation
   OMX_CONFIG_SATURATIONTYPE saturation_st;
-  OMXCAM_INIT_STRUCTURE (saturation_st);
+  omxcam_structure_init (saturation_st);
   saturation_st.nPortIndex = OMX_ALL;
   saturation_st.nSaturation = settings->saturation;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -186,7 +186,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Brightness
   OMX_CONFIG_BRIGHTNESSTYPE brightness_st;
-  OMXCAM_INIT_STRUCTURE (brightness_st);
+  omxcam_structure_init (brightness_st);
   brightness_st.nPortIndex = OMX_ALL;
   brightness_st.nBrightness = settings->brightness;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -198,7 +198,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Exposure value
   OMX_CONFIG_EXPOSUREVALUETYPE exposure_value_st;
-  OMXCAM_INIT_STRUCTURE (exposure_value_st);
+  omxcam_structure_init (exposure_value_st);
   exposure_value_st.nPortIndex = OMX_ALL;
   exposure_value_st.eMetering = settings->metering;
   exposure_value_st.xEVCompensation =
@@ -216,7 +216,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Exposure control
   OMX_CONFIG_EXPOSURECONTROLTYPE exposure_control_st;
-  OMXCAM_INIT_STRUCTURE (exposure_control_st);
+  omxcam_structure_init (exposure_control_st);
   exposure_control_st.nPortIndex = OMX_ALL;
   exposure_control_st.eExposureControl = settings->exposure;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -228,7 +228,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Frame stabilisation
   OMX_CONFIG_FRAMESTABTYPE frame_stabilisation_st;
-  OMXCAM_INIT_STRUCTURE (frame_stabilisation_st);
+  omxcam_structure_init (frame_stabilisation_st);
   frame_stabilisation_st.nPortIndex = OMX_ALL;
   frame_stabilisation_st.bStab = settings->frame_stabilisation_enable;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -240,7 +240,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //White balance
   OMX_CONFIG_WHITEBALCONTROLTYPE white_balance_st;
-  OMXCAM_INIT_STRUCTURE (white_balance_st);
+  omxcam_structure_init (white_balance_st);
   white_balance_st.nPortIndex = OMX_ALL;
   white_balance_st.eWhiteBalControl = settings->white_balance;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -253,7 +253,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   //White balance gains (if white balance is set to off)
   if (!settings->white_balance){
     OMX_CONFIG_CUSTOMAWBGAINSTYPE white_balance_gains_st;
-    OMXCAM_INIT_STRUCTURE (white_balance_gains_st);
+    omxcam_structure_init (white_balance_gains_st);
     white_balance_gains_st.xGainR =
         (OMX_U32)(settings->white_balance_red_gain*65536);
     white_balance_gains_st.xGainB =
@@ -268,7 +268,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Image filter
   OMX_CONFIG_IMAGEFILTERTYPE image_filter_st;
-  OMXCAM_INIT_STRUCTURE (image_filter_st);
+  omxcam_structure_init (image_filter_st);
   image_filter_st.nPortIndex = OMX_ALL;
   image_filter_st.eImageFilter = settings->image_filter;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -280,7 +280,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Mirror
   OMX_CONFIG_MIRRORTYPE mirror_st;
-  OMXCAM_INIT_STRUCTURE (mirror_st);
+  omxcam_structure_init (mirror_st);
   mirror_st.nPortIndex = video ? 71 : 72;
   mirror_st.eMirror = settings->mirror;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -292,7 +292,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Rotation
   OMX_CONFIG_ROTATIONTYPE rotation_st;
-  OMXCAM_INIT_STRUCTURE (rotation_st);
+  omxcam_structure_init (rotation_st);
   rotation_st.nPortIndex = video ? 71 : 72;
   rotation_st.nRotation = settings->rotation;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
@@ -304,7 +304,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Color enhancement
   OMX_CONFIG_COLORENHANCEMENTTYPE color_enhancement_st;
-  OMXCAM_INIT_STRUCTURE (color_enhancement_st);
+  omxcam_structure_init (color_enhancement_st);
   color_enhancement_st.nPortIndex = OMX_ALL;
   color_enhancement_st.bColorEnhancement = settings->color_enable;
   color_enhancement_st.nCustomizedU = settings->color_u;
@@ -318,7 +318,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //Denoise
   OMX_CONFIG_BOOLEANTYPE denoise_st;
-  OMXCAM_INIT_STRUCTURE (denoise_st);
+  omxcam_structure_init (denoise_st);
   denoise_st.bEnabled = settings->noise_reduction_enable;
   if ((error = OMX_SetConfig (omxcam_ctx.camera.handle,
       OMX_IndexConfigStillColourDenoiseEnable, &denoise_st))){
@@ -329,7 +329,7 @@ int omxcam_camera_configure_omx (omxcam_camera_settings_t* settings, int video){
   
   //ROI
   OMX_CONFIG_INPUTCROPTYPE roi_st;
-  OMXCAM_INIT_STRUCTURE (roi_st);
+  omxcam_structure_init (roi_st);
   roi_st.nPortIndex = OMX_ALL;
   roi_st.xLeft = (OMX_U32)(settings->roi_left*65536);
   roi_st.xTop = (OMX_U32)(settings->roi_top*65536);
