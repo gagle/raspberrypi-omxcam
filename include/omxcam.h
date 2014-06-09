@@ -221,7 +221,7 @@ typedef struct {
 #define OMXCAM_COMMON_SETTINGS                                                 \
   omxcam_camera_settings_t camera;                                             \
   omxcam_format format;                                                        \
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);                   \
+  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
 
 typedef struct {
   OMXCAM_COMMON_SETTINGS

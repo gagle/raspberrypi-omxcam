@@ -174,7 +174,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
-    omxcam__set_last_error (error ==  OMX_ErrorBadParameter
+    omxcam__set_last_error (error == OMX_ErrorBadParameter
         ? OMXCAM_ERROR_BAD_PARAMETER
         : OMXCAM_ERROR_STILL);
     return -1;
