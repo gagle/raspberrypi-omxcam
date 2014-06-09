@@ -684,10 +684,7 @@ int omxcam_video_start (
   
   bg_error = 0;
   
-  if (omxcam__init ()){
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
-  }
+  if (omxcam__init ()) return -1;
   
   if (omxcam__omx_init (settings)) return -1;
   
@@ -827,10 +824,7 @@ int omxcam_video_stop (){
     }
   }
   
-  if (omxcam__deinit ()){
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
-  }
+  if (omxcam__deinit ()) return -1;
   
   return 0;
 }

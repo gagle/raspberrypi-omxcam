@@ -264,6 +264,7 @@ int omxcam__init (){
   
   if ((error = OMX_Init ())){
     omxcam__error ("OMX_Init: %s", omxcam__dump_OMX_ERRORTYPE (error));
+    omxcam__set_last_error (OMXCAM_ERROR_INIT);
     return -1;
   }
   
@@ -275,6 +276,7 @@ int omxcam__deinit (){
   
   if ((error = OMX_Deinit ())){
     omxcam__error ("OMX_Deinit: %s", omxcam__dump_OMX_ERRORTYPE (error));
+    omxcam__set_last_error (OMXCAM_ERROR_DEINIT);
     return -1;
   }
 

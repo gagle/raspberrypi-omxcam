@@ -52,10 +52,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     return -1;
   }
   
-  if (omxcam__init ()){
-    omxcam__set_last_error (OMXCAM_ERROR_STILL);
-    return -1;
-  }
+  if (omxcam__init ()) return -1;
   
   int use_encoder;
   OMX_COLOR_FORMATTYPE color_format;
@@ -472,10 +469,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     return -1;
   }
   
-  if (omxcam__deinit ()){
-    omxcam__set_last_error (OMXCAM_ERROR_STILL);
-    return -1;
-  }
+  if (omxcam__deinit ()) return -1;
   
   return 0;
 }
