@@ -1,6 +1,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "omxcam.h"
 
@@ -15,8 +17,7 @@ void buffer_callback (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   //Note: Writing the data directly to disk will slow down the capture speed
   //due to the I/O access. A posible workaround is to save the buffers into
-  //memory, similar to the still/raw.c (YUV) example, and then write the
-  //whole image to disk
+  //memory, similar to the YUV example, and then write the whole image to disk
   if (pwrite (fd, buffer, length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_still_stop ()) log_error ();
@@ -29,50 +30,42 @@ int save (char* filename, omxcam_still_settings_t* settings){
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
     fprintf (stderr, "error: open\n");
-    return -1;
+    return 1;
   }
   
-  if (omxcam_still_start (settings)) return log_error ();
+  if (omxcam_still_start (settings)) log_error ();
   
   //Close the file
   if (close (fd)){
     fprintf (stderr, "error: close\n");
-    return -1;
+    return 1;
   }
   
   return 0;
 }
 
 int main (){
-  //2592x1944 by default
   omxcam_still_settings_t settings;
-  
-  //Capture an image with default settings
   omxcam_still_init (&settings);
-  settings.buffer_callback = buffer_callback;
   
-  if (save ("still-default-2592x1944.jpg", &settings)) return 1;
+  //2592x1944 by default
   
-  //Capture an image with shutter speed 1/4, EV -10 and some EXIF tags
-  omxcam_still_init (&settings);
   settings.buffer_callback = buffer_callback;
   settings.camera.shutter_speed_auto = OMXCAM_FALSE;
-  //Shutter speed in milliseconds
-  settings.camera.shutter_speed = 250;
-  //Values of color_u and color_v are 128 by default, gray image
-  settings.camera.color_enhancement = OMXCAM_TRUE;
+  //Shutter speed in milliseconds (1/8 by default: 125)
+  settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
+  settings.camera.width = 640;
+  settings.camera.height = 480;
   
-  //See firmware/documentation/ilcomponents/image_decode.html for valid keys
-  //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags
-  //for valid keys and their description
-  omxcam_exif_tag_t exif_tags[] = {
-    //Manufacturer
-    { "IFD0.Make", "Raspberry Pi" }
-  };
-  settings.jpeg.exif_tags = exif_tags;
-  settings.jpeg.exif_valid_tags = 1;
+  //RGB, 640x480
+  settings.format = OMXCAM_FORMAT_RGB888;
   
-  if (save ("still-2592x1944.jpg", &settings)) return 1;
+  if (save ("still-640x480.rgb", &settings)) return 1;
+  
+  //RGBA (alpha channel is unused, value 255), 640x480
+  settings.format = OMXCAM_FORMAT_RGBA8888;
+  
+  if (save ("still-640x480.rgba", &settings)) return 1;
   
   printf ("ok\n");
   

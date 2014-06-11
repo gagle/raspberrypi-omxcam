@@ -151,7 +151,7 @@ uint32_t              shutter_speed               125
 omxcam_bool           iso_auto                    OMXCAM_TRUE
 uint32_t              iso                         100                        100 .. 800
 omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
-int32_t               exposure_compensation       0                          -10 .. 10
+int32_t               exposure_compensation       0                          -25 .. 25
 omxcam_mirror         mirror                      OMXCAM_MIRROR_NONE
 omxcam_rotation       rotation                    OMXCAM_ROTATION_NONE
 omxcam_bool           color_enhancement           OMXCAM_FALSE

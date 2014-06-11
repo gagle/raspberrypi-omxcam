@@ -1,5 +1,5 @@
 APP = h264
 OMXCAM_HOME = ../../..
-CLEAN = video-time.h264 video-length.h264
+CLEAN = video-time-640x480.h264 video-length-640x480.h264
 
 include ../../Makefile-common

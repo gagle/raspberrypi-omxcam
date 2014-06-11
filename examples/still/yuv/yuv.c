@@ -20,18 +20,7 @@ uint32_t offset_u;
 uint32_t offset_v;
 uint8_t* file_buffer;
 
-void buffer_callback_rgb (uint8_t* buffer, uint32_t length){
-  //Append the buffer to the file
-  //Note: Writing the data directly to disk will slow down the capture speed
-  //due to the I/O access. A posible workaround is to save the buffers into
-  //memory, similar to the YUV example, and then write the whole image to disk
-  if (pwrite (fd, buffer, length, 0) == -1){
-    fprintf (stderr, "error: pwrite\n");
-    if (omxcam_still_stop ()) log_error ();
-  }
-}
-
-void buffer_callback_yuv (uint8_t* buffer, uint32_t length){
+void buffer_callback (uint8_t* buffer, uint32_t length){
   //Append the data to the buffers
   memcpy (file_buffer + offset_y, buffer + yuv_planes_slice.offset_y,
       yuv_planes_slice.length_y);
@@ -46,27 +35,7 @@ void buffer_callback_yuv (uint8_t* buffer, uint32_t length){
   offset_v += yuv_planes_slice.length_v;
 }
 
-int save_rgb (char* filename, omxcam_still_settings_t* settings){
-  printf ("capturing %s\n", filename);
-
-  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
-  if (fd == -1){
-    fprintf (stderr, "error: open\n");
-    return 1;
-  }
-  
-  if (omxcam_still_start (settings)) log_error ();
-  
-  //Close the file
-  if (close (fd)){
-    fprintf (stderr, "error: close\n");
-    return 1;
-  }
-  
-  return 0;
-}
-
-int save_yuv (char* filename, omxcam_still_settings_t* settings){
+int save (char* filename, omxcam_still_settings_t* settings){
   /*
   The camera returns YUV420PackedPlanar buffers/slices.
   Packed means that each slice has a little portion of y + u + v planes.
@@ -131,20 +100,15 @@ int save_yuv (char* filename, omxcam_still_settings_t* settings){
 }
 
 int main (){
-  //2592x1944 by default
   omxcam_still_settings_t settings;
-  
-  //Capture a raw RGB image (640x480)
   omxcam_still_init (&settings);
-  settings.buffer_callback = buffer_callback_rgb;
+  
+  //2592x1944 by default
+  
+  settings.buffer_callback = buffer_callback;
   settings.camera.shutter_speed_auto = OMXCAM_FALSE;
   //Shutter speed in milliseconds (1/8 by default: 125)
   settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
-  settings.format = OMXCAM_FORMAT_RGB888;
-  settings.camera.width = 640;
-  settings.camera.height = 480;
-  
-  //if (save_rgb ("still.rgb", &settings)) return 1;
   
   /*
   Please note that the original aspect ratio of an image is 4:3. If you set
@@ -181,21 +145,21 @@ int main (){
     the camera.
   */
   
-  //16:9
-  settings.buffer_callback = buffer_callback_yuv;
+  //YUV420, 1296x730, 16:9
+  settings.buffer_callback = buffer_callback;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = 1296;
   settings.camera.height = 730;
   
-  if (save_yuv ("still-1312x736.yuv", &settings)) return 1;
+  if (save ("still-1312x736.yuv", &settings)) return 1;
   
-  //4:3
-  settings.buffer_callback = buffer_callback_yuv;
+  //YUV420, 1296x972, 4:3
+  settings.buffer_callback = buffer_callback;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = 1296;
   settings.camera.height = 972;
   
-  if (save_yuv ("still-1312x976.yuv", &settings)) return 1;
+  if (save ("still-1312x976.yuv", &settings)) return 1;
   
   printf ("ok\n");
   

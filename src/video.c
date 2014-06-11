@@ -157,6 +157,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   //The preview port must be configured with the same settings as the video port
   port_st.nPortIndex = 70;
+  port_st.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
   if ((error = OMX_SetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",

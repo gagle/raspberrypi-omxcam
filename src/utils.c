@@ -1,8 +1,9 @@
 #include "omxcam.h"
 #include "internal.h"
 
-uint32_t omxcam_round (uint32_t value, uint32_t divisor){
-  return (divisor + value - 1) & ~(divisor - 1);
+uint32_t omxcam_round (uint32_t value, uint32_t multiplier){
+  //Assumed that the rounding value is a power of 2
+  return (value + multiplier - 1) & ~(multiplier - 1);
 }
 
 void omxcam_yuv_planes (

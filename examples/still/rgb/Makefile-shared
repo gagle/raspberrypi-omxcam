@@ -1,0 +1,5 @@
+APP = rgb
+OMXCAM_HOME = ../../..
+CLEAN = still.rgb still.rgba
+
+include ../../Makefile-shared-common
