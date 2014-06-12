@@ -84,27 +84,27 @@ int main (){
   
   settings.buffer_callback = buffer_callback;
   
-  //RGB, 642x480 @30fps (10 frames)
-  //When no encoder is used, the width and the height need to be multiple of 32
-  //and 16, therefore, 642 rounded up to the nearest multiple of 32 is 672
+  //RGB, 640x480 @30fps (10 frames)
   settings.format = OMXCAM_FORMAT_RGB888;
-  settings.camera.width = 642;
-  settings.camera.height = 480;
-  
-  current = 0;
-  total = 672*480*3*10;
-  
-  if (save ("video-672x480.rgb", &settings)) return 1;
-  
-  //RGBA (alpha channel is unused, value 255), 640x480 @30fps (10 frames)
-  settings.format = OMXCAM_FORMAT_RGBA8888;
   settings.camera.width = 640;
   settings.camera.height = 480;
   
   current = 0;
-  total = 640*480*4*10;
+  total = 640*480*3*10;
   
-  if (save ("video-640x480.rgba", &settings)) return 1;
+  if (save ("video-640x480.rgb", &settings)) return 1;
+  
+  //RGBA (alpha channel is unused, value 255), 642x480 @30fps (10 frames)
+  //When no encoder is used, the width and the height need to be multiple of 32
+  //and 16, therefore, 642 rounded up to the nearest multiple of 32 is 672
+  settings.format = OMXCAM_FORMAT_RGBA8888;
+  settings.camera.width = 642;
+  settings.camera.height = 480;
+  
+  current = 0;
+  total = 672*480*4*10;
+  
+  if (save ("video-672x480.rgba", &settings)) return 1;
   
   printf ("ok\n");
   

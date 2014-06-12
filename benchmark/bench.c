@@ -11,9 +11,10 @@ Results:
 In video mode, the closer to 30fps and 1000ms, the better.
 In still mode, the faster, the better.
 
-video rgb: 21.80 fps (1376 ms)
-video yuv: 21.91 fps (1369 ms)
-still yuv: 0.96 fps (1039 ms)
+video rgb: 21.29 fps (1409 ms)
+video yuv: 21.88 fps (1371 ms)
+still rgb: 0.96 fps (1040 ms)
+still yuv: 0.96 fps (1042 ms)
 */
 
 long now (){
@@ -45,10 +46,10 @@ int main (){
   diff = now () - ms;
   printf ("video yuv: %.2f fps (%d ms)\n", frames/(diff/1000.0), diff);
   
-  /*ms = now ();
+  ms = now ();
   if (rgb_still (width, height)) return log_error ();
   diff = now () - ms;
-  printf ("still rgb: %.2f fps (%d ms)\n", 1000.0/diff, diff);*/
+  printf ("still rgb: %.2f fps (%d ms)\n", 1000.0/diff, diff);
   
   ms = now ();
   if (yuv_still (width, height)) return log_error ();
