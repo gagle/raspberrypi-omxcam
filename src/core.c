@@ -247,6 +247,13 @@ int omxcam__buffer_free (omxcam__component_t* component, uint32_t port){
   return 0;
 }
 
+int omxcam__exit (int code){
+  omxcam__ctx.state.running = 0;
+  omxcam__ctx.state.joined = 0;
+  omxcam__ctx.state.stopping = 0;
+  return code;
+}
+
 int omxcam__init (){
   omxcam__ctx.camera.name = OMXCAM_CAMERA_NAME;
   omxcam__ctx.image_encode.name = OMXCAM_IMAGE_ENCODE_NAME;

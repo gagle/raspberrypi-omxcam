@@ -37,37 +37,6 @@
 #endif
 
 /*
- * Component's event flags.
- */
-typedef struct {
-  pthread_mutex_t mutex;
-  pthread_cond_t cond;
-  uint32_t flags;
-  int error;
-} omxcam__event_t;
-
-/*
- * Wrapper for an OpenMAX IL component.
- */
-typedef struct {
-  OMX_HANDLETYPE handle;
-  omxcam__event_t event;
-  OMX_STRING name;
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
-} omxcam__component_t;
-
-/*
- * Program's global context.
- */
-typedef struct {
-  omxcam__component_t camera;
-  omxcam__component_t image_encode;
-  omxcam__component_t video_encode;
-  omxcam__component_t null_sink;
-  OMX_BUFFERHEADERTYPE* output_buffer;
-} omxcam__context_t;
-
-/*
  * Enumeration with a mapping between all the OpenMAX IL events and a unique
  * number. The id allows them to be bitwise-or'ed, e.g.
  * OMXCAM_EVENT_ERROR | OMXCAM_EVENT_PORT_ENABLE == 0x3
@@ -96,6 +65,42 @@ typedef enum {
   OMXCAM_STATE_WAIT_FOR_RESOURCES = OMX_StateWaitForResources,
   OMXCAM_STATE_INVALID = OMX_StateInvalid
 } omxcam__state;
+
+/*
+ * Component's event flags.
+ */
+typedef struct {
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
+  uint32_t flags;
+  int error;
+} omxcam__event_t;
+
+/*
+ * Wrapper for an OpenMAX IL component.
+ */
+typedef struct {
+  OMX_HANDLETYPE handle;
+  omxcam__event_t event;
+  OMX_STRING name;
+  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
+} omxcam__component_t;
+
+/*
+ * Program's global context.
+ */
+typedef struct {
+  omxcam__component_t camera;
+  omxcam__component_t image_encode;
+  omxcam__component_t video_encode;
+  omxcam__component_t null_sink;
+  OMX_BUFFERHEADERTYPE* output_buffer;
+  struct {
+    int running;
+    int joined;
+    int stopping;
+  } state;
+} omxcam__context_t;
 
 //Context's global variable
 omxcam__context_t omxcam__ctx;
@@ -199,6 +204,20 @@ int omxcam__component_port_enable (
 int omxcam__component_port_disable (
     omxcam__component_t* component,
     uint32_t port);
+
+/*
+ * Performs cleanup tasks before exit. These tasks doesn't return any error.
+ * The main usage is to call this function in the return of the function that
+ * was called by the user. The return is always the 'code' parameter.
+ * 
+ * For example:
+ *
+ * int omxcam_start_video(...){
+ *   ...
+ *   return omxcam__exit (omxcam_stop_video ());
+ * }
+ */
+int omxcam__exit (int code);
 
 /*
  * Initializes a component. All its ports are enabled and the OpenMAX IL event

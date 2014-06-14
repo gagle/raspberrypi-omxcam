@@ -23,14 +23,14 @@ extern "C" {
 #define OMXCAM_ERRNO_MAP(XX)                                                   \
   XX (0, ERROR_NONE, "success")                                                \
   XX (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")         \
-  XX (2, ERROR_INIT, "initialization error")                                   \
-  XX (3, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
-  XX (4, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
+  XX (2, ERROR_DRIVERS, "cannot load the camera drivers")                      \
+  XX (3, ERROR_INIT, "initialization error")                                   \
+  XX (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
+  XX (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
       "component")                                                             \
-  XX (5, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
+  XX (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
       "component")                                                             \
-  XX (6, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
-  XX (7, ERROR_DRIVERS, "cannot load the camera drivers")                      \
+  XX (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
   XX (8, ERROR_DEINIT, "deinitialization error")                               \
   XX (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")    \
   XX (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' "\
@@ -40,19 +40,21 @@ extern "C" {
   XX (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "       \
       "component")                                                             \
   XX (13, ERROR_CAPTURE, "error while capturing")                              \
-  XX (14, ERROR_STILL, "still error")                                          \
-  XX (15, ERROR_VIDEO, "video error")                                          \
-  XX (16, ERROR_JPEG, "error configuring jpeg encoder")                        \
-  XX (17, ERROR_H264, "error configuring h264 encoder")                        \
-  XX (18, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
-  XX (19, ERROR_LOADED, "cannot transition to the Loaded state")               \
-  XX (20, ERROR_IDLE, "cannot transition to the Idle state")                   \
-  XX (21, ERROR_EXECUTING, "cannot transition to the Executing state")         \
-  XX (22, ERROR_FORMAT, "invalid encoding format")                             \
-  XX (23, ERROR_SLEEP, "cannot sleep the thread")                              \
-  XX (24, ERROR_WAKE, "cannot wake the thread")                                \
-  XX (25, ERROR_LOCK, "cannot lock the thread")                                \
-  XX (26, ERROR_UNLOCK, "cannot unlock the thread")
+  XX (14, ERROR_RUNNING, "camera is already running")                          \
+  XX (15, ERROR_STOPPING, "camera is already being stopped")                   \
+  XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
+  XX (17, ERROR_STILL, "still error")                                          \
+  XX (18, ERROR_VIDEO, "video error")                                          \
+  XX (19, ERROR_JPEG, "error configuring jpeg encoder")                        \
+  XX (20, ERROR_H264, "error configuring h264 encoder")                        \
+  XX (21, ERROR_LOADED, "cannot transition to the Loaded state")               \
+  XX (22, ERROR_IDLE, "cannot transition to the Idle state")                   \
+  XX (23, ERROR_EXECUTING, "cannot transition to the Executing state")         \
+  XX (24, ERROR_FORMAT, "invalid encoding format")                             \
+  XX (25, ERROR_SLEEP, "cannot sleep the thread")                              \
+  XX (26, ERROR_WAKE, "cannot wake the thread")                                \
+  XX (27, ERROR_LOCK, "cannot lock the thread")                                \
+  XX (28, ERROR_UNLOCK, "cannot unlock the thread")
 
 typedef enum {
   OMXCAM_FALSE,

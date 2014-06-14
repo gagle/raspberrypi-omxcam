@@ -70,7 +70,7 @@ All the functions that have a non-void return, return an `int` type: `0` if the 
 omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
 ```
 
-You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library (by default it's enabled). An even more specific error message should be printed to the stdout, for example:
+You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library. An even more specific error message should be printed to the stdout, for example:
 
 ```
 omxcam: error: OMX_EventError: OMX_ErrorInsufficientResources (function: 'event_handler', file: '../../../src/core.c', line: 41)
@@ -83,14 +83,14 @@ All the error codes and their descriptive messages are:
 ```
 XX (0, ERROR_NONE, "success")                                                \
 XX (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")         \
-XX (2, ERROR_INIT, "initialization error")                                   \
-XX (3, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
-XX (4, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
+XX (2, ERROR_DRIVERS, "cannot load the camera drivers")                      \
+XX (3, ERROR_INIT, "initialization error")                                   \
+XX (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
+XX (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
     "component")                                                             \
-XX (5, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
+XX (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
     "component")                                                             \
-XX (6, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
-XX (7, ERROR_DRIVERS, "cannot load the camera drivers")                      \
+XX (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
 XX (8, ERROR_DEINIT, "deinitialization error")                               \
 XX (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")    \
 XX (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' "\
@@ -100,19 +100,21 @@ XX (11, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' "\
 XX (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "       \
     "component")                                                             \
 XX (13, ERROR_CAPTURE, "error while capturing")                              \
-XX (14, ERROR_STILL, "still error")                                          \
-XX (15, ERROR_VIDEO, "video error")                                          \
-XX (16, ERROR_JPEG, "error configuring jpeg encoder")                        \
-XX (17, ERROR_H264, "error configuring h264 encoder")                        \
-XX (18, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
-XX (19, ERROR_LOADED, "cannot transition to the Loaded state")               \
-XX (20, ERROR_IDLE, "cannot transition to the Idle state")                   \
-XX (21, ERROR_EXECUTING, "cannot transition to the Executing state")         \
-XX (22, ERROR_FORMAT, "invalid encoding format")                             \
-XX (23, ERROR_SLEEP, "cannot sleep the thread")                              \
-XX (24, ERROR_WAKE, "cannot wake the thread")                                \
-XX (25, ERROR_LOCK, "cannot lock the thread")                                \
-XX (26, ERROR_UNLOCK, "cannot unlock the thread")
+XX (14, ERROR_RUNNING, "camera is already running")                          \
+XX (15, ERROR_STOPPING, "camera is already being stopped")                   \
+XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
+XX (17, ERROR_STILL, "still error")                                          \
+XX (18, ERROR_VIDEO, "video error")                                          \
+XX (19, ERROR_JPEG, "error configuring jpeg encoder")                        \
+XX (20, ERROR_H264, "error configuring h264 encoder")                        \
+XX (21, ERROR_LOADED, "cannot transition to the Loaded state")               \
+XX (22, ERROR_IDLE, "cannot transition to the Idle state")                   \
+XX (23, ERROR_EXECUTING, "cannot transition to the Executing state")         \
+XX (24, ERROR_FORMAT, "invalid encoding format")                             \
+XX (25, ERROR_SLEEP, "cannot sleep the thread")                              \
+XX (26, ERROR_WAKE, "cannot wake the thread")                                \
+XX (27, ERROR_LOCK, "cannot lock the thread")                                \
+XX (28, ERROR_UNLOCK, "cannot unlock the thread")
 ```
 
 Note: If you receive a `ERROR_CAMERA_MODULE` error, make sure that the property `gpu_mem_512` or `gpu_mem_256` (depending on the model of the Raspberry Pi) has `128` or more MB in the file `/boot/config.txt`. Uncomment if necessary. For example, if you have a Raspberry Pi model B, Arch Linux ARM (build from june 2014) defaults to:
@@ -151,7 +153,7 @@ uint32_t              shutter_speed               125
 omxcam_bool           iso_auto                    OMXCAM_TRUE
 uint32_t              iso                         100                        100 .. 800
 omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
-int32_t               exposure_compensation       0                          -25 .. 25
+int32_t               exposure_compensation       0                          -24 .. 24
 omxcam_mirror         mirror                      OMXCAM_MIRROR_NONE
 omxcam_rotation       rotation                    OMXCAM_ROTATION_NONE
 omxcam_bool           color_enhancement           OMXCAM_FALSE

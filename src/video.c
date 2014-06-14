@@ -168,7 +168,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   //The framerate must be configured (again) with its own structure in the video
   //and preview ports
-  omxcam__trace ("Configuring %s framerate", omxcam__ctx.camera.name);
+  omxcam__trace ("configuring %s framerate", omxcam__ctx.camera.name);
   
   OMX_CONFIG_FRAMERATETYPE framerate_st;
   omxcam__omx_struct_init (framerate_st);
@@ -234,7 +234,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     }
     
     //Setup tunnel: camera (video) -> video_encode
-    omxcam__trace ("Configuring tunnel '%s' -> '%s'", omxcam__ctx.camera.name,
+    omxcam__trace ("configuring tunnel '%s' -> '%s'", omxcam__ctx.camera.name,
         omxcam__ctx.video_encode.name);
     
     if ((error = OMX_SetupTunnel (omxcam__ctx.camera.handle, 71,
@@ -672,22 +672,22 @@ int omxcam_video_start (
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
-  if (!settings->buffer_callback){
-    omxcam__error ("the 'buffer_callback' field must be defined");
-    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
-    return -1;
-  }
-  if (running){
-    omxcam__error ("video capture is already running");
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+  if (omxcam__ctx.state.running){
+    omxcam__error ("camera is already running");
+    omxcam__set_last_error (OMXCAM_ERROR_RUNNING);
     return -1;
   }
   
+  omxcam__ctx.state.running = 1;
+  omxcam__ctx.state.joined = 0;
+  omxcam__ctx.state.stopping = 0;
+  
+  running = 1;
   bg_error = 0;
   
-  if (omxcam__init ()) return -1;
+  if (omxcam__init ()) return omxcam__exit (-1);
   
-  if (omxcam__omx_init (settings)) return -1;
+  if (omxcam__omx_init (settings)) return omxcam__exit (-1);
   
   //Start the background thread
   omxcam__trace ("creating background thread");
@@ -695,27 +695,25 @@ int omxcam_video_start (
   if (pthread_mutex_init (&mutex, 0)){
     omxcam__error ("pthread_mutex_init");
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
+    return omxcam__exit (-1);
   }
-  
-  running = 1;
   
   if (pthread_create (&bg_thread, 0, omxcam__video_capture, &thread_arg)){
     omxcam__error ("pthread_create");
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
+    return omxcam__exit (-1);
   }
   
   //Block the main thread
   if (ms == OMXCAM_CAPTURE_FOREVER){
     if (omxcam__thread_lock ()){
       omxcam__set_last_error (OMXCAM_ERROR_LOCK);
-      return -1;
+      return omxcam__exit (-1);
     }
   }else{
     if (omxcam__thread_sleep (ms)){
       omxcam__set_last_error (OMXCAM_ERROR_SLEEP);
-      return -1;
+      return omxcam__exit (-1);
     }
   }
   
@@ -732,26 +730,26 @@ int omxcam_video_start (
     if (pthread_join (bg_thread, 0)){
       omxcam__error ("pthread_join");
       omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-      return -1;
+      return omxcam__exit (-1);
     }
     
-    return error;
+    return omxcam__exit (error);
   }
   
   if (!running){
     //The video was already stopped by the user
     omxcam__trace ("video already stopped by the user");
     
-    if (pthread_join (bg_thread, 0)){
+    if (!omxcam__ctx.state.joined && pthread_join (bg_thread, 0)){
       omxcam__error ("pthread_join");
       omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-      return -1;
+      return omxcam__exit (-1);
     }
     
-    return 0;
+    return omxcam__exit (0);
   }
   
-  return omxcam_video_stop ();
+  return omxcam__exit (omxcam_video_stop ());
 }
 
 int omxcam_video_stop (){
@@ -759,11 +757,19 @@ int omxcam_video_stop (){
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
-  if (!running){
-    omxcam__error ("video capture is not running");
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+  if (!omxcam__ctx.state.running){
+    omxcam__error ("camera is not running");
+    omxcam__set_last_error (OMXCAM_ERROR_RUNNING);
     return -1;
   }
+  
+  if (omxcam__ctx.state.stopping){
+    omxcam__error ("camera is already being stopped");
+    omxcam__set_last_error (OMXCAM_ERROR_STOPPING);
+    return -1;
+  }
+  
+  omxcam__ctx.state.stopping = 1;
   
   if (pthread_equal (pthread_self (), bg_thread)){
     //Background thread
@@ -774,7 +780,8 @@ int omxcam_video_stop (){
     //join(), just set running to false and the thread will die naturally
     running = 0;
     
-    //This var is used to prevent calling mutex_lock() after mutex_destroy()
+    //This var is used to prevent from calling mutex_lock() after
+    //mutex_destroy()
     running_safe = 0;
   }else{
     //Main thread
@@ -801,6 +808,8 @@ int omxcam_video_stop (){
       omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
       return -1;
     }
+    
+    omxcam__ctx.state.joined = 1;
   }
   
   int error = omxcam__omx_deinit ();
