@@ -2,7 +2,7 @@
 #include "internal.h"
 
 void omxcam__event_error (omxcam__component_t* component){
-  component->event.error = -1;
+  component->event.fn_error = -1;
 }
 
 int omxcam__event_create (omxcam__component_t* component){
@@ -16,7 +16,7 @@ int omxcam__event_create (omxcam__component_t* component){
     return -1;
   }
   
-  component->event.error = component->event.flags = 0;
+  component->event.fn_error = component->event.flags = 0;
   
   return 0;
 }
@@ -35,13 +35,17 @@ int omxcam__event_destroy (omxcam__component_t* component){
   return 0;
 }
 
-int omxcam__event_wake (omxcam__component_t* component, omxcam__event event){
+int omxcam__event_wake (
+    omxcam__component_t* component,
+    omxcam__event event,
+    OMX_ERRORTYPE omx_error){
   if (pthread_mutex_lock (&component->event.mutex)){
     omxcam__error ("pthread_mutex_lock");
     return -1;
   }
   
   component->event.flags |= event;
+  component->event.omx_error = omx_error;
   
   if (pthread_cond_signal (&component->event.cond)){
     omxcam__error ("pthread_cond_signal");
@@ -59,14 +63,15 @@ int omxcam__event_wake (omxcam__component_t* component, omxcam__event event){
 int omxcam__event_wait (
     omxcam__component_t* component,
     omxcam__event events,
-    omxcam__event* current_events){
+    omxcam__event* current_events,
+    OMX_ERRORTYPE* omx_error){
   //Wait for the events
   if (pthread_mutex_lock (&component->event.mutex)){
     omxcam__error ("pthread_mutex_lock");
     return -1;
   }
   
-  if (!(events & component->event.flags)){
+  if (!((events | OMXCAM_EVENT_ERROR) & component->event.flags)){
     //Include the events to wait for
     component->event.flags |= events;
     
@@ -84,14 +89,17 @@ int omxcam__event_wait (
     return -1;
   }
   
-  if (flags & OMXCAM_EVENT_ERROR){
-    //omxcam__error() was called from the the EventHandler
-    return -1;
-  }
-  
   if (current_events){
     *current_events = flags;
   }
   
-  return component->event.error;
+  if (flags & OMXCAM_EVENT_ERROR){
+    //omxcam__error() was called from the the EventHandler
+    if (omx_error){
+      *omx_error = component->event.omx_error;
+    }
+    return -1;
+  }
+  
+  return component->event.fn_error;
 }

@@ -43,7 +43,7 @@ int omxcam__camera_load_drivers (){
   }
   
   return omxcam__event_wait (&omxcam__ctx.camera,
-      OMXCAM_EVENT_PARAM_OR_CONFIG_CHANGED, 0);
+      OMXCAM_EVENT_PARAM_OR_CONFIG_CHANGED, 0, 0);
 }
 
 int omxcam__camera_check (){

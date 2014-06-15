@@ -10,6 +10,7 @@ OMX_ERRORTYPE event_handler (
     OMX_IN OMX_PTR event_data){
   omxcam__component_t* component = (omxcam__component_t*)app_data;
   omxcam__event evt = -1;
+  OMX_ERRORTYPE error = OMX_ErrorNone;
   
   switch (event){
     case OMX_EventCmdComplete:
@@ -41,6 +42,7 @@ OMX_ERRORTYPE event_handler (
       omxcam__trace ("event: %s", omxcam__dump_OMX_ERRORTYPE (data1));
       omxcam__error ("OMX_EventError: %s", omxcam__dump_OMX_ERRORTYPE (data1));
       evt = OMXCAM_EVENT_ERROR;
+      error = data1;
       break;
     case OMX_EventMark:
       omxcam__trace ("event: OMX_EventMark");
@@ -73,10 +75,10 @@ OMX_ERRORTYPE event_handler (
       return OMX_ErrorNone;
   }
   
-  if (omxcam__event_wake (component, evt)){
+  if (omxcam__event_wake (component, evt, error)){
     omxcam__event_error (component);
   }
-
+  
   return OMX_ErrorNone;
 }
 
@@ -87,7 +89,8 @@ OMX_ERRORTYPE fill_buffer_done (
   omxcam__component_t* component = (omxcam__component_t*)app_data;
   
   omxcam__trace ("event: FillBufferDone");
-  if (omxcam__event_wake (component, OMXCAM_EVENT_FILL_BUFFER_DONE)){
+  if (omxcam__event_wake (component, OMXCAM_EVENT_FILL_BUFFER_DONE,
+      OMX_ErrorNone)){
     omxcam__event_error (component);
   }
   
@@ -167,7 +170,7 @@ int omxcam__component_init (omxcam__component_t* component){
     for (port=ports_st.nStartPortNumber;
         port<ports_st.nStartPortNumber + ports_st.nPorts; port++){
       if (omxcam__component_port_disable (component, port)) return -1;
-      if (omxcam__event_wait (component, OMXCAM_EVENT_PORT_DISABLE, 0)){
+      if (omxcam__event_wait (component, OMXCAM_EVENT_PORT_DISABLE, 0, 0)){
         return -1;
       }
     }

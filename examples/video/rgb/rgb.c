@@ -65,7 +65,7 @@ int save (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  if (omxcam_video_start (settings, 0)) log_error ();
+  if (omxcam_video_start (settings, OMXCAM_CAPTURE_FOREVER)) log_error ();
   
   //Close the file
   if (close (fd)){

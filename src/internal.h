@@ -73,7 +73,8 @@ typedef struct {
   pthread_mutex_t mutex;
   pthread_cond_t cond;
   uint32_t flags;
-  int error;
+  OMX_ERRORTYPE omx_error;
+  int fn_error;
 } omxcam__event_t;
 
 /*
@@ -178,7 +179,10 @@ int omxcam__event_destroy (omxcam__component_t* component);
  * 
  * Unlocks the current thread if there are events waiting to the given events.
  */
-int omxcam__event_wake (omxcam__component_t* component, omxcam__event event);
+int omxcam__event_wake (
+    omxcam__component_t* component,
+    omxcam__event event,
+    OMX_ERRORTYPE omx_error);
 /*
  * Retrieve some events.
  *
@@ -193,7 +197,8 @@ int omxcam__event_wake (omxcam__component_t* component, omxcam__event event);
 int omxcam__event_wait (
     omxcam__component_t* component,
     omxcam__event events,
-    omxcam__event* current_events);
+    omxcam__event* current_events,
+    OMX_ERRORTYPE* omx_error);
 
 /*
  * Enables and disables the port of a component.

@@ -5,14 +5,24 @@ static int omxcam__still_change_state (omxcam__state state, int use_encoder){
   if (omxcam__component_change_state (&omxcam__ctx.camera, state)){
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_STATE_SET, 0)){
+  OMX_ERRORTYPE error;
+  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_STATE_SET,
+      0, &error)){
+      printf("%X\n", error);
+    if (error == OMX_ErrorInsufficientResources){
+      //It's most likely that the camera is already running by another IL
+      //client. Very ugly but needs to be done this way in order to set the last
+      //error
+      return -2;
+    }
     return -1;
   }
   
   if (omxcam__component_change_state (&omxcam__ctx.null_sink, state)){
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.null_sink, OMXCAM_EVENT_STATE_SET, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.null_sink, OMXCAM_EVENT_STATE_SET, 0,
+      0)){
     return -1;
   }
   
@@ -22,7 +32,7 @@ static int omxcam__still_change_state (omxcam__state state, int use_encoder){
     return -1;
   }
   if (omxcam__event_wait (&omxcam__ctx.image_encode, OMXCAM_EVENT_STATE_SET,
-      0)){
+      0, 0)){
     return -1;
   }
   
@@ -262,8 +272,15 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   }
   
   //Change to Idle
-  if (omxcam__still_change_state (OMXCAM_STATE_IDLE, use_encoder)){
-    omxcam__set_last_error (OMXCAM_ERROR_IDLE);
+  int r;
+  if ((r = omxcam__still_change_state (OMXCAM_STATE_IDLE, use_encoder))){
+    //If r == -2, the camera is already running by another IL client. Very ugly
+    //but needs to be done this way in order to set the last error
+    if (r == -1){
+      omxcam__set_last_error (OMXCAM_ERROR_IDLE);
+    }else{
+      omxcam__set_last_error (OMXCAM_ERROR_CAMERA_RUNNING);
+    }
     return -1;
   }
   
@@ -276,7 +293,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_ENABLE, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_ENABLE, 0, 0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -284,7 +301,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_ENABLE, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_ENABLE, 0, 0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -292,7 +309,8 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.null_sink, OMXCAM_EVENT_PORT_ENABLE, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.null_sink, OMXCAM_EVENT_PORT_ENABLE, 0,
+      0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -303,7 +321,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
     }
     if (omxcam__event_wait (&omxcam__ctx.image_encode, OMXCAM_EVENT_PORT_ENABLE,
-        0)){
+        0, 0)){
       omxcam__set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }
@@ -316,7 +334,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
     }
     if (omxcam__event_wait (&omxcam__ctx.image_encode, OMXCAM_EVENT_PORT_ENABLE,
-        0)){
+        0, 0)){
       omxcam__set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }
@@ -351,7 +369,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     
     //Wait until it's filled
     if (omxcam__event_wait (fill_component, OMXCAM_EVENT_FILL_BUFFER_DONE,
-        &current_events)){
+        &current_events, 0)){
       omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
       return -1;
     }
@@ -368,13 +386,13 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     if (current_events == end_events){
       //Clear the EOS flags
       if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_BUFFER_FLAG,
-          0)){
+          0, 0)){
         omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
         return -1;
       }
       if (use_encoder &&
           omxcam__event_wait (&omxcam__ctx.image_encode,
-              OMXCAM_EVENT_BUFFER_FLAG, 0)){
+              OMXCAM_EVENT_BUFFER_FLAG, 0, 0)){
         omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
         return -1;
       }
@@ -403,7 +421,8 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_DISABLE, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_DISABLE, 0,
+      0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -411,7 +430,8 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
-  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_DISABLE, 0)){
+  if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_PORT_DISABLE, 0,
+      0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -420,7 +440,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     return -1;
   }
   if (omxcam__event_wait (&omxcam__ctx.null_sink, OMXCAM_EVENT_PORT_DISABLE,
-      0)){
+      0, 0)){
     omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
@@ -431,7 +451,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
     }
     if (omxcam__event_wait (&omxcam__ctx.image_encode,
-        OMXCAM_EVENT_PORT_DISABLE, 0)){
+        OMXCAM_EVENT_PORT_DISABLE, 0, 0)){
       omxcam__set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }
@@ -444,7 +464,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
       return -1;
     }
     if (omxcam__event_wait (&omxcam__ctx.image_encode,
-        OMXCAM_EVENT_PORT_DISABLE, 0)){
+        OMXCAM_EVENT_PORT_DISABLE, 0, 0)){
       omxcam__set_last_error (OMXCAM_ERROR_STILL);
       return -1;
     }

@@ -45,7 +45,9 @@ int main (){
   signal (SIGQUIT, signal_handler);
   signal (SIGHUP, signal_handler);
   
-  if (omxcam_video_start (&settings, 0)) return log_error ();
+  if (omxcam_video_start (&settings, OMXCAM_CAPTURE_FOREVER)){
+    return log_error ();
+  }
   
   return 0;
 }

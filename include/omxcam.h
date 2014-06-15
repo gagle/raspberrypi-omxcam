@@ -40,8 +40,8 @@ extern "C" {
   XX (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "       \
       "component")                                                             \
   XX (13, ERROR_CAPTURE, "error while capturing")                              \
-  XX (14, ERROR_RUNNING, "camera is already running")                          \
-  XX (15, ERROR_STOPPING, "camera is already being stopped")                   \
+  XX (14, ERROR_CAMERA_RUNNING, "camera is already running")                   \
+  XX (15, ERROR_CAMERA_STOPPING, "camera is already being stopped")            \
   XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
   XX (17, ERROR_STILL, "still error")                                          \
   XX (18, ERROR_VIDEO, "video error")                                          \
@@ -168,7 +168,7 @@ typedef struct {
   omxcam_bool iso_auto;
   uint32_t iso; //100 .. 800
   omxcam_exposure exposure;
-  int32_t exposure_compensation; //-10 .. 10
+  int32_t exposure_compensation; //-24 .. 24
   omxcam_mirror mirror;
   omxcam_rotation rotation;
   omxcam_bool color_enhancement;

@@ -113,7 +113,7 @@ int save (char* filename, omxcam_video_settings_t* settings){
   //Allocate the buffer
   file_buffer = (uint8_t*)malloc (sizeof (uint8_t)*frame_size);
   
-  if (omxcam_video_start (settings, 0)) log_error ();
+  if (omxcam_video_start (settings, OMXCAM_CAPTURE_FOREVER)) log_error ();
   
   free (file_buffer);
   
