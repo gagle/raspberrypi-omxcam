@@ -25,7 +25,6 @@ static int omxcam__video_change_state (omxcam__state state, int use_encoder){
   OMX_ERRORTYPE error;
   if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_STATE_SET,
       0, &error)){
-      printf("%X\n", error);
     if (error == OMX_ErrorInsufficientResources){
       //It's most likely that the camera is already running by another IL
       //client. Very ugly but needs to be done this way in order to set the last
