@@ -159,10 +159,10 @@ typedef enum {
 typedef struct {
   uint32_t width;
   uint32_t height;
-  uint32_t sharpness;
-  uint32_t contrast;
+  int32_t sharpness;
+  int32_t contrast;
   uint32_t brightness;
-  uint32_t saturation;
+  int32_t saturation;
   omxcam_bool shutter_speed_auto;
   uint32_t shutter_speed;
   omxcam_bool iso_auto;
