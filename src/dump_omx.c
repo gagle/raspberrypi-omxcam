@@ -3,8 +3,8 @@
 
 #define OMXCAM_DUMP_CASE(x) case x: return #x;
 
-const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color){
-  switch (color){
+const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_COLOR_FormatUnused)
     OMXCAM_DUMP_CASE (OMX_COLOR_FormatMonochrome)
     OMXCAM_DUMP_CASE (OMX_COLOR_Format8bitRGB332)
@@ -61,8 +61,8 @@ const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color){
   }
 }
 
-const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format){
-  switch (format){
+const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_OTHER_FormatTime);
     OMXCAM_DUMP_CASE (OMX_OTHER_FormatPower);
     OMXCAM_DUMP_CASE (OMX_OTHER_FormatStats);
@@ -74,8 +74,8 @@ const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format){
   }
 }
 
-const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding){
-  switch (coding){
+const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_AUDIO_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_AUDIO_CodingAutoDetect)
     OMXCAM_DUMP_CASE (OMX_AUDIO_CodingPCM)
@@ -115,8 +115,8 @@ const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding){
   }
 }
 
-const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding){
-  switch (coding){
+const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_VIDEO_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_VIDEO_CodingAutoDetect)
     OMXCAM_DUMP_CASE (OMX_VIDEO_CodingMPEG2)
@@ -137,8 +137,8 @@ const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding){
   }
 }
 
-const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding){
-  switch (coding){
+const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_IMAGE_CodingUnused)
     OMXCAM_DUMP_CASE (OMX_IMAGE_CodingAutoDetect)
     OMXCAM_DUMP_CASE (OMX_IMAGE_CodingJPEG)
@@ -155,8 +155,8 @@ const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding){
   }
 }
 
-const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE state){
-  switch (state){
+const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_StateInvalid)
     OMXCAM_DUMP_CASE (OMX_StateLoaded)
     OMXCAM_DUMP_CASE (OMX_StateIdle)
@@ -167,8 +167,8 @@ const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE state){
   }
 }
 
-const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE error){
-  switch (error){
+const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_ErrorNone)
     OMXCAM_DUMP_CASE (OMX_ErrorInsufficientResources)
     OMXCAM_DUMP_CASE (OMX_ErrorUndefined)
@@ -216,8 +216,8 @@ const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE error){
   }
 }
 
-const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE event){
-  switch (event){
+const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE type){
+  switch (type){
     OMXCAM_DUMP_CASE (OMX_EventCmdComplete)
     OMXCAM_DUMP_CASE (OMX_EventError)
     OMXCAM_DUMP_CASE (OMX_EventMark)
@@ -242,22 +242,49 @@ const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type){
   }
 }
 
+const char* omxcam__dump_OMX_METERINGTYPE (OMX_METERINGTYPE type){
+  switch (type){
+    OMXCAM_DUMP_CASE (OMX_MeteringModeAverage)
+    OMXCAM_DUMP_CASE (OMX_MeteringModeSpot)
+    OMXCAM_DUMP_CASE (OMX_MeteringModeMatrix)
+    OMXCAM_DUMP_CASE (OMX_MeteringModeBacklit)
+    default: return "other OMX_METERINGTYPE";
+  }
+}
+
+const char* omxcam__dump_OMX_WHITEBALCONTROLTYPE (
+    OMX_WHITEBALCONTROLTYPE type){
+  switch (type){
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlOff)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlAuto)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlSunLight)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlCloudy)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlShade)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlTungsten)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlFluorescent)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlIncandescent)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlFlash)
+    OMXCAM_DUMP_CASE (OMX_WhiteBalControlHorizon)
+    default: return "other OMX_WHITEBALCONTROLTYPE";
+  }
+}
+
 void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
-    OMX_PARAM_PORTDEFINITIONTYPE* port){
+    OMX_PARAM_PORTDEFINITIONTYPE* type){
   char domain[512];
   char domain_info[512];
   
-  switch (port->eDomain){
+  switch (type->eDomain){
     case OMX_PortDomainAudio:
       strcpy (domain, "OMX_PortDomainAudio");
       sprintf (domain_info,
           "    cMIMEType: %s\n"
           "    bFlagErrorConcealment: %s\n"
           "    eEncoding: %s\n",
-          port->format.video.cMIMEType,
-          port->format.image.bFlagErrorConcealment ? "true" : "false",
+          type->format.video.cMIMEType,
+          omxcam__strbool (type->format.image.bFlagErrorConcealment),
           omxcam__dump_OMX_AUDIO_CODINGTYPE (
-              port->format.audio.eEncoding));
+              type->format.audio.eEncoding));
       break;
     case OMX_PortDomainVideo:
       strcpy (domain, "OMX_PortDomainVideo");
@@ -272,18 +299,18 @@ void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
           "    bFlagErrorConcealment: %s\n"
           "    eCompressionFormat: %s\n"
           "    eColorFormat: %s\n"
-          , port->format.video.cMIMEType,
-          port->format.video.nFrameWidth,
-          port->format.video.nFrameHeight,
-          port->format.video.nStride,
-          port->format.video.nSliceHeight,
-          port->format.video.nBitrate,
-          port->format.video.xFramerate,
-          port->format.image.bFlagErrorConcealment ? "true" : "false",
+          , type->format.video.cMIMEType,
+          type->format.video.nFrameWidth,
+          type->format.video.nFrameHeight,
+          type->format.video.nStride,
+          type->format.video.nSliceHeight,
+          type->format.video.nBitrate,
+          type->format.video.xFramerate,
+          omxcam__strbool (type->format.image.bFlagErrorConcealment),
           omxcam__dump_OMX_VIDEO_CODINGTYPE (
-              port->format.video.eCompressionFormat),
+              type->format.video.eCompressionFormat),
           omxcam__dump_OMX_COLOR_FORMATTYPE (
-              port->format.video.eColorFormat));
+              type->format.video.eColorFormat));
       break;
     case OMX_PortDomainImage:
       strcpy (domain, "OMX_PortDomainImage");
@@ -296,23 +323,23 @@ void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
           "    bFlagErrorConcealment: %s\n"
           "    eCompressionFormat: %s\n"
           "    eColorFormat: %s\n"
-          , port->format.image.cMIMEType,
-          port->format.image.nFrameWidth,
-          port->format.image.nFrameHeight,
-          port->format.image.nStride,
-          port->format.image.nSliceHeight,
-          port->format.image.bFlagErrorConcealment ? "true" : "false",
+          , type->format.image.cMIMEType,
+          type->format.image.nFrameWidth,
+          type->format.image.nFrameHeight,
+          type->format.image.nStride,
+          type->format.image.nSliceHeight,
+          omxcam__strbool (type->format.image.bFlagErrorConcealment),
           omxcam__dump_OMX_IMAGE_CODINGTYPE (
-              port->format.image.eCompressionFormat),
+              type->format.image.eCompressionFormat),
           omxcam__dump_OMX_COLOR_FORMATTYPE (
-              port->format.image.eColorFormat));
+              type->format.image.eColorFormat));
       break;
     case OMX_PortDomainOther:
       strcpy (domain, "OMX_PortDomainOther");
       sprintf (domain_info,
           "    eFormat: %s\n",
           omxcam__dump_OMX_OTHER_FORMATTYPE (
-              port->format.other.eFormat));
+              type->format.other.eFormat));
       break;
     default:
       strcpy (domain, "unknown");
@@ -334,39 +361,39 @@ void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
       "%s"
       "bBuffersContiguous: %s\n"
       "nBufferAlignment: %d\n",
-      port->nSize,
-      port->nPortIndex,
-      port->eDir == OMX_DirInput ? "input" : "output",
-      port->nBufferCountActual,
-      port->nBufferCountMin,
-      port->nBufferSize,
-      port->bEnabled ? "true" : "false",
-      port->bPopulated ? "true" : "false",
+      type->nSize,
+      type->nPortIndex,
+      type->eDir == OMX_DirInput ? "input" : "output",
+      type->nBufferCountActual,
+      type->nBufferCountMin,
+      type->nBufferSize,
+      omxcam__strbool (type->bEnabled),
+      omxcam__strbool (type->bPopulated),
       domain,
       domain_info,
-      port->bBuffersContiguous ? "true": "false",
-      port->nBufferAlignment);
+      omxcam__strbool (type->bBuffersContiguous),
+      type->nBufferAlignment);
 }
 
 void omxcam__dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
-    OMX_IMAGE_PARAM_PORTFORMATTYPE* port){
+    OMX_IMAGE_PARAM_PORTFORMATTYPE* type){
   printf (
       "nSize: %d\n"
       "nPortIndex: %d\n"
       "nIndex: %d\n"
       "eCompressionFormat: %s\n"
       "eColorFormat: %s\n",
-      port->nSize,
-      port->nPortIndex,
-      port->nIndex,
-      omxcam__dump_OMX_IMAGE_CODINGTYPE (port->eCompressionFormat),
-      omxcam__dump_OMX_COLOR_FORMATTYPE (port->eColorFormat));
+      type->nSize,
+      type->nPortIndex,
+      type->nIndex,
+      omxcam__dump_OMX_IMAGE_CODINGTYPE (type->eCompressionFormat),
+      omxcam__dump_OMX_COLOR_FORMATTYPE (type->eColorFormat));
 }
 
-void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header){
-  long long int timestamp = (long long int)header->nTimeStamp.nHighPart;
+void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* type){
+  long long int timestamp = (long long int)type->nTimeStamp.nHighPart;
   timestamp = timestamp << 32;
-  timestamp |= (long long int)header->nTimeStamp.nLowPart;
+  timestamp |= (long long int)type->nTimeStamp.nLowPart;
 
   printf (
       "nSize: %d\n"
@@ -379,14 +406,14 @@ void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header){
       "nFlags: %X\n"
       "nOutputPortIndex: %d\n"
       "nInputPortIndex: %d\n",
-      header->nSize,
-      header->nAllocLen,
-      header->nFilledLen,
-      header->nOffset,
-      header->hMarkTargetComponent ? "not null" : "null (no mark)",
-      header->nTickCount,
+      type->nSize,
+      type->nAllocLen,
+      type->nFilledLen,
+      type->nOffset,
+      type->hMarkTargetComponent ? "not null" : "null (no mark)",
+      type->nTickCount,
       timestamp,
-      header->nFlags,
-      header->nOutputPortIndex,
-      header->nInputPortIndex);
+      type->nFlags,
+      type->nOutputPortIndex,
+      type->nInputPortIndex);
 }

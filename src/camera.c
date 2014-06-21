@@ -132,8 +132,8 @@ void omxcam__camera_init (
   settings->noise_reduction = OMXCAM_TRUE;
   settings->metering = OMXCAM_METERING_AVERAGE;
   settings->white_balance = OMXCAM_WHITE_BALANCE_AUTO;
-  settings->white_balance_red_gain = 0.1;
-  settings->white_balance_blue_gain = 0.1;
+  settings->white_balance_red_gain = 1000;
+  settings->white_balance_blue_gain = 1000;
   settings->image_filter = OMXCAM_IMAGE_FILTER_NONE;
   settings->roi_top = 0.0;
   settings->roi_left = 0.0;
@@ -147,7 +147,7 @@ int omxcam__camera_configure_omx (
     omxcam_camera_settings_t* settings,
     int video){
   omxcam__trace ("configuring '%s' settings", omxcam__ctx.camera.name);
-
+  
   OMX_ERRORTYPE error;
   
   //Sharpness
@@ -258,10 +258,10 @@ int omxcam__camera_configure_omx (
   if (!settings->white_balance){
     OMX_CONFIG_CUSTOMAWBGAINSTYPE white_balance_gains_st;
     omxcam__omx_struct_init (white_balance_gains_st);
-    white_balance_gains_st.xGainR =
-        (OMX_U32)(settings->white_balance_red_gain*65536);
+    white_balance_gains_st.xGainR = 
+        (settings->white_balance_red_gain << 16)/1000;
     white_balance_gains_st.xGainB =
-        (OMX_U32)(settings->white_balance_blue_gain*65536);
+        (settings->white_balance_blue_gain << 16)/1000;
     if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
         OMX_IndexConfigCustomAwbGains, &white_balance_gains_st))){
       omxcam__error ("OMX_SetConfig - OMX_IndexConfigCustomAwbGains: %s",

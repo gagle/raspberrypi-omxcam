@@ -28,6 +28,12 @@
 #define OMXCAM_NULL_SINK_NAME "OMX.broadcom.null_sink"
 
 #define OMXCAM_MIN_GPU_MEM 128 //MB
+#define OMXCAM_VIDEO_MAX_WIDTH 1920
+#define OMXCAM_VIDEO_MAX_HEIGHT 1080
+#define OMXCAM_STILL_MAX_WIDTH 2592
+#define OMXCAM_STILL_MAX_HEIGHT 1944
+#define OMXCAM_MIN_WIDTH 16
+#define OMXCAM_MIN_HEIGHT 16
 
 #ifdef OMXCAM_DEBUG
 #define omxcam__error(message, ...)                                            \
@@ -84,7 +90,7 @@ typedef struct {
   OMX_HANDLETYPE handle;
   omxcam__event_t event;
   OMX_STRING name;
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
+  //void (*buffer_callback)(uint8_t* buffer, uint32_t length);
 } omxcam__component_t;
 
 /*
@@ -105,6 +111,11 @@ typedef struct {
 
 //Context's global variable
 omxcam__context_t omxcam__ctx;
+
+/*
+ * Returns 'true' if OMXCAM_TRUE, 'false' if OMXCAM_FALSE.
+ */
+const char* omxcam__strbool (omxcam_bool value);
 
 /*
  * Prints an error message to the stdout along with the file, line and function
@@ -141,20 +152,23 @@ OMX_ERRORTYPE fill_buffer_done (
 /*
  * OpenMAX IL miscellaneous dump functions.
  */
-const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE color);
-const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE format);
-const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE coding);
-const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE coding);
-const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE coding);
-const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE state);
-const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE error);
-const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE event);
+const char* omxcam__dump_OMX_COLOR_FORMATTYPE (OMX_COLOR_FORMATTYPE type);
+const char* omxcam__dump_OMX_OTHER_FORMATTYPE (OMX_OTHER_FORMATTYPE type);
+const char* omxcam__dump_OMX_AUDIO_CODINGTYPE (OMX_AUDIO_CODINGTYPE type);
+const char* omxcam__dump_OMX_VIDEO_CODINGTYPE (OMX_VIDEO_CODINGTYPE type);
+const char* omxcam__dump_OMX_IMAGE_CODINGTYPE (OMX_IMAGE_CODINGTYPE type);
+const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE type);
+const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE type);
+const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE type);
 const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type);
+const char* omxcam__dump_OMX_METERINGTYPE (OMX_METERINGTYPE type);
+const char* omxcam__dump_OMX_WHITEBALCONTROLTYPE (
+    OMX_WHITEBALCONTROLTYPE type);
 void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
-    OMX_PARAM_PORTDEFINITIONTYPE* port);
+    OMX_PARAM_PORTDEFINITIONTYPE* type);
 void omxcam__dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
-    OMX_IMAGE_PARAM_PORTFORMATTYPE* port);
-void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* header);
+    OMX_IMAGE_PARAM_PORTFORMATTYPE* type);
+void omxcam__dump_OMX_BUFFERHEADERTYPE (OMX_BUFFERHEADERTYPE* type);
 
 /*
  * Prints a debug message to the stdout. It is printed if the cflag OMXCAM_DEBUG

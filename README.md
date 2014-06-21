@@ -162,8 +162,8 @@ uint32_t              color_v                     128                        0 .
 omxcam_bool           noise_reduction             OMXCAM_TRUE
 omxcam_metering       metering                    OMXCAM_METERING_AVERAGE
 omxcam_white_balance  white_balance               OMXCAM_WHITE_BALANCE_AUTO
-float                 white_balance_red_gain      0.1                        0.001 .. 7.999
-float                 white_balance_blue_gain     0.1                        0.001 .. 7.999
+uint32_t              white_balance_red_gain      1000                       1 .. 
+uint32_t              white_balance_blue_gain     1000                       1 ..
 omxcam_image_filter   image_filter                OMXCAM_IMAGE_FILTER_NONE
 float                 roi_top                     0.0                        0.0 .. 1.0
 float                 roi_left                    0.0                        0.0 .. 1.0

@@ -97,7 +97,6 @@ int main (){
   //Capture a video of 2MB, 1920x1080 @30fps
   omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_length;
-  settings.camera.framerate = 30;
   
   if (save_length ("video-length-640x480.h264", &settings)) return 1;
   

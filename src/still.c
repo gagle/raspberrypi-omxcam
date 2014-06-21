@@ -40,7 +40,8 @@ static int omxcam__still_change_state (omxcam__state state, int use_encoder){
 }
 
 void omxcam_still_init (omxcam_still_settings_t* settings){
-  omxcam__camera_init (&settings->camera, 2592, 1944);
+  omxcam__camera_init (&settings->camera, OMXCAM_STILL_MAX_WIDTH,
+      OMXCAM_STILL_MAX_HEIGHT);
   settings->format = OMXCAM_FORMAT_JPEG;
   omxcam__jpeg_init (&settings->jpeg);
   settings->buffer_callback = 0;
@@ -80,27 +81,27 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   
   switch (settings->format){
     case OMXCAM_FORMAT_RGB888:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
       stride = stride*3;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
       stride = stride*4;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_JPEG:
-      omxcam__ctx.image_encode.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.image_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       width = settings->camera.width;

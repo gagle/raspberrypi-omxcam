@@ -117,7 +117,7 @@ typedef enum {
 } omxcam_image_filter;
 
 typedef enum {
-  OMXCAM_METERING_AVERAGE = OMX_MeteringModeAverage, //Center-weighted average
+  OMXCAM_METERING_AVERAGE = OMX_MeteringModeAverage,
   OMXCAM_METERING_SPOT = OMX_MeteringModeSpot,
   OMXCAM_METERING_MATRIX = OMX_MeteringModeMatrix,
   OMXCAM_METERING_BACKLIT = OMX_MeteringModeBacklit
@@ -159,32 +159,32 @@ typedef enum {
 typedef struct {
   uint32_t width;
   uint32_t height;
-  uint32_t sharpness; //-100 .. 100
-  uint32_t contrast; //-100 .. 100
-  uint32_t brightness; //0 .. 100
-  uint32_t saturation; //-100 .. 100
-  omxcam_bool shutter_speed_auto; //-100 .. 100
+  uint32_t sharpness;
+  uint32_t contrast;
+  uint32_t brightness;
+  uint32_t saturation;
+  omxcam_bool shutter_speed_auto;
   uint32_t shutter_speed;
   omxcam_bool iso_auto;
-  uint32_t iso; //100 .. 800
+  uint32_t iso;
   omxcam_exposure exposure;
-  int32_t exposure_compensation; //-24 .. 24
+  int32_t exposure_compensation;
   omxcam_mirror mirror;
   omxcam_rotation rotation;
   omxcam_bool color_enhancement;
-  uint32_t color_u; //0 .. 255
-  uint32_t color_v; //0 .. 255
+  uint32_t color_u;
+  uint32_t color_v;
   omxcam_bool noise_reduction;
   omxcam_metering metering;
   omxcam_white_balance white_balance;
   //The gains are used if the white balance is set to off
-  float white_balance_red_gain; //0.001 .. 7.999
-  float white_balance_blue_gain; //0.001 .. 7.999
+  uint32_t white_balance_red_gain;
+  uint32_t white_balance_blue_gain;
   omxcam_image_filter image_filter;
-  float roi_top; //0.0 .. 1.0
-  float roi_left; //0.0 .. 1.0
-  float roi_width; //0.0 .. 1.0
-  float roi_height; //0.0 .. 1.0
+  float roi_top;
+  float roi_left;
+  float roi_width;
+  float roi_height;
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode
@@ -351,6 +351,9 @@ OMXCAM_EXTERN int omxcam_video_start (
  * or from another thread.
  */
 OMXCAM_EXTERN int omxcam_video_stop ();
+
+OMXCAM_EXTERN int omxcam_video_update_buffer_callback (
+    void (*buffer_callback)(uint8_t* buffer, uint32_t length));
 
 #ifdef __cplusplus
 }

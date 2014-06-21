@@ -36,3 +36,7 @@ void omxcam_yuv_planes_slice (
   planes->offset_v = planes->length_y + planes->length_u;
   planes->length_v = planes->length_u;
 }
+
+const char* omxcam__strbool (omxcam_bool value){
+  return value ? "true" : "false";
+}

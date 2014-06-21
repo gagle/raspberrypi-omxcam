@@ -78,27 +78,27 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   switch (settings->format){
     case OMXCAM_FORMAT_RGB888:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
       stride = stride*3;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
       stride = stride*4;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
-      omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_H264:
-      omxcam__ctx.video_encode.buffer_callback = settings->buffer_callback;
+      //omxcam__ctx.video_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       width = settings->camera.width;
@@ -630,6 +630,7 @@ static void* omxcam__video_capture (void* thread_arg){
   omxcam__thread_arg_t* arg = (omxcam__thread_arg_t*)thread_arg;
   int stop = 0;
   OMX_ERRORTYPE error;
+  void (*buffer_callback)(uint8_t*, uint32_t);
   
   running_safe = 1;
   
@@ -643,6 +644,7 @@ static void* omxcam__video_capture (void* thread_arg){
     }
     
     stop = !running;
+    buffer_callback = arg->buffer_callback;
     
     if (pthread_mutex_unlock (&mutex)){
       omxcam__error ("pthread_mutex_unlock");
@@ -667,8 +669,11 @@ static void* omxcam__video_capture (void* thread_arg){
       return (void*)0;
     }
     
+    //The buffers are fileld event if there's no callback
+    if (!buffer_callback) continue;
+    
     //Emit the buffer
-    arg->buffer_callback (omxcam__ctx.output_buffer->pBuffer,
+    buffer_callback (omxcam__ctx.output_buffer->pBuffer,
         omxcam__ctx.output_buffer->nFilledLen);
   }
   
@@ -677,8 +682,28 @@ static void* omxcam__video_capture (void* thread_arg){
   return (void*)0;
 }
 
+int omxcam_video_update_buffer_callback (
+    void (*buffer_callback)(uint8_t* buffer, uint32_t length)){
+  if (pthread_mutex_lock (&mutex)){
+    omxcam__error ("pthread_mutex_lock");
+    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    return -1;
+  }
+  
+  thread_arg.buffer_callback = buffer_callback;
+  
+  if (pthread_mutex_unlock (&mutex)){
+    omxcam__error ("pthread_mutex_unlock");
+    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    return -1;
+  }
+  
+  return 0;
+};
+
 void omxcam_video_init (omxcam_video_settings_t* settings){
-  omxcam__camera_init (&settings->camera, 1920, 1080);
+  omxcam__camera_init (&settings->camera, OMXCAM_VIDEO_MAX_WIDTH,
+      OMXCAM_VIDEO_MAX_HEIGHT);
   settings->format = OMXCAM_FORMAT_H264;
   omxcam__h264_init (&settings->h264);
   settings->buffer_callback = 0;
