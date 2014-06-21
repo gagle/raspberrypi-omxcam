@@ -117,11 +117,8 @@ void omxcam__camera_init (
   settings->contrast = 0;
   settings->brightness = 50;
   settings->saturation = 0;
-  settings->shutter_speed_auto = OMXCAM_TRUE;
-  //1/8 seconds in milliseconds
-  settings->shutter_speed = 125;
-  settings->iso_auto = OMXCAM_TRUE;
-  settings->iso = 100;
+  settings->shutter_speed = 0;
+  settings->iso = 0;
   settings->exposure = OMXCAM_EXPOSURE_AUTO;
   settings->exposure_compensation = 0;
   settings->mirror = OMXCAM_MIRROR_NONE;
@@ -205,9 +202,9 @@ int omxcam__camera_configure_omx (
   exposure_value_st.eMetering = settings->metering;
   exposure_value_st.xEVCompensation = (settings->exposure_compensation << 16)/6;
   exposure_value_st.nShutterSpeedMsec = settings->shutter_speed*1000;
-  exposure_value_st.bAutoShutterSpeed = settings->shutter_speed_auto;
+  exposure_value_st.bAutoShutterSpeed = !settings->shutter_speed;
   exposure_value_st.nSensitivity = settings->iso;
-  exposure_value_st.bAutoSensitivity = settings->iso_auto;
+  exposure_value_st.bAutoSensitivity = !settings->iso;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonExposureValue, &exposure_value_st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonExposureValue: "

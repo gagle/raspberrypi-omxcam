@@ -148,9 +148,7 @@ int32_t               sharpness                   0                          -10
 int32_t               contrast                    0                          -100 .. 100
 uint32_t              brightness                  50                         0 .. 100
 int32_t               saturation                  0                          -100 .. 100
-omxcam_bool           shutter_speed_auto          OMXCAM_TRUE
 uint32_t              shutter_speed               125                        0 ..
-omxcam_bool           iso_auto                    OMXCAM_TRUE
 uint32_t              iso                         100                        100 .. 800
 omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
 int32_t               exposure_compensation       0                          -24 .. 24
@@ -182,7 +180,6 @@ omxcam_still_init (&settings);
 
 settings.camera.mirror = OMXCAM_MIRROR_VERTICAL;
 
-settings.camera.shutter_speed_auto = OMXCAM_FALSE;
 //Shutter speed in milliseconds
 settings.camera.shutter_speed = 500;
 

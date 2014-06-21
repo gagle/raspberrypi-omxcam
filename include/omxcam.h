@@ -163,9 +163,7 @@ typedef struct {
   int32_t contrast;
   uint32_t brightness;
   int32_t saturation;
-  omxcam_bool shutter_speed_auto;
   uint32_t shutter_speed;
-  omxcam_bool iso_auto;
   uint32_t iso;
   omxcam_exposure exposure;
   int32_t exposure_compensation;

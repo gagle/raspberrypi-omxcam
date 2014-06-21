@@ -106,9 +106,8 @@ int main (){
   //2592x1944 by default
   
   settings.buffer_callback = buffer_callback;
-  settings.camera.shutter_speed_auto = OMXCAM_FALSE;
-  //Shutter speed in milliseconds (1/8 by default: 125)
-  settings.camera.shutter_speed = (uint32_t)((1.0/8.0)*1000);
+  //Shutter speed in milliseconds, 1000*(1/8)
+  settings.camera.shutter_speed = 125;
   
   /*
   Please note that the original aspect ratio of an image is 4:3. If you set
