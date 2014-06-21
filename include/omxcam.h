@@ -181,10 +181,10 @@ typedef struct {
   uint32_t white_balance_red_gain;
   uint32_t white_balance_blue_gain;
   omxcam_image_filter image_filter;
-  float roi_top;
-  float roi_left;
-  float roi_width;
-  float roi_height;
+  uint32_t roi_top;
+  uint32_t roi_left;
+  uint32_t roi_width;
+  uint32_t roi_height;
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode

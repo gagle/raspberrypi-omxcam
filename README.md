@@ -149,7 +149,7 @@ uint32_t              contrast                    0                          -10
 uint32_t              brightness                  50                         0 .. 100
 uint32_t              saturation                  0                          -100 .. 100
 omxcam_bool           shutter_speed_auto          OMXCAM_TRUE
-uint32_t              shutter_speed               125
+uint32_t              shutter_speed               125                        0 ..
 omxcam_bool           iso_auto                    OMXCAM_TRUE
 uint32_t              iso                         100                        100 .. 800
 omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
@@ -162,14 +162,14 @@ uint32_t              color_v                     128                        0 .
 omxcam_bool           noise_reduction             OMXCAM_TRUE
 omxcam_metering       metering                    OMXCAM_METERING_AVERAGE
 omxcam_white_balance  white_balance               OMXCAM_WHITE_BALANCE_AUTO
-uint32_t              white_balance_red_gain      1000                       1 .. 
-uint32_t              white_balance_blue_gain     1000                       1 ..
+uint32_t              white_balance_red_gain      1000                       0 .. 
+uint32_t              white_balance_blue_gain     1000                       0 ..
 omxcam_image_filter   image_filter                OMXCAM_IMAGE_FILTER_NONE
-float                 roi_top                     0.0                        0.0 .. 1.0
-float                 roi_left                    0.0                        0.0 .. 1.0
-float                 roi_width                   0.0                        0.0 .. 1.0
-float                 roi_height                  0.0                        0.0 .. 1.0
-uint32_t              framerate                   30
+float                 roi_top                     0.0                        0 .. 100
+float                 roi_left                    0.0                        0 .. 100
+float                 roi_width                   0.0                        0 .. 100
+float                 roi_height                  0.0                        0 .. 100
+uint32_t              framerate                   30                         1 ..
 omxcam_bool           video_stabilisation         OMXCAM_FALSE
 ```
 

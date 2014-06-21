@@ -135,10 +135,10 @@ void omxcam__camera_init (
   settings->white_balance_red_gain = 1000;
   settings->white_balance_blue_gain = 1000;
   settings->image_filter = OMXCAM_IMAGE_FILTER_NONE;
-  settings->roi_top = 0.0;
-  settings->roi_left = 0.0;
-  settings->roi_width = 1.0;
-  settings->roi_height = 1.0;
+  settings->roi_top = 0;
+  settings->roi_left = 0;
+  settings->roi_width = 100;
+  settings->roi_height = 100;
   settings->framerate = 30;
   settings->video_stabilisation = OMXCAM_FALSE;
 }
@@ -147,7 +147,7 @@ int omxcam__camera_configure_omx (
     omxcam_camera_settings_t* settings,
     int video){
   omxcam__trace ("configuring '%s' settings", omxcam__ctx.camera.name);
-  
+
   OMX_ERRORTYPE error;
   
   //Sharpness
@@ -203,8 +203,7 @@ int omxcam__camera_configure_omx (
   omxcam__omx_struct_init (exposure_value_st);
   exposure_value_st.nPortIndex = OMX_ALL;
   exposure_value_st.eMetering = settings->metering;
-  exposure_value_st.xEVCompensation =
-      (OMX_S32)((settings->exposure_compensation<<16)/6.0);
+  exposure_value_st.xEVCompensation = (settings->exposure_compensation << 16)/6;
   exposure_value_st.nShutterSpeedMsec = settings->shutter_speed*1000;
   exposure_value_st.bAutoShutterSpeed = settings->shutter_speed_auto;
   exposure_value_st.nSensitivity = settings->iso;
@@ -335,10 +334,10 @@ int omxcam__camera_configure_omx (
   OMX_CONFIG_INPUTCROPTYPE roi_st;
   omxcam__omx_struct_init (roi_st);
   roi_st.nPortIndex = OMX_ALL;
-  roi_st.xLeft = (OMX_U32)(settings->roi_left*65536);
-  roi_st.xTop = (OMX_U32)(settings->roi_top*65536);
-  roi_st.xWidth = (OMX_U32)(settings->roi_width*65536);
-  roi_st.xHeight = (OMX_U32)(settings->roi_height*65536);
+  roi_st.xLeft = (settings->roi_left << 16)/100;
+  roi_st.xTop = (settings->roi_top << 16)/100;
+  roi_st.xWidth = (settings->roi_width << 16)/100;
+  roi_st.xHeight = (settings->roi_height << 16)/100;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigInputCropPercentages, &roi_st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigInputCropPercentages: %s",
