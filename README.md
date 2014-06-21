@@ -144,10 +144,10 @@ type                  name                        default                     ra
 ----                  ----                        -------                     -----
 uint32_t              width                       image 2592, video 1920
 uint32_t              height                      image 1944, video 1080
-uint32_t              sharpness                   0                          -100 .. 100
-uint32_t              contrast                    0                          -100 .. 100
+int32_t               sharpness                   0                          -100 .. 100
+int32_t               contrast                    0                          -100 .. 100
 uint32_t              brightness                  50                         0 .. 100
-uint32_t              saturation                  0                          -100 .. 100
+int32_t               saturation                  0                          -100 .. 100
 omxcam_bool           shutter_speed_auto          OMXCAM_TRUE
 uint32_t              shutter_speed               125                        0 ..
 omxcam_bool           iso_auto                    OMXCAM_TRUE
