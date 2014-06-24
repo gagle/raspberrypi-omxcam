@@ -875,6 +875,10 @@ int omxcam_video_stop (){
 
 int omxcam_video_update_on_data (
     void (*on_data)(uint8_t* buffer, uint32_t length)){
+  omxcam__trace ("updating 'on_data' callback");
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
+  
   if (!omxcam__ctx.state.ready){
     omxcam__error ("camera is still not configured");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_UPDATE);
@@ -915,7 +919,9 @@ static int omxcam__video_check_update (){
 }
 
 int omxcam_video_update_sharpness (int32_t sharpness){
-  omxcam__trace ("updated 'camera.sharpness': %d", sharpness);
+  omxcam__trace ("updating 'camera.sharpness': %d", sharpness);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -931,7 +937,9 @@ int omxcam_video_update_sharpness (int32_t sharpness){
 }
 
 int omxcam_video_update_contrast (int32_t contrast){
-  omxcam__trace ("updated 'camera.contrast': %d", contrast);
+  omxcam__trace ("updating 'camera.contrast': %d", contrast);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -947,7 +955,9 @@ int omxcam_video_update_contrast (int32_t contrast){
 }
 
 int omxcam_video_update_brightness (uint32_t brightness){
-  omxcam__trace ("updated 'camera.brightness': %d", brightness);
+  omxcam__trace ("updating 'camera.brightness': %d", brightness);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -963,7 +973,9 @@ int omxcam_video_update_brightness (uint32_t brightness){
 }
 
 int omxcam_video_update_saturation (int32_t saturation){
-  omxcam__trace ("updated 'camera.saturation': %d", saturation);
+  omxcam__trace ("updating 'camera.saturation': %d", saturation);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -979,7 +991,9 @@ int omxcam_video_update_saturation (int32_t saturation){
 }
 
 int omxcam_video_update_iso (omxcam_iso iso){
-  omxcam__trace ("updated 'camera.iso': %s", omxcam__camera_str_iso (iso));
+  omxcam__trace ("updating 'camera.iso': %s", omxcam__camera_str_iso (iso));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -994,8 +1008,10 @@ int omxcam_video_update_iso (omxcam_iso iso){
 }
 
 int omxcam_video_update_exposure (omxcam_exposure exposure){
-  omxcam__trace ("updated 'camera.exposure': %s",
+  omxcam__trace ("updating 'camera.exposure': %s",
       omxcam__camera_str_exposure (exposure));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1011,8 +1027,10 @@ int omxcam_video_update_exposure (omxcam_exposure exposure){
 
 int omxcam_video_update_exposure_compensation (
     int32_t exposure_compensation){
-  omxcam__trace ("updated 'camera.exposure_compensation': %d",
+  omxcam__trace ("updating 'camera.exposure_compensation': %d",
       exposure_compensation);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1030,8 +1048,10 @@ int omxcam_video_update_exposure_compensation (
 }
 
 int omxcam_video_update_mirror (omxcam_mirror mirror){
-  omxcam__trace ("updated 'camera.mirror': %s",
+  omxcam__trace ("updating 'camera.mirror': %s",
       omxcam__camera_str_mirror (mirror));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1046,8 +1066,10 @@ int omxcam_video_update_mirror (omxcam_mirror mirror){
 }
 
 int omxcam_video_update_rotation (omxcam_rotation rotation){
-  omxcam__trace ("updated 'camera.rotation': %s",
+  omxcam__trace ("updating 'camera.rotation': %s",
       omxcam__camera_str_rotation (rotation));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1068,8 +1090,10 @@ int omxcam_video_update_color_effects (
     sprintf (buffer, " (u: %d, v: %d)", color_effects->u, color_effects->v);
   }
   
-  omxcam__trace ("updated 'camera.color_effects': %s%s",
+  omxcam__trace ("updating 'camera.color_effects': %s%s",
       color_effects->enabled ? "enabled" : "disabled", buffer);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1090,8 +1114,10 @@ int omxcam_video_update_color_effects (
 }
 
 int omxcam_video_update_metering (omxcam_metering metering){
-  omxcam__trace ("updated 'camera.metering': %s",
+  omxcam__trace ("updating 'camera.metering': %s",
       omxcam__camera_str_metering (metering));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1107,9 +1133,11 @@ int omxcam_video_update_metering (omxcam_metering metering){
 
 int omxcam_video_update_white_balance (
     omxcam_white_balance_t* white_balance){
-  omxcam__trace ("updated 'camera.white_balance': %s (red_gain: %d, blue_gain: "
+  omxcam__trace ("updating 'camera.white_balance': %s (red_gain: %d, blue_gain: "
       "%d)", omxcam__camera_str_white_balance (white_balance->mode),
       white_balance->red_gain, white_balance->blue_gain);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1125,8 +1153,10 @@ int omxcam_video_update_white_balance (
 
 int omxcam_video_update_image_filter (
     omxcam_image_filter image_filter){
-  omxcam__trace ("updated 'camera.image_filter': %s",
+  omxcam__trace ("updating 'camera.image_filter': %s",
       omxcam__camera_str_image_filter (image_filter));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1141,8 +1171,10 @@ int omxcam_video_update_image_filter (
 }
 
 int omxcam_video_update_roi (omxcam_roi_t* roi){
-  omxcam__trace ("updated 'camera.roi': top: %d, left: %d, width: %d, height: "
+  omxcam__trace ("updating 'camera.roi': top: %d, left: %d, width: %d, height: "
       "%d", roi->top, roi->left, roi->width, roi->height);
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
@@ -1170,8 +1202,10 @@ int omxcam_video_update_roi (omxcam_roi_t* roi){
 
 int omxcam_video_update_frame_stabilisation (
     omxcam_bool frame_stabilisation){
-  omxcam__trace ("updated 'camera.frame_stabilisation': %s",
+  omxcam__trace ("updating 'camera.frame_stabilisation': %s",
       omxcam__strbool (frame_stabilisation));
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (omxcam__video_check_update ()) return -1;
   
