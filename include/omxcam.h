@@ -280,7 +280,8 @@ typedef struct {
   omxcam_camera_settings_t camera;                                             \
   omxcam_format format;                                                        \
   void (*on_ready)();                                                          \
-  void (*on_data)(uint8_t* buffer, uint32_t length);
+  void (*on_data)(uint8_t* buffer, uint32_t length);                           \
+  void (*on_stop)();
 
 typedef struct {
   OMXCAM_COMMON_SETTINGS

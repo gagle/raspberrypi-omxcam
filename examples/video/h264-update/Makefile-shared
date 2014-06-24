@@ -1,0 +1,5 @@
+APP = h264-update
+OMXCAM_HOME = ../../..
+CLEAN = video.h264
+
+include ../../Makefile-shared-common

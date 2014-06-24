@@ -101,6 +101,7 @@ typedef struct {
   omxcam__component_t video_encode;
   omxcam__component_t null_sink;
   OMX_BUFFERHEADERTYPE* output_buffer;
+  void (*on_stop)();
   int video;
   struct {
     int running;

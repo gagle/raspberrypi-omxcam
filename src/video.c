@@ -711,6 +711,8 @@ int omxcam_video_start (
   omxcam__ctx.state.ready = 0;
   omxcam__ctx.video = 1;
   
+  omxcam__ctx.on_stop = settings->on_stop;
+  
   running = 1;
   bg_error = 0;
   
@@ -804,6 +806,7 @@ int omxcam_video_stop (){
   }
   
   omxcam__ctx.state.stopping = 1;
+  if (omxcam__ctx.on_stop) omxcam__ctx.on_stop ();
   
   if (pthread_equal (pthread_self (), bg_thread)){
     //Background thread
