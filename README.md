@@ -143,38 +143,38 @@ gpu_mem_512=128
 The `omxcam_still_settings_t` and `omxcam_video_settings_t` structs have a `camera` field that is used to configure the camera settings. Its type definition is `omxcam_camera_settings_t` and has the following fields:
 
 ```
-type                    name                   default                    range
-----                    ----                   -------                    -----
-uint32_t                width                  image 2592, video 1920     16 .. 2592 | 1920
-uint32_t                height                 image 1944, video 1080     16 .. 1944 | 1080
-int32_t                 sharpness              0                          -100 .. 100
-int32_t                 contrast               0                          -100 .. 100
-uint32_t                brightness             50                         0 .. 100
-int32_t                 saturation             0                          -100 .. 100
-uint32_t                shutter_speed          125                        0 ..
-omxcam_iso              iso                    OMXCAM_ISO_AUTO
-omxcam_exposure         exposure               OMXCAM_EXPOSURE_AUTO
-int32_t                 exposure_compensation  0                          -24 .. 24
-omxcam_mirror           mirror                 OMXCAM_MIRROR_NONE
-omxcam_rotation         rotation               OMXCAM_ROTATION_NONE
-omxcam_color_effects_t  color_effects
-  omxcam_bool             enabled              OMXCAM_FALSE
-  uint32_t                u                    128                        0 .. 255
-  uint32_t                v                    128                        0 .. 255
-omxcam_bool             color_denoise          OMXCAM_TRUE
-omxcam_metering         metering               OMXCAM_METERING_AVERAGE
-omxcam_white_balance_t  white_balance          
-  omxcam_white_balance    mode                 OMXCAM_WHITE_BALANCE_AUTO
-  uint32_t                red_gain             1000                       0 .. 
-  uint32_t                blue_gain            1000                       0 ..
-omxcam_image_filter     image_filter           OMXCAM_IMAGE_FILTER_NONE
-omxcam_roi_t            roi
-  uint32_t                top                  0                          0 .. 100
-  uint32_t                left                 0                          0 .. 100
-  uint32_t                width                0                          0 .. 100
-  uint32_t                height               0                          0 .. 100
-uint32_t                framerate              30                         1 ..
-omxcam_bool             frame_stabilisation    OMXCAM_FALSE
+type                     name                    default                     range
+----                     ----                    -------                     -----
+uint32_t                 width                   image 2592, video 1920      16 .. 2592 | 1920
+uint32_t                 height                  image 1944, video 1080      16 .. 1944 | 1080
+int32_t                  sharpness               0                           -100 .. 100
+int32_t                  contrast                0                           -100 .. 100
+uint32_t                 brightness              50                          0 .. 100
+int32_t                  saturation              0                           -100 .. 100
+uint32_t                 shutter_speed           125                         0 ..
+omxcam_iso               iso                     OMXCAM_ISO_AUTO
+omxcam_exposure          exposure                OMXCAM_EXPOSURE_AUTO
+int32_t                  exposure_compensation   0                           -24 .. 24
+omxcam_mirror            mirror                  OMXCAM_MIRROR_NONE
+omxcam_rotation          rotation                OMXCAM_ROTATION_NONE
+omxcam_color_effects_t   color_effects
+  omxcam_bool              enabled               OMXCAM_FALSE
+  uint32_t                 u                     128                         0 .. 255
+  uint32_t                 v                     128                         0 .. 255
+omxcam_bool              color_denoise           OMXCAM_TRUE
+omxcam_metering          metering                OMXCAM_METERING_AVERAGE
+omxcam_white_balance_t   white_balance
+  omxcam_white_balance     mode                  OMXCAM_WHITE_BALANCE_AUTO
+  uint32_t                 red_gain              1000                        0 .. 
+  uint32_t                 blue_gain             1000                        0 ..
+omxcam_image_filter      image_filter            OMXCAM_IMAGE_FILTER_NONE
+omxcam_roi_t             roi
+  uint32_t                 top                   0                           0 .. 100
+  uint32_t                 left                  0                           0 .. 100
+  uint32_t                 width                 0                           0 .. 100
+  uint32_t                 height                0                           0 .. 100
+uint32_t                 framerate               30                          1 ..
+omxcam_bool              frame_stabilisation     OMXCAM_FALSE
 ```
 
 All the previous settings can be used in video and still mode, except:
