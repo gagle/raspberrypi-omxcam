@@ -81,40 +81,43 @@ Copy all the debug messages and open an issue.
 All the error codes and their descriptive messages are:
 
 ```
-XX (0, ERROR_NONE, "success")                                                \
-XX (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")         \
-XX (2, ERROR_DRIVERS, "cannot load the camera drivers")                      \
-XX (3, ERROR_INIT, "initialization error")                                   \
-XX (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
-XX (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
-    "component")                                                             \
-XX (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
-    "component")                                                             \
-XX (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
-XX (8, ERROR_DEINIT, "deinitialization error")                               \
-XX (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")    \
-XX (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' "\
-    "component")                                                             \
-XX (11, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' "\
-    "component")                                                             \
-XX (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "       \
-    "component")                                                             \
-XX (13, ERROR_CAPTURE, "error while capturing")                              \
-XX (14, ERROR_CAMERA_RUNNING, "camera is already running")                   \
-XX (15, ERROR_CAMERA_STOPPING, "camera is already being stopped")            \
-XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
-XX (17, ERROR_STILL, "still error")                                          \
-XX (18, ERROR_VIDEO, "video error")                                          \
-XX (19, ERROR_JPEG, "error configuring jpeg encoder")                        \
-XX (20, ERROR_H264, "error configuring h264 encoder")                        \
-XX (21, ERROR_LOADED, "cannot transition to the Loaded state")               \
-XX (22, ERROR_IDLE, "cannot transition to the Idle state")                   \
-XX (23, ERROR_EXECUTING, "cannot transition to the Executing state")         \
-XX (24, ERROR_FORMAT, "invalid encoding format")                             \
-XX (25, ERROR_SLEEP, "cannot sleep the thread")                              \
-XX (26, ERROR_WAKE, "cannot wake the thread")                                \
-XX (27, ERROR_LOCK, "cannot lock the thread")                                \
-XX (28, ERROR_UNLOCK, "cannot unlock the thread")
+  X (0, ERROR_NONE, "success")                                                 \
+  X (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")          \
+  X (2, ERROR_DRIVERS, "cannot load the camera drivers")                       \
+  X (3, ERROR_INIT, "initialization error")                                    \
+  X (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")         \
+  X (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "      \
+      "component")                                                             \
+  X (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "      \
+      "component")                                                             \
+  X (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")   \
+  X (8, ERROR_DEINIT, "deinitialization error")                                \
+  X (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")     \
+  X (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' " \
+      "component")                                                             \
+  X (11, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' " \
+      "component")                                                             \
+  X (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "        \
+      "component")                                                             \
+  X (13, ERROR_CAPTURE, "error while capturing")                               \
+  X (14, ERROR_CAMERA_RUNNING, "camera is already running")                    \
+  X (15, ERROR_CAMERA_NOT_RUNNING, "camera is not running")                    \
+  X (16, ERROR_CAMERA_STOPPING, "camera is already being stopped")             \
+  X (17, ERROR_CAMERA_UPDATE, "camera is not ready to be updated")             \
+  X (18, ERROR_BAD_PARAMETER, "incorrect parameter value")                     \
+  X (19, ERROR_VIDEO_ONLY, "action can be executed only in video mode")        \
+  X (20, ERROR_STILL, "still error")                                           \
+  X (21, ERROR_VIDEO, "video error")                                           \
+  X (22, ERROR_JPEG, "error configuring jpeg encoder")                         \
+  X (23, ERROR_H264, "error configuring h264 encoder")                         \
+  X (24, ERROR_LOADED, "cannot transition to the Loaded state")                \
+  X (25, ERROR_IDLE, "cannot transition to the Idle state")                    \
+  X (26, ERROR_EXECUTING, "cannot transition to the Executing state")          \
+  X (27, ERROR_FORMAT, "invalid encoding format")                              \
+  X (28, ERROR_SLEEP, "cannot sleep the thread")                               \
+  X (29, ERROR_WAKE, "cannot wake the thread")                                 \
+  X (30, ERROR_LOCK, "cannot lock the thread")                                 \
+  X (31, ERROR_UNLOCK, "cannot unlock the thread")
 ```
 
 Note: If you receive a `ERROR_CAMERA_MODULE` error, make sure that the property `gpu_mem_512` or `gpu_mem_256` (depending on the model of the Raspberry Pi) has `128` or more MB in the file `/boot/config.txt`. Uncomment if necessary. For example, if you have a Raspberry Pi model B, Arch Linux ARM (build from june 2014) defaults to:
@@ -140,36 +143,44 @@ gpu_mem_512=128
 The `omxcam_still_settings_t` and `omxcam_video_settings_t` structs have a `camera` field that is used to configure the camera settings. Its type definition is `omxcam_camera_settings_t` and has the following fields:
 
 ```
-type                  name                        default                     range
-----                  ----                        -------                     -----
-uint32_t              width                       image 2592, video 1920
-uint32_t              height                      image 1944, video 1080
-int32_t               sharpness                   0                          -100 .. 100
-int32_t               contrast                    0                          -100 .. 100
-uint32_t              brightness                  50                         0 .. 100
-int32_t               saturation                  0                          -100 .. 100
-uint32_t              shutter_speed               125                        0 ..
-uint32_t              iso                         100                        100 .. 800
-omxcam_exposure       exposure                    OMXCAM_EXPOSURE_AUTO
-int32_t               exposure_compensation       0                          -24 .. 24
-omxcam_mirror         mirror                      OMXCAM_MIRROR_NONE
-omxcam_rotation       rotation                    OMXCAM_ROTATION_NONE
-omxcam_bool           color_enhancement           OMXCAM_FALSE
-uint32_t              color_u                     128                        0 .. 255
-uint32_t              color_v                     128                        0 .. 255
-omxcam_bool           noise_reduction             OMXCAM_TRUE
-omxcam_metering       metering                    OMXCAM_METERING_AVERAGE
-omxcam_white_balance  white_balance               OMXCAM_WHITE_BALANCE_AUTO
-uint32_t              white_balance_red_gain      1000                       0 .. 
-uint32_t              white_balance_blue_gain     1000                       0 ..
-omxcam_image_filter   image_filter                OMXCAM_IMAGE_FILTER_NONE
-float                 roi_top                     0.0                        0 .. 100
-float                 roi_left                    0.0                        0 .. 100
-float                 roi_width                   0.0                        0 .. 100
-float                 roi_height                  0.0                        0 .. 100
-uint32_t              framerate                   30                         1 ..
-omxcam_bool           video_stabilisation         OMXCAM_FALSE
+type                    name                   default                    range
+----                    ----                   -------                    -----
+uint32_t                width                  image 2592, video 1920     16 .. 2592 | 1920
+uint32_t                height                 image 1944, video 1080     16 .. 1944 | 1080
+int32_t                 sharpness              0                          -100 .. 100
+int32_t                 contrast               0                          -100 .. 100
+uint32_t                brightness             50                         0 .. 100
+int32_t                 saturation             0                          -100 .. 100
+uint32_t                shutter_speed          125                        0 ..
+omxcam_iso              iso                    OMXCAM_ISO_AUTO
+omxcam_exposure         exposure               OMXCAM_EXPOSURE_AUTO
+int32_t                 exposure_compensation  0                          -24 .. 24
+omxcam_mirror           mirror                 OMXCAM_MIRROR_NONE
+omxcam_rotation         rotation               OMXCAM_ROTATION_NONE
+omxcam_color_effects_t  color_effects
+  omxcam_bool             enabled              OMXCAM_FALSE
+  uint32_t                u                    128                        0 .. 255
+  uint32_t                v                    128                        0 .. 255
+omxcam_bool             color_denoise          OMXCAM_TRUE
+omxcam_metering         metering               OMXCAM_METERING_AVERAGE
+omxcam_white_balance_t  white_balance          
+  omxcam_white_balance    mode                 OMXCAM_WHITE_BALANCE_AUTO
+  uint32_t                red_gain             1000                       0 .. 
+  uint32_t                blue_gain            1000                       0 ..
+omxcam_image_filter     image_filter           OMXCAM_IMAGE_FILTER_NONE
+omxcam_roi_t            roi
+  uint32_t                top                  0                          0 .. 100
+  uint32_t                left                 0                          0 .. 100
+  uint32_t                width                0                          0 .. 100
+  uint32_t                height               0                          0 .. 100
+uint32_t                framerate              30                         1 ..
+omxcam_bool             frame_stabilisation    OMXCAM_FALSE
 ```
+
+All the previous settings can be used in video and still mode, except:
+
+- Still only: `color_denoise`.
+- Video only: `framerate`, `frame_stabilisation`.
 
 For example, if you want to take a grayscale jpeg image with vga resolution (640x480), vertically mirrored and with a fixed shutter speed of 1/2 second:
 
@@ -183,9 +194,10 @@ settings.camera.mirror = OMXCAM_MIRROR_VERTICAL;
 //Shutter speed in milliseconds
 settings.camera.shutter_speed = 500;
 
-//When 'camera.color_enhancement' is enabled, 'camera.color_u' and 'camera.color_v'
-//are used. They default to 128, the values for a grayscale image
-settings.camera.color_enhancement = OMXCAM_TRUE;
+//When 'camera.color_effects' is enabled, 'camera.color_effects.u' and
+//'camera.color_effects.v' are used. They default to 128, the values for a
+//grayscale image
+settings.camera.color_effects = OMXCAM_TRUE;
 ```
 
 <a name="image_streaming"></a>

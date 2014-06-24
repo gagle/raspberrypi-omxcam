@@ -19,12 +19,17 @@ void buffer_callback_time (uint8_t* buffer, uint32_t length){
     if (omxcam_video_stop ()) log_error ();
   }
 }
-
+int changed = 0;
 void buffer_callback_length (uint8_t* buffer, uint32_t length){
   current += length;
   
+  if (!changed && current > 153600){
+    changed = 1;
+    if (omxcam_video_update_frame_stabilisation (OMXCAM_TRUE)) log_error ();
+  }
+  
   //Max file size 2MB
-  if (current > 2097152){
+  if (current > 307200/*2097152*/){
     if (omxcam_video_stop ()) log_error ();
     return;
   }
@@ -90,12 +95,12 @@ int main (){
   //http://picamera.readthedocs.org/en/release-1.4/fov.html#camera-modes
   settings.camera.width = 640;
   settings.camera.height = 480;
-  settings.camera.framerate = 90;
+  //settings.camera.framerate = 90;
   
-  if (save_time ("video-time-640x480.h264", &settings)) return 1;
+  //if (save_time ("video-time-640x480.h264", &settings)) return 1;
   
   //Capture a video of 2MB, 1920x1080 @30fps
-  omxcam_video_init (&settings);
+  //omxcam_video_init (&settings);
   settings.buffer_callback = buffer_callback_length;
   
   if (save_length ("video-length-640x480.h264", &settings)) return 1;

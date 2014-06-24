@@ -20,7 +20,7 @@
   (x).nVersion.s.nVersionMajor = OMX_VERSION_MAJOR;                            \
   (x).nVersion.s.nVersionMinor = OMX_VERSION_MINOR;                            \
   (x).nVersion.s.nRevision = OMX_VERSION_REVISION;                             \
-  (x).nVersion.s.nStep = OMX_VERSION_STEP
+  (x).nVersion.s.nStep = OMX_VERSION_STEP;
 
 #define OMXCAM_CAMERA_NAME "OMX.broadcom.camera"
 #define OMXCAM_IMAGE_ENCODE_NAME "OMX.broadcom.image_encode"
@@ -102,10 +102,12 @@ typedef struct {
   omxcam__component_t video_encode;
   omxcam__component_t null_sink;
   OMX_BUFFERHEADERTYPE* output_buffer;
+  int video;
   struct {
     int running;
     int joined;
     int stopping;
+    int ready;
   } state;
 } omxcam__context_t;
 
@@ -161,9 +163,6 @@ const char* omxcam__dump_OMX_STATETYPE (OMX_STATETYPE type);
 const char* omxcam__dump_OMX_ERRORTYPE (OMX_ERRORTYPE type);
 const char* omxcam__dump_OMX_EVENTTYPE (OMX_EVENTTYPE type);
 const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type);
-const char* omxcam__dump_OMX_METERINGTYPE (OMX_METERINGTYPE type);
-const char* omxcam__dump_OMX_WHITEBALCONTROLTYPE (
-    OMX_WHITEBALCONTROLTYPE type);
 void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
     OMX_PARAM_PORTDEFINITIONTYPE* type);
 void omxcam__dump_OMX_IMAGE_PARAM_PORTFORMATTYPE (
@@ -306,6 +305,65 @@ void omxcam__camera_init (
 int omxcam__camera_configure_omx (
     omxcam_camera_settings_t* settings,
     int video);
+
+/*
+ * Configures the camera settings.
+ */
+int omxcam__camera_set_sharpness (int32_t sharpness);
+int omxcam__camera_set_contrast (int32_t contrast);
+int omxcam__camera_set_brightness (uint32_t brightness);
+int omxcam__camera_set_saturation (int32_t saturation);
+int omxcam__camera_set_iso (omxcam_iso iso);
+int omxcam__camera_set_exposure (omxcam_exposure exposure);
+int omxcam__camera_set_exposure_compensation (int32_t exposure_compensation);
+int omxcam__camera_set_mirror (omxcam_mirror mirror, int video);
+int omxcam__camera_set_rotation (omxcam_rotation rotation, int video);
+int omxcam__camera_set_color_effects (
+    omxcam_color_effects_t* color_effects);
+int omxcam__camera_set_color_denoise (omxcam_bool color_denoise);
+int omxcam__camera_set_metering (omxcam_metering metering);
+int omxcam__camera_set_white_balance (omxcam_white_balance_t* white_balance);
+int omxcam__camera_set_image_filter (omxcam_image_filter image_filter);
+int omxcam__camera_set_roi (omxcam_roi_t* roi);
+int omxcam__camera_set_frame_stabilisation (omxcam_bool frame_stabilisation);
+
+/*
+ * Validates the camera settings.
+ */
+int omxcam__camera_validate (omxcam_camera_settings_t* settings, int video);
+
+/*
+ * Validates each camera setting. Returns 1 if it's valid, 0 otherwise.
+ */
+int omxcam__camera_is_valid_width (uint32_t width, int video);
+int omxcam__camera_is_valid_height (uint32_t height, int video);
+int omxcam__camera_is_valid_sharpness (int32_t sharpness);
+int omxcam__camera_is_valid_contrast (int32_t contrast);
+int omxcam__camera_is_valid_brightness (uint32_t brightness);
+int omxcam__camera_is_valid_saturation (int32_t saturation);
+int omxcam__camera_is_valid_iso (omxcam_iso iso);
+int omxcam__camera_is_valid_exposure (omxcam_exposure exposure);
+int omxcam__camera_is_valid_exposure_compensation (
+    int32_t exposure_compensation);
+int omxcam__camera_is_valid_mirror (omxcam_mirror mirror);
+int omxcam__camera_is_valid_rotation (omxcam_rotation rotation);
+int omxcam__camera_is_valid_color_effects (uint32_t color);
+int omxcam__camera_is_valid_metering (omxcam_metering metering);
+int omxcam__camera_is_valid_white_balance (omxcam_white_balance white_balance);
+int omxcam__camera_is_valid_image_filter (omxcam_image_filter image_filter);
+int omxcam__camera_is_valid_roi (uint32_t roi);
+
+/*
+ * Returns the string name of the given camera setting.
+ */
+const char* omxcam__camera_str_iso (omxcam_iso iso);
+const char* omxcam__camera_str_exposure (omxcam_exposure exposure);
+const char* omxcam__camera_str_mirror (omxcam_mirror mirror);
+const char* omxcam__camera_str_rotation (omxcam_rotation rotation);
+const char* omxcam__camera_str_metering (omxcam_metering metering);
+const char* omxcam__camera_str_white_balance (
+    omxcam_white_balance white_balance);
+const char* omxcam__camera_str_image_filter (omxcam_image_filter image_filter);
 
 /*
  * Sets the default settings for the jpeg encoder.

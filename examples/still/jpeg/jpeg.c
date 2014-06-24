@@ -58,8 +58,9 @@ int main (){
   settings.buffer_callback = buffer_callback;
   //Shutter speed in milliseconds, 1000*(1/4)
   settings.camera.shutter_speed = 250;
-  //Values of color_u and color_v are 128 by default, gray image
-  settings.camera.color_enhancement = OMXCAM_TRUE;
+  //Values of color_effects.u and color_effects.v are 128 by default,
+  //a gray image
+  settings.camera.color_effects.enabled = OMXCAM_TRUE;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags

@@ -20,41 +20,131 @@ extern "C" {
 #define OMXCAM_CAPTURE_FOREVER 0
 
 //Error definitions, expand if necessary
-#define OMXCAM_ERRNO_MAP(XX)                                                   \
-  XX (0, ERROR_NONE, "success")                                                \
-  XX (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")         \
-  XX (2, ERROR_DRIVERS, "cannot load the camera drivers")                      \
-  XX (3, ERROR_INIT, "initialization error")                                   \
-  XX (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")        \
-  XX (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "     \
+#define OMXCAM_ERRNO_MAP(X)                                                    \
+  X (0, ERROR_NONE, "success")                                                 \
+  X (1, ERROR_CAMERA_MODULE, "camera module is not ready to be used")          \
+  X (2, ERROR_DRIVERS, "cannot load the camera drivers")                       \
+  X (3, ERROR_INIT, "initialization error")                                    \
+  X (4, ERROR_INIT_CAMERA, "cannot initialize the 'camera' component")         \
+  X (5, ERROR_INIT_IMAGE_ENCODER, "cannot initialize the 'image_encode' "      \
       "component")                                                             \
-  XX (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "     \
+  X (6, ERROR_INIT_VIDEO_ENCODER, "cannot initialize the 'video_encode' "      \
       "component")                                                             \
-  XX (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")  \
-  XX (8, ERROR_DEINIT, "deinitialization error")                               \
-  XX (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")    \
-  XX (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' "\
+  X (7, ERROR_INIT_NULL_SINK, "cannot initialize the 'null_sink' component")   \
+  X (8, ERROR_DEINIT, "deinitialization error")                                \
+  X (9, ERROR_DEINIT_CAMERA, "cannot deinitialize the 'camera' component")     \
+  X (10, ERROR_DEINIT_IMAGE_ENCODER, "cannot deinitialize the 'image_encode' " \
       "component")                                                             \
-  XX (11, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' "\
+  X (11, ERROR_DEINIT_VIDEO_ENCODER, "cannot deinitialize the 'video_encode' " \
       "component")                                                             \
-  XX (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "       \
+  X (12, ERROR_DEINIT_NULL_SINK, "cannot deinitialize the 'null_sink' "        \
       "component")                                                             \
-  XX (13, ERROR_CAPTURE, "error while capturing")                              \
-  XX (14, ERROR_CAMERA_RUNNING, "camera is already running")                   \
-  XX (15, ERROR_CAMERA_STOPPING, "camera is already being stopped")            \
-  XX (16, ERROR_BAD_PARAMETER, "incorrect parameter value")                    \
-  XX (17, ERROR_STILL, "still error")                                          \
-  XX (18, ERROR_VIDEO, "video error")                                          \
-  XX (19, ERROR_JPEG, "error configuring jpeg encoder")                        \
-  XX (20, ERROR_H264, "error configuring h264 encoder")                        \
-  XX (21, ERROR_LOADED, "cannot transition to the Loaded state")               \
-  XX (22, ERROR_IDLE, "cannot transition to the Idle state")                   \
-  XX (23, ERROR_EXECUTING, "cannot transition to the Executing state")         \
-  XX (24, ERROR_FORMAT, "invalid encoding format")                             \
-  XX (25, ERROR_SLEEP, "cannot sleep the thread")                              \
-  XX (26, ERROR_WAKE, "cannot wake the thread")                                \
-  XX (27, ERROR_LOCK, "cannot lock the thread")                                \
-  XX (28, ERROR_UNLOCK, "cannot unlock the thread")
+  X (13, ERROR_CAPTURE, "error while capturing")                               \
+  X (14, ERROR_CAMERA_RUNNING, "camera is already running")                    \
+  X (15, ERROR_CAMERA_NOT_RUNNING, "camera is not running")                    \
+  X (16, ERROR_CAMERA_STOPPING, "camera is already being stopped")             \
+  X (17, ERROR_CAMERA_UPDATE, "camera is not ready to be updated")             \
+  X (18, ERROR_BAD_PARAMETER, "incorrect parameter value")                     \
+  X (19, ERROR_VIDEO_ONLY, "action can be executed only in video mode")        \
+  X (20, ERROR_STILL, "still error")                                           \
+  X (21, ERROR_VIDEO, "video error")                                           \
+  X (22, ERROR_JPEG, "error configuring jpeg encoder")                         \
+  X (23, ERROR_H264, "error configuring h264 encoder")                         \
+  X (24, ERROR_LOADED, "cannot transition to the Loaded state")                \
+  X (25, ERROR_IDLE, "cannot transition to the Idle state")                    \
+  X (26, ERROR_EXECUTING, "cannot transition to the Executing state")          \
+  X (27, ERROR_FORMAT, "invalid encoding format")                              \
+  X (28, ERROR_SLEEP, "cannot sleep the thread")                               \
+  X (29, ERROR_WAKE, "cannot wake the thread")                                 \
+  X (30, ERROR_LOCK, "cannot lock the thread")                                 \
+  X (31, ERROR_UNLOCK, "cannot unlock the thread")
+
+#define OMXCAM_ISO_MAP(X)                                                      \
+  X (ISO_AUTO, 0)                                                              \
+  X (ISO_100, 100)                                                             \
+  X (ISO_160, 160)                                                             \
+  X (ISO_200, 200)                                                             \
+  X (ISO_250, 250)                                                             \
+  X (ISO_320, 320)                                                             \
+  X (ISO_400, 400)                                                             \
+  X (ISO_500, 500)                                                             \
+  X (ISO_640, 640)                                                             \
+  X (ISO_800, 800)
+
+#define OMXCAM_EXPOSURE_MAP(X)                                                 \
+  X (EXPOSURE_OFF, OMX_ExposureControlOff)                                     \
+  X (EXPOSURE_AUTO, OMX_ExposureControlAuto)                                   \
+  X (EXPOSURE_NIGHT, OMX_ExposureControlNight)                                 \
+  X (EXPOSURE_BLACK_LIGHT, OMX_ExposureControlBackLight)                       \
+  X (EXPOSURE_SPOTLIGHT, OMX_ExposureControlSpotLight)                         \
+  X (EXPOSURE_SPORTS, OMX_ExposureControlSports)                               \
+  X (EXPOSURE_SNOW, OMX_ExposureControlSnow)                                   \
+  X (EXPOSURE_BEACH, OMX_ExposureControlBeach)                                 \
+  X (EXPOSURE_LARGE_APERTURE, OMX_ExposureControlLargeAperture)                \
+  X (EXPOSURE_SMALL_APERTURE, OMX_ExposureControlSmallAperture)                \
+  X (EXPOSURE_VERY_LONG, OMX_ExposureControlVeryLong)                          \
+  X (EXPOSURE_FIXED_FPS, OMX_ExposureControlFixedFps)                          \
+  X (EXPOSURE_NIGHT_WITH_PREVIEW, OMX_ExposureControlNightWithPreview)         \
+  X (EXPOSURE_ANTISHAKE, OMX_ExposureControlAntishake)                         \
+  X (EXPOSURE_FIREWORKS, OMX_ExposureControlFireworks)
+
+#define OMXCAM_MIRROR_MAP(X)                                                   \
+  X (MIRROR_NONE, OMX_MirrorNone)                                              \
+  X (MIRROR_VERTICAL, OMX_MirrorVertical)                                      \
+  X (MIRROR_HORIZONTAL, OMX_MirrorHorizontal)                                  \
+  X (MIRROR_BOTH, OMX_MirrorBoth)
+
+#define OMXCAM_ROTATION_MAP(X)                                                 \
+  X (ROTATION_NONE, 0)                                                         \
+  X (ROTATION_90, 90)                                                          \
+  X (ROTATION_180, 180)                                                        \
+  X (ROTATION_270, 270)
+
+#define OMXCAM_METERING_MAP(X)                                                 \
+  X (METERING_AVERAGE, OMX_MeteringModeAverage)                                \
+  X (METERING_SPOT, OMX_MeteringModeSpot)                                      \
+  X (METERING_MATRIX, OMX_MeteringModeMatrix)                                  \
+  X (METERING_BACKLIT, OMX_MeteringModeBacklit)
+
+#define OMXCAM_WHITE_BALANCE_MAP(X)                                            \
+  X (WHITE_BALANCE_OFF, OMX_WhiteBalControlOff)                                \
+  X (WHITE_BALANCE_AUTO, OMX_WhiteBalControlAuto)                              \
+  X (WHITE_BALANCE_SUNLIGHT, OMX_WhiteBalControlSunLight)                      \
+  X (WHITE_BALANCE_CLOUDY, OMX_WhiteBalControlCloudy)                          \
+  X (WHITE_BALANCE_SHADE, OMX_WhiteBalControlShade)                            \
+  X (WHITE_BALANCE_TUNGSTEN, OMX_WhiteBalControlTungsten)                      \
+  X (WHITE_BALANCE_FLUORESCENT, OMX_WhiteBalControlFluorescent)                \
+  X (WHITE_BALANCE_INCANDESCENT, OMX_WhiteBalControlIncandescent)              \
+  X (WHITE_BALANCE_FLASH, OMX_WhiteBalControlFlash)                            \
+  X (WHITE_BALANCE_HORIZON, OMX_WhiteBalControlHorizon)
+
+#define OMXCAM_IMAGE_FILTER_MAP(X)                                             \
+  X (IMAGE_FILTER_NONE, OMX_ImageFilterNone)                                   \
+  X (IMAGE_FILTER_NOISE, OMX_ImageFilterNoise)                                 \
+  X (IMAGE_FILTER_EMBOSS, OMX_ImageFilterEmboss)                               \
+  X (IMAGE_FILTER_NEGATIVE, OMX_ImageFilterNegative)                           \
+  X (IMAGE_FILTER_SKETCH, OMX_ImageFilterSketch)                               \
+  X (IMAGE_FILTER_OILPAINT, OMX_ImageFilterOilPaint)                           \
+  X (IMAGE_FILTER_HATCH, OMX_ImageFilterHatch)                                 \
+  X (IMAGE_FILTER_GPEN, OMX_ImageFilterGpen)                                   \
+  X (IMAGE_FILTER_ANTIALIAS, OMX_ImageFilterAntialias)                         \
+  X (IMAGE_FILTER_DERING, OMX_ImageFilterDeRing)                               \
+  X (IMAGE_FILTER_SOLARIZE, OMX_ImageFilterSolarize)                           \
+  X (IMAGE_FILTER_WATERCOLOR, OMX_ImageFilterWatercolor)                       \
+  X (IMAGE_FILTER_PASTEL, OMX_ImageFilterPastel)                               \
+  X (IMAGE_FILTER_SHARPEN, OMX_ImageFilterSharpen)                             \
+  X (IMAGE_FILTER_FILM, OMX_ImageFilterFilm)                                   \
+  X (IMAGE_FILTER_BLUR, OMX_ImageFilterBlur)                                   \
+  X (IMAGE_FILTER_SATURATION, OMX_ImageFilterSaturation)                       \
+  X (IMAGE_FILTER_DEINTERLACE_LINE_DOUBLE,                                     \
+      OMX_ImageFilterDeInterlaceLineDouble)                                    \
+  X (IMAGE_FILTER_DEINTERLACE_ADVANCED, OMX_ImageFilterDeInterlaceAdvanced)    \
+  X (IMAGE_FILTER_COLOUR_SWAP, OMX_ImageFilterColourSwap)                      \
+  X (IMAGE_FILTER_WASHED_OUT, OMX_ImageFilterWashedOut)                        \
+  X (IMAGE_FILTER_COLOUR_POINT, OMX_ImageFilterColourPoint)                    \
+  X (IMAGE_FILTER_POSTERISE, OMX_ImageFilterPosterise)                         \
+  X (IMAGE_FILTER_COLOUR_BALANCE, OMX_ImageFilterColourBalance)                \
+  X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)
 
 typedef enum {
   OMXCAM_FALSE,
@@ -69,92 +159,66 @@ typedef enum {
   OMXCAM_FORMAT_H264
 } omxcam_format;
 
+#define OMXCAM_ENUM_FN(name, value)                                           \
+  OMXCAM_ ## name = value,
+
 typedef enum {
-  OMXCAM_EXPOSURE_OFF = OMX_ExposureControlOff,
-  OMXCAM_EXPOSURE_AUTO = OMX_ExposureControlAuto,
-  OMXCAM_EXPOSURE_NIGHT = OMX_ExposureControlNight,
-  OMXCAM_EXPOSURE_BLACK_LIGHT = OMX_ExposureControlBackLight,
-  OMXCAM_EXPOSURE_SPOTLIGHT = OMX_ExposureControlSpotLight,
-  OMXCAM_EXPOSURE_SPORTS = OMX_ExposureControlSports,
-  OMXCAM_EXPOSURE_SNOW = OMX_ExposureControlSnow,
-  OMXCAM_EXPOSURE_BEACH = OMX_ExposureControlBeach,
-  OMXCAM_EXPOSURE_LARGE_APERTURE = OMX_ExposureControlLargeAperture,
-  OMXCAM_EXPOSURE_SMALL_APERTURE = OMX_ExposureControlSmallAperture,
-  OMXCAM_EXPOSURE_VERY_LONG = OMX_ExposureControlVeryLong,
-  OMXCAM_EXPOSURE_FIXED_FPS = OMX_ExposureControlFixedFps,
-  OMXCAM_EXPOSURE_NIGHT_WITH_PREVIEW = OMX_ExposureControlNightWithPreview,
-  OMXCAM_EXPOSURE_ANTISHAKE = OMX_ExposureControlAntishake,
-  OMXCAM_EXPOSURE_FIREWORKS = OMX_ExposureControlFireworks
+  OMXCAM_ISO_MAP (OMXCAM_ENUM_FN)
+} omxcam_iso;
+
+typedef enum {
+  OMXCAM_EXPOSURE_MAP (OMXCAM_ENUM_FN)
 } omxcam_exposure;
 
 typedef enum {
-  OMXCAM_IMAGE_FILTER_NONE = OMX_ImageFilterNone,
-  OMXCAM_IMAGE_FILTER_NOISE = OMX_ImageFilterNoise,
-  OMXCAM_IMAGE_FILTER_EMBOSS = OMX_ImageFilterEmboss,
-  OMXCAM_IMAGE_FILTER_NEGATIVE = OMX_ImageFilterNegative,
-  OMXCAM_IMAGE_FILTER_SKETCH = OMX_ImageFilterSketch,
-  OMXCAM_IMAGE_FILTER_OILPAINT = OMX_ImageFilterOilPaint,
-  OMXCAM_IMAGE_FILTER_HATCH = OMX_ImageFilterHatch,
-  OMXCAM_IMAGE_FILTER_GPEN = OMX_ImageFilterGpen,
-  OMXCAM_IMAGE_FILTER_ANTIALIAS = OMX_ImageFilterAntialias,
-  OMXCAM_IMAGE_FILTER_DERING = OMX_ImageFilterDeRing,
-  OMXCAM_IMAGE_FILTER_SOLARIZE = OMX_ImageFilterSolarize,
-  OMXCAM_IMAGE_FILTER_WATERCOLOR = OMX_ImageFilterWatercolor,
-  OMXCAM_IMAGE_FILTER_PASTEL = OMX_ImageFilterPastel,
-  OMXCAM_IMAGE_FILTER_SHARPEN = OMX_ImageFilterSharpen,
-  OMXCAM_IMAGE_FILTER_FILM = OMX_ImageFilterFilm,
-  OMXCAM_IMAGE_FILTER_BLUR = OMX_ImageFilterBlur,
-  OMXCAM_IMAGE_FILTER_SATURATION = OMX_ImageFilterSaturation,
-  OMXCAM_IMAGE_FILTER_DEINTERLACE_LINE_DOUBLE =
-      OMX_ImageFilterDeInterlaceLineDouble,
-  OMXCAM_IMAGE_FILTER_DEINTERLACE_ADVANCED = OMX_ImageFilterDeInterlaceAdvanced,
-  OMXCAM_IMAGE_FILTER_COLOUR_SWAP = OMX_ImageFilterColourSwap,
-  OMXCAM_IMAGE_FILTER_WASHED_OUT = OMX_ImageFilterWashedOut,
-  OMXCAM_IMAGE_FILTER_COLOUR_POINT = OMX_ImageFilterColourPoint,
-  OMXCAM_IMAGE_FILTER_POSTERISE = OMX_ImageFilterPosterise,
-  OMXCAM_IMAGE_FILTER_COLOUR_BALANCE = OMX_ImageFilterColourBalance,
-  OMXCAM_IMAGE_FILTER_CARTOON = OMX_ImageFilterCartoon
-} omxcam_image_filter;
-
-typedef enum {
-  OMXCAM_METERING_AVERAGE = OMX_MeteringModeAverage,
-  OMXCAM_METERING_SPOT = OMX_MeteringModeSpot,
-  OMXCAM_METERING_MATRIX = OMX_MeteringModeMatrix,
-  OMXCAM_METERING_BACKLIT = OMX_MeteringModeBacklit
-} omxcam_metering;
-
-typedef enum {
-  OMXCAM_MIRROR_NONE = OMX_MirrorNone,
-  OMXCAM_MIRROR_VERTICAL = OMX_MirrorVertical,
-  OMXCAM_MIRROR_HORIZONTAL = OMX_MirrorHorizontal,
-  OMXCAM_MIRROR_BOTH = OMX_MirrorBoth
+  OMXCAM_MIRROR_MAP (OMXCAM_ENUM_FN)
 } omxcam_mirror;
 
 typedef enum {
-  OMXCAM_ROTATION_NONE = 0,
-  OMXCAM_ROTATION_90 = 90,
-  OMXCAM_ROTATION_180 = 180,
-  OMXCAM_ROTATION_270 = 270
+  OMXCAM_ROTATION_MAP (OMXCAM_ENUM_FN)
 } omxcam_rotation;
 
 typedef enum {
-  OMXCAM_WHITE_BALANCE_OFF = OMX_WhiteBalControlOff,
-  OMXCAM_WHITE_BALANCE_AUTO = OMX_WhiteBalControlAuto,
-  OMXCAM_WHITE_BALANCE_SUNLIGHT = OMX_WhiteBalControlSunLight,
-  OMXCAM_WHITE_BALANCE_CLOUDY = OMX_WhiteBalControlCloudy,
-  OMXCAM_WHITE_BALANCE_SHADE = OMX_WhiteBalControlShade,
-  OMXCAM_WHITE_BALANCE_TUNGSTEN = OMX_WhiteBalControlTungsten,
-  OMXCAM_WHITE_BALANCE_FLUORESCENT = OMX_WhiteBalControlFluorescent,
-  OMXCAM_WHITE_BALANCE_INCANDESCENT = OMX_WhiteBalControlIncandescent,
-  OMXCAM_WHITE_BALANCE_FLASH = OMX_WhiteBalControlFlash,
-  OMXCAM_WHITE_BALANCE_HORIZON = OMX_WhiteBalControlHorizon
+  OMXCAM_METERING_MAP (OMXCAM_ENUM_FN)
+} omxcam_metering;
+
+typedef enum {
+  OMXCAM_WHITE_BALANCE_MAP (OMXCAM_ENUM_FN)
 } omxcam_white_balance;
 
 typedef enum {
-#define XX(errno, name, _) OMXCAM_ ## name = errno,
-  OMXCAM_ERRNO_MAP (XX)
-#undef XX
+  OMXCAM_IMAGE_FILTER_MAP (OMXCAM_ENUM_FN)
+} omxcam_image_filter;
+
+#undef OMXCAM_ENUM_FN
+
+#define OMXCAM_ENUM_FN(errno, name, _)                                        \
+  OMXCAM_ ## name = errno,
+
+typedef enum {
+  OMXCAM_ERRNO_MAP (OMXCAM_ENUM_FN)
 } omxcam_errno;
+
+#undef OMXCAM_ENUM_FN
+
+typedef struct {
+  omxcam_bool enabled;
+  uint32_t u;
+  uint32_t v;
+} omxcam_color_effects_t;
+
+typedef struct {
+  omxcam_white_balance mode;
+  uint32_t red_gain;
+  uint32_t blue_gain;
+} omxcam_white_balance_t;
+
+typedef struct {
+  uint32_t top;
+  uint32_t left;
+  uint32_t width;
+  uint32_t height;
+} omxcam_roi_t;
 
 typedef struct {
   uint32_t width;
@@ -169,24 +233,16 @@ typedef struct {
   int32_t exposure_compensation;
   omxcam_mirror mirror;
   omxcam_rotation rotation;
-  omxcam_bool color_enhancement;
-  uint32_t color_u;
-  uint32_t color_v;
-  omxcam_bool noise_reduction;
+  omxcam_color_effects_t color_effects;
+  omxcam_bool color_denoise;
   omxcam_metering metering;
-  omxcam_white_balance white_balance;
-  //The gains are used if the white balance is set to off
-  uint32_t white_balance_red_gain;
-  uint32_t white_balance_blue_gain;
+  omxcam_white_balance_t white_balance;
   omxcam_image_filter image_filter;
-  uint32_t roi_top;
-  uint32_t roi_left;
-  uint32_t roi_width;
-  uint32_t roi_height;
+  omxcam_roi_t roi;
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode
-  omxcam_bool video_stabilisation;
+  omxcam_bool frame_stabilisation;
 } omxcam_camera_settings_t;
 
 typedef struct {
@@ -235,8 +291,11 @@ typedef struct {
   omxcam_h264_settings_t h264;
 } omxcam_video_settings_t;
 
+#undef OMXCAM_COMMON_SETTINGS
+
 /*
- * Returns the string name of the given error.
+ * Returns the string name of the given error. Returns NULL if the error is not
+ * valid.
  */
 OMXCAM_EXTERN const char* omxcam_error_name (omxcam_errno error);
 
@@ -350,8 +409,37 @@ OMXCAM_EXTERN int omxcam_video_start (
  */
 OMXCAM_EXTERN int omxcam_video_stop ();
 
+/*
+ * Replaces the video buffer callback. Can be only executed when the camera is
+ * running.
+ */
 OMXCAM_EXTERN int omxcam_video_update_buffer_callback (
     void (*buffer_callback)(uint8_t* buffer, uint32_t length));
+
+/*
+ * Updates the camera settings. Can be only executed when the camera is running
+ * and it's in video mode.
+ */
+OMXCAM_EXTERN int omxcam_video_update_sharpness (int32_t sharpness);
+OMXCAM_EXTERN int omxcam_video_update_contrast (int32_t contrast);
+OMXCAM_EXTERN int omxcam_video_update_brightness (uint32_t brightness);
+OMXCAM_EXTERN int omxcam_video_update_saturation (int32_t saturation);
+OMXCAM_EXTERN int omxcam_video_update_iso (omxcam_iso iso);
+OMXCAM_EXTERN int omxcam_video_update_exposure (omxcam_exposure exposure);
+OMXCAM_EXTERN int omxcam_video_update_exposure_compensation (
+    int32_t exposure_compensation);
+OMXCAM_EXTERN int omxcam_video_update_mirror (omxcam_mirror mirror);
+OMXCAM_EXTERN int omxcam_video_update_rotation (omxcam_rotation rotation);
+OMXCAM_EXTERN int omxcam_video_update_color_effects (
+    omxcam_color_effects_t* color_effects);
+OMXCAM_EXTERN int omxcam_video_update_metering (omxcam_metering metering);
+OMXCAM_EXTERN int omxcam_video_update_white_balance (
+    omxcam_white_balance_t* white_balance);
+OMXCAM_EXTERN int omxcam_video_update_image_filter (
+    omxcam_image_filter image_filter);
+OMXCAM_EXTERN int omxcam_video_update_roi (omxcam_roi_t* roi);
+OMXCAM_EXTERN int omxcam_video_update_frame_stabilisation (
+    omxcam_bool frame_stabilisation);
 
 #ifdef __cplusplus
 }

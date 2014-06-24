@@ -78,27 +78,23 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   switch (settings->format){
     case OMXCAM_FORMAT_RGB888:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
       stride = stride*3;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
       stride = stride*4;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_H264:
-      //omxcam__ctx.video_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       width = settings->camera.width;
@@ -682,25 +678,6 @@ static void* omxcam__video_capture (void* thread_arg){
   return (void*)0;
 }
 
-int omxcam_video_update_buffer_callback (
-    void (*buffer_callback)(uint8_t* buffer, uint32_t length)){
-  if (pthread_mutex_lock (&mutex)){
-    omxcam__error ("pthread_mutex_lock");
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
-  }
-  
-  thread_arg.buffer_callback = buffer_callback;
-  
-  if (pthread_mutex_unlock (&mutex)){
-    omxcam__error ("pthread_mutex_unlock");
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
-    return -1;
-  }
-  
-  return 0;
-};
-
 void omxcam_video_init (omxcam_video_settings_t* settings){
   omxcam__camera_init (&settings->camera, OMXCAM_VIDEO_MAX_WIDTH,
       OMXCAM_VIDEO_MAX_HEIGHT);
@@ -722,9 +699,16 @@ int omxcam_video_start (
     return -1;
   }
   
+  if (omxcam__camera_validate (&settings->camera, 1)){
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
   omxcam__ctx.state.running = 1;
   omxcam__ctx.state.joined = 0;
   omxcam__ctx.state.stopping = 0;
+  omxcam__ctx.state.ready = 0;
+  omxcam__ctx.video = 1;
   
   running = 1;
   bg_error = 0;
@@ -748,6 +732,8 @@ int omxcam_video_start (
     return omxcam__exit (-1);
   }
   
+  omxcam__ctx.state.ready = 1;
+  
   //Block the main thread
   if (ms == OMXCAM_CAPTURE_FOREVER){
     if (omxcam__thread_lock ()){
@@ -760,6 +746,8 @@ int omxcam_video_start (
       return omxcam__exit (-1);
     }
   }
+  
+  omxcam__ctx.state.ready = 0;
   
   if (bg_error){
     //The video was already stopped due to an error
@@ -803,7 +791,7 @@ int omxcam_video_stop (){
   
   if (!omxcam__ctx.state.running){
     omxcam__error ("camera is not running");
-    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_RUNNING);
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
     return -1;
   }
   
@@ -879,6 +867,313 @@ int omxcam_video_stop (){
   }
   
   if (omxcam__deinit ()) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_buffer_callback (
+    void (*buffer_callback)(uint8_t* buffer, uint32_t length)){
+  if (!omxcam__ctx.state.ready){
+    omxcam__error ("camera is still not configured");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_UPDATE);
+    return -1;
+  }
+  
+  if (pthread_mutex_lock (&mutex)){
+    omxcam__error ("pthread_mutex_lock");
+    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    return -1;
+  }
+  
+  thread_arg.buffer_callback = buffer_callback;
+  
+  if (pthread_mutex_unlock (&mutex)){
+    omxcam__error ("pthread_mutex_unlock");
+    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    return -1;
+  }
+  
+  return 0;
+};
+
+static int omxcam__video_check_update (){
+  if (!omxcam__ctx.state.ready){
+    omxcam__error (omxcam_strerror (OMXCAM_ERROR_CAMERA_UPDATE));
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_UPDATE);
+    return -1;
+  }
+  
+  if (!omxcam__ctx.video){
+    omxcam__error (omxcam_strerror (OMXCAM_ERROR_VIDEO_ONLY));
+    omxcam__set_last_error (OMXCAM_ERROR_VIDEO_ONLY);
+    return -1;
+  }
+  
+  return 0;
+}
+
+int omxcam_video_update_sharpness (int32_t sharpness){
+  omxcam__trace ("updated 'camera.sharpness': %d", sharpness);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_sharpness (sharpness)){
+    omxcam__error ("invalid 'camera.sharpness' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  if (omxcam__camera_set_sharpness (sharpness)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_contrast (int32_t contrast){
+  omxcam__trace ("updated 'camera.contrast': %d", contrast);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_contrast (contrast)){
+    omxcam__error ("invalid 'camera.contrast' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  if (omxcam__camera_set_contrast (contrast)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_brightness (uint32_t brightness){
+  omxcam__trace ("updated 'camera.brightness': %d", brightness);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_brightness (brightness)){
+    omxcam__error ("invalid 'camera.brightness' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  if (omxcam__camera_set_brightness (brightness)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_saturation (int32_t saturation){
+  omxcam__trace ("updated 'camera.saturation': %d", saturation);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_saturation (saturation)){
+    omxcam__error ("invalid 'camera.saturation' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  if (omxcam__camera_set_saturation (saturation)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_iso (omxcam_iso iso){
+  omxcam__trace ("updated 'camera.iso': %s", omxcam__camera_str_iso (iso));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_iso (iso)){
+    omxcam__error ("invalid 'camera.iso' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_iso (iso)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_exposure (omxcam_exposure exposure){
+  omxcam__trace ("updated 'camera.exposure': %s",
+      omxcam__camera_str_exposure (exposure));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_exposure (exposure)){
+    omxcam__error ("invalid 'camera.exposure' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_exposure (exposure)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_exposure_compensation (
+    int32_t exposure_compensation){
+  omxcam__trace ("updated 'camera.exposure_compensation': %d",
+      exposure_compensation);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_exposure_compensation (exposure_compensation)){
+    omxcam__error ("invalid 'camera.exposure_compensation' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  if (omxcam__camera_set_exposure_compensation (exposure_compensation)){
+    return -1;
+  }
+  
+  return 0;
+}
+
+int omxcam_video_update_mirror (omxcam_mirror mirror){
+  omxcam__trace ("updated 'camera.mirror': %s",
+      omxcam__camera_str_mirror (mirror));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_mirror (mirror)){
+    omxcam__error ("invalid 'camera.mirror' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_mirror (mirror, 1)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_rotation (omxcam_rotation rotation){
+  omxcam__trace ("updated 'camera.rotation': %s",
+      omxcam__camera_str_rotation (rotation));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_rotation (rotation)){
+    omxcam__error ("invalid 'camera.rotation' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_rotation (rotation, 1)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_color_effects (
+    omxcam_color_effects_t* color_effects){
+  char buffer[64] = "";
+  if (color_effects->enabled){
+    sprintf (buffer, " (u: %d, v: %d)", color_effects->u, color_effects->v);
+  }
+  
+  omxcam__trace ("updated 'camera.color_effects': %s%s",
+      color_effects->enabled ? "enabled" : "disabled", buffer);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (color_effects->enabled){
+    if (!omxcam__camera_is_valid_color_effects (color_effects->u)){
+      omxcam__error ("invalid 'camera.color_effects.u' value");
+      return -1;
+    }
+    if (!omxcam__camera_is_valid_color_effects (color_effects->v)){
+      omxcam__error ("invalid 'camera.color_effects.v' value");
+      return -1;
+    }
+  }
+  
+  if (omxcam__camera_set_color_effects (color_effects)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_metering (omxcam_metering metering){
+  omxcam__trace ("updated 'camera.metering': %s",
+      omxcam__camera_str_metering (metering));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_metering (metering)){
+    omxcam__error ("invalid 'camera.metering' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_metering (metering)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_white_balance (
+    omxcam_white_balance_t* white_balance){
+  omxcam__trace ("updated 'camera.white_balance': %s (red_gain: %d, blue_gain: "
+      "%d)", omxcam__camera_str_white_balance (white_balance->mode),
+      white_balance->red_gain, white_balance->blue_gain);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_white_balance (white_balance->mode)){
+    omxcam__error ("invalid 'camera.white_balance.mode' value");
+    return -1;
+  }
+  
+  if (omxcam__camera_set_white_balance (white_balance)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_image_filter (
+    omxcam_image_filter image_filter){
+  omxcam__trace ("updated 'camera.image_filter': %s",
+      omxcam__camera_str_image_filter (image_filter));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_image_filter (image_filter)){
+    omxcam__error ("invalid 'camera.image_filter' value");
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  }
+  
+  if (omxcam__camera_set_image_filter (image_filter)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_roi (omxcam_roi_t* roi){
+  omxcam__trace ("updated 'camera.roi': top: %d, left: %d, width: %d, height: "
+      "%d", roi->top, roi->left, roi->width, roi->height);
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (!omxcam__camera_is_valid_roi (roi->top)){
+    omxcam__error ("invalid 'camera.roi.top' value");
+    return -1;
+  }
+  if (!omxcam__camera_is_valid_roi (roi->left)){
+    omxcam__error ("invalid 'camera.roi.left' value");
+    return -1;
+  }
+  if (!omxcam__camera_is_valid_roi (roi->width)){
+    omxcam__error ("invalid 'camera.roi.width' value");
+    return -1;
+  }
+  if (!omxcam__camera_is_valid_roi (roi->height)){
+    omxcam__error ("invalid 'camera.roi.height' value");
+    return -1;
+  }
+  
+  if (omxcam__camera_set_roi (roi)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_update_frame_stabilisation (
+    omxcam_bool frame_stabilisation){
+  omxcam__trace ("updated 'camera.frame_stabilisation': %s",
+      omxcam__strbool (frame_stabilisation));
+  
+  if (omxcam__video_check_update ()) return -1;
+  
+  if (omxcam__camera_set_frame_stabilisation (frame_stabilisation)) return -1;
   
   return 0;
 }

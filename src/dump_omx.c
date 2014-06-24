@@ -242,32 +242,7 @@ const char* omxcam__dump_OMX_INDEXTYPE (OMX_INDEXTYPE type){
   }
 }
 
-const char* omxcam__dump_OMX_METERINGTYPE (OMX_METERINGTYPE type){
-  switch (type){
-    OMXCAM_DUMP_CASE (OMX_MeteringModeAverage)
-    OMXCAM_DUMP_CASE (OMX_MeteringModeSpot)
-    OMXCAM_DUMP_CASE (OMX_MeteringModeMatrix)
-    OMXCAM_DUMP_CASE (OMX_MeteringModeBacklit)
-    default: return "other OMX_METERINGTYPE";
-  }
-}
-
-const char* omxcam__dump_OMX_WHITEBALCONTROLTYPE (
-    OMX_WHITEBALCONTROLTYPE type){
-  switch (type){
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlOff)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlAuto)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlSunLight)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlCloudy)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlShade)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlTungsten)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlFluorescent)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlIncandescent)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlFlash)
-    OMXCAM_DUMP_CASE (OMX_WhiteBalControlHorizon)
-    default: return "other OMX_WHITEBALCONTROLTYPE";
-  }
-}
+#undef OMXCAM_DUMP_CASE
 
 void omxcam__dump_OMX_PARAM_PORTDEFINITIONTYPE (
     OMX_PARAM_PORTDEFINITIONTYPE* type){

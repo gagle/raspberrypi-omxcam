@@ -254,6 +254,8 @@ int omxcam__exit (int code){
   omxcam__ctx.state.running = 0;
   omxcam__ctx.state.joined = 0;
   omxcam__ctx.state.stopping = 0;
+  omxcam__ctx.state.ready = 0;
+  omxcam__ctx.video = 0;
   return code;
 }
 

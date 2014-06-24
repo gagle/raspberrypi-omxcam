@@ -20,3 +20,6 @@ uint32_t omxcam_version (){
 const char* omxcam_version_string (){
   return OMXCAM_VERSION_STRING;
 }
+
+#undef OMXCAM_STR
+#undef OMXCAM_STR_
