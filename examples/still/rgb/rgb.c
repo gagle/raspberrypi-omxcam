@@ -13,7 +13,7 @@ int log_error (){
 
 int fd;
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   //Note: Writing the data directly to disk will slow down the capture speed
   //due to the I/O access. A posible workaround is to save the buffers into
@@ -50,7 +50,7 @@ int main (){
   
   //2592x1944 by default
   
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   //Shutter speed in milliseconds, 1000*(1/8)
   settings.camera.shutter_speed = 125;
   settings.camera.width = 640;

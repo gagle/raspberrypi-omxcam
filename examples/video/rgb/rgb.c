@@ -16,7 +16,7 @@ int log_error (){
   return 1;
 }
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   int stop = 0;
   current += length;
   
@@ -82,7 +82,7 @@ int main (){
   
   //1920x1080 @30fps by default
   
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   
   //RGB, 640x480 @30fps (10 frames)
   settings.format = OMXCAM_FORMAT_RGB888;

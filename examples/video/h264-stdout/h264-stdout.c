@@ -20,7 +20,7 @@ int log_error (){
   return 1;
 }
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //Write the buffers to the stdout
   if (write (STDOUT_FILENO, buffer, length) == -1){
     fprintf (stderr, "error: write\n");
@@ -36,7 +36,7 @@ int main (){
   omxcam_video_settings_t settings;
   omxcam_video_init (&settings);
   
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   settings.camera.width = 640;
   settings.camera.height = 480;
   

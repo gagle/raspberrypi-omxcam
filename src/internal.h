@@ -90,7 +90,6 @@ typedef struct {
   OMX_HANDLETYPE handle;
   omxcam__event_t event;
   OMX_STRING name;
-  //void (*buffer_callback)(uint8_t* buffer, uint32_t length);
 } omxcam__component_t;
 
 /*

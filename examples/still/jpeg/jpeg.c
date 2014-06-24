@@ -11,7 +11,7 @@ int log_error (){
 
 int fd;
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //Append the buffer to the file
   //Note: Writing the data directly to disk will slow down the capture speed
   //due to the I/O access. A posible workaround is to save the buffers into
@@ -49,13 +49,11 @@ int main (){
   
   //Capture an image with default settings
   omxcam_still_init (&settings);
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
   //Capture an image with shutter speed 1/4, EV -10 and some EXIF tags
-  omxcam_still_init (&settings);
-  settings.buffer_callback = buffer_callback;
   //Shutter speed in milliseconds, 1000*(1/4)
   settings.camera.shutter_speed = 250;
   //Values of color_effects.u and color_effects.v are 128 by default,

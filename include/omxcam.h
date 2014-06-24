@@ -159,7 +159,7 @@ typedef enum {
   OMXCAM_FORMAT_H264
 } omxcam_format;
 
-#define OMXCAM_ENUM_FN(name, value)                                           \
+#define OMXCAM_ENUM_FN(name, value)                                            \
   OMXCAM_ ## name = value,
 
 typedef enum {
@@ -192,7 +192,7 @@ typedef enum {
 
 #undef OMXCAM_ENUM_FN
 
-#define OMXCAM_ENUM_FN(errno, name, _)                                        \
+#define OMXCAM_ENUM_FN(errno, name, _)                                         \
   OMXCAM_ ## name = errno,
 
 typedef enum {
@@ -279,7 +279,8 @@ typedef struct {
 #define OMXCAM_COMMON_SETTINGS                                                 \
   omxcam_camera_settings_t camera;                                             \
   omxcam_format format;                                                        \
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
+  void (*on_ready)();                                                          \
+  void (*on_data)(uint8_t* buffer, uint32_t length);
 
 typedef struct {
   OMXCAM_COMMON_SETTINGS
@@ -381,7 +382,7 @@ OMXCAM_EXTERN int omxcam_still_start (omxcam_still_settings_t* settings);
 
 /*
  * Stops the image capture and unblocks the current thread. It is safe to use
- * from anywhere in your code. You can call it from inside the 'buffer_callback'
+ * from anywhere in your code. You can call it from inside the 'on_data'
  * or from another thread.
  */
 OMXCAM_EXTERN int omxcam_still_stop ();
@@ -404,7 +405,7 @@ OMXCAM_EXTERN int omxcam_video_start (
 
 /*
  * Stops the video capture and unblocks the current thread. It is safe to use
- * from anywhere in your code. You can call it from inside the 'buffer_callback'
+ * from anywhere in your code. You can call it from inside the 'on_data'
  * or from another thread.
  */
 OMXCAM_EXTERN int omxcam_video_stop ();
@@ -413,8 +414,8 @@ OMXCAM_EXTERN int omxcam_video_stop ();
  * Replaces the video buffer callback. Can be only executed when the camera is
  * running.
  */
-OMXCAM_EXTERN int omxcam_video_update_buffer_callback (
-    void (*buffer_callback)(uint8_t* buffer, uint32_t length));
+OMXCAM_EXTERN int omxcam_video_update_on_data (
+    void (*on_data)(uint8_t* buffer, uint32_t length));
 
 /*
  * Updates the camera settings. Can be only executed when the camera is running

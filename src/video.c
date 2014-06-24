@@ -2,7 +2,7 @@
 #include "internal.h"
 
 typedef struct {
-  void (*buffer_callback)(uint8_t* buffer, uint32_t length);
+  void (*on_data)(uint8_t* buffer, uint32_t length);
   omxcam__component_t* fill_component;
 } omxcam__thread_arg_t;
 
@@ -109,7 +109,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   omxcam__trace ("%dx%d @%dfps", settings->camera.width,
       settings->camera.height, settings->camera.framerate);
   
-  thread_arg.buffer_callback = settings->buffer_callback;
+  thread_arg.on_data = settings->on_data;
   thread_arg.fill_component = fill_component;
   
   if (omxcam__component_init (&omxcam__ctx.camera)){
@@ -626,7 +626,7 @@ static void* omxcam__video_capture (void* thread_arg){
   omxcam__thread_arg_t* arg = (omxcam__thread_arg_t*)thread_arg;
   int stop = 0;
   OMX_ERRORTYPE error;
-  void (*buffer_callback)(uint8_t*, uint32_t);
+  void (*on_data)(uint8_t*, uint32_t);
   
   running_safe = 1;
   
@@ -640,7 +640,7 @@ static void* omxcam__video_capture (void* thread_arg){
     }
     
     stop = !running;
-    buffer_callback = arg->buffer_callback;
+    on_data = arg->on_data;
     
     if (pthread_mutex_unlock (&mutex)){
       omxcam__error ("pthread_mutex_unlock");
@@ -665,11 +665,11 @@ static void* omxcam__video_capture (void* thread_arg){
       return (void*)0;
     }
     
-    //The buffers are fileld event if there's no callback
-    if (!buffer_callback) continue;
+    //The buffers are filled even if there's no callback
+    if (!on_data) continue;
     
     //Emit the buffer
-    buffer_callback (omxcam__ctx.output_buffer->pBuffer,
+    on_data (omxcam__ctx.output_buffer->pBuffer,
         omxcam__ctx.output_buffer->nFilledLen);
   }
   
@@ -683,7 +683,8 @@ void omxcam_video_init (omxcam_video_settings_t* settings){
       OMXCAM_VIDEO_MAX_HEIGHT);
   settings->format = OMXCAM_FORMAT_H264;
   omxcam__h264_init (&settings->h264);
-  settings->buffer_callback = 0;
+  settings->on_ready = 0;
+  settings->on_data = 0;
 }
 
 int omxcam_video_start (
@@ -733,6 +734,7 @@ int omxcam_video_start (
   }
   
   omxcam__ctx.state.ready = 1;
+  if (settings->on_ready) settings->on_ready ();
   
   //Block the main thread
   if (ms == OMXCAM_CAPTURE_FOREVER){
@@ -808,7 +810,7 @@ int omxcam_video_stop (){
     omxcam__trace ("stopping from background thread");
     
     //If stop() is called from inside the background thread (from the
-    //buffer_callback or due to an error), there's no need to use mutexes and
+    //on_data or due to an error), there's no need to use mutexes and
     //join(), just set running to false and the thread will die naturally
     running = 0;
     
@@ -871,8 +873,8 @@ int omxcam_video_stop (){
   return 0;
 }
 
-int omxcam_video_update_buffer_callback (
-    void (*buffer_callback)(uint8_t* buffer, uint32_t length)){
+int omxcam_video_update_on_data (
+    void (*on_data)(uint8_t* buffer, uint32_t length)){
   if (!omxcam__ctx.state.ready){
     omxcam__error ("camera is still not configured");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_UPDATE);
@@ -885,7 +887,7 @@ int omxcam_video_update_buffer_callback (
     return -1;
   }
   
-  thread_arg.buffer_callback = buffer_callback;
+  thread_arg.on_data = on_data;
   
   if (pthread_mutex_unlock (&mutex)){
     omxcam__error ("pthread_mutex_unlock");

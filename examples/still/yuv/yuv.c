@@ -20,7 +20,7 @@ uint32_t offset_u;
 uint32_t offset_v;
 uint8_t* file_buffer;
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //Append the data to the buffers
   memcpy (file_buffer + offset_y, buffer + yuv_planes_slice.offset_y,
       yuv_planes_slice.length_y);
@@ -105,9 +105,11 @@ int main (){
   
   //2592x1944 by default
   
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   //Shutter speed in milliseconds, 1000*(1/8)
   settings.camera.shutter_speed = 125;
+  settings.format = OMXCAM_FORMAT_YUV420;
+  settings.camera.width = 1296;
   
   /*
   Please note that the original aspect ratio of an image is 4:3. If you set
@@ -145,17 +147,12 @@ int main (){
   */
   
   //YUV420, 1296x730, 16:9
-  settings.buffer_callback = buffer_callback;
-  settings.format = OMXCAM_FORMAT_YUV420;
-  settings.camera.width = 1296;
   settings.camera.height = 730;
   
   if (save ("still-1312x736.yuv", &settings)) return 1;
   
   //YUV420, 1296x972, 4:3
-  settings.buffer_callback = buffer_callback;
-  settings.format = OMXCAM_FORMAT_YUV420;
-  settings.camera.width = 1296;
+  
   settings.camera.height = 972;
   
   if (save ("still-1312x976.yuv", &settings)) return 1;

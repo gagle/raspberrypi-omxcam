@@ -23,7 +23,7 @@ int log_error (){
   return 1;
 }
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   current += length;
   
   //Append the data to the buffer
@@ -133,7 +133,7 @@ int main (){
   //1920x1080 @30fps by default
   
   //YUV420, 640x480 @30fps (10 frames)
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = 640;
   settings.camera.height = 480;

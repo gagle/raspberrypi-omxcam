@@ -7,7 +7,7 @@ static uint32_t frame;
 static int total_frames;
 static int bg_error = 0;
 
-static void buffer_callback_video (uint8_t* buffer, uint32_t length){
+static void on_data_video (uint8_t* buffer, uint32_t length){
   current += length;
   
   if (current == frame){
@@ -19,7 +19,7 @@ static void buffer_callback_video (uint8_t* buffer, uint32_t length){
   }
 }
 
-static void buffer_callback_still (uint8_t* buffer, uint32_t length){
+static void on_data_still (uint8_t* buffer, uint32_t length){
   //No-op
 }
 
@@ -27,7 +27,7 @@ int yuv_video (int width, int height, int frames){
   omxcam_video_settings_t settings;
   
   omxcam_video_init (&settings);
-  settings.buffer_callback = buffer_callback_video;
+  settings.on_data = on_data_video;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = width;
   settings.camera.height = height;
@@ -46,7 +46,7 @@ int yuv_still (int width, int height){
   omxcam_still_settings_t settings;
   
   omxcam_still_init (&settings);
-  settings.buffer_callback = buffer_callback_still;
+  settings.on_data = on_data_still;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = width;
   settings.camera.height = height;

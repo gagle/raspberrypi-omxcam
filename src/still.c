@@ -44,7 +44,7 @@ void omxcam_still_init (omxcam_still_settings_t* settings){
       OMXCAM_STILL_MAX_HEIGHT);
   settings->format = OMXCAM_FORMAT_JPEG;
   omxcam__jpeg_init (&settings->jpeg);
-  settings->buffer_callback = 0;
+  settings->on_data = 0;
 }
 
 int omxcam_still_start (omxcam_still_settings_t* settings){
@@ -52,8 +52,8 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
-  if (!settings->buffer_callback){
-    omxcam__error ("the 'buffer_callback' field must be defined");
+  if (!settings->on_data){
+    omxcam__error ("the 'on_data' field must be defined");
     omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
     return -1;
   }
@@ -81,27 +81,23 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   
   switch (settings->format){
     case OMXCAM_FORMAT_RGB888:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
       stride = stride*3;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
       stride = stride*4;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
-      //omxcam__ctx.camera.buffer_callback = settings->buffer_callback;
       use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_JPEG:
-      //omxcam__ctx.image_encode.buffer_callback = settings->buffer_callback;
       use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       width = settings->camera.width;
@@ -377,7 +373,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     
     //Emit the buffer
     if (omxcam__ctx.output_buffer->nFilledLen){
-      settings->buffer_callback (omxcam__ctx.output_buffer->pBuffer,
+      settings->on_data (omxcam__ctx.output_buffer->pBuffer,
           omxcam__ctx.output_buffer->nFilledLen);
     }
     
