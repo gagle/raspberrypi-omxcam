@@ -56,10 +56,6 @@ void on_data (uint8_t* buffer, uint32_t length){
   }
 }
 
-void on_stop (){
-  printf ("stop!\n");
-}
-
 int save (char* filename, omxcam_video_settings_t* settings){
   printf ("capturing %s\n", filename);
   
