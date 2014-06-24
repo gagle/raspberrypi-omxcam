@@ -206,7 +206,7 @@ settings.camera.color_effects = OMXCAM_TRUE;
 ```c
 #include "omxcam.h"
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //buffer: the data
   //length: the length of the buffer
 }
@@ -219,7 +219,7 @@ int main (){
   omxcam_still_init (&settings);
   
   //Set the buffer callback, this is mandatory
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   
   //Start the image streaming
   omxcam_still_start (&settings);
@@ -235,7 +235,7 @@ int main (){
 ```c
 #include "omxcam.h"
 
-void buffer_callback (uint8_t* buffer, uint32_t length){
+void on_data (uint8_t* buffer, uint32_t length){
   //buffer: the data
   //length: the length of the buffer
 }
@@ -248,7 +248,7 @@ int main (){
   omxcam_video_init (&settings);
   
   //Set the buffer callback, this is mandatory
-  settings.buffer_callback = buffer_callback;
+  settings.on_data = on_data;
   
   //Two capture modes: with or without a timer
   //Capture 3000ms
