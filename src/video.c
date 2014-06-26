@@ -685,6 +685,7 @@ void omxcam_video_init (omxcam_video_settings_t* settings){
   omxcam__h264_init (&settings->h264);
   settings->on_ready = 0;
   settings->on_data = 0;
+  settings->on_stop = 0;
 }
 
 int omxcam_video_start (
