@@ -51,9 +51,6 @@ int main (){
   omxcam_still_init (&settings);
   settings.on_data = on_data;
   
-  settings.jpeg.exif_enable = OMXCAM_FALSE;
-  settings.jpeg.thumbnail_enable = OMXCAM_FALSE;
-  
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
   //Capture an image with shutter speed 1/4, EV -10 and some EXIF tags
