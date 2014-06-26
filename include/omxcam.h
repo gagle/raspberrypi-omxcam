@@ -59,6 +59,7 @@ extern "C" {
   X (30, ERROR_LOCK, "cannot lock the thread")                                 \
   X (31, ERROR_UNLOCK, "cannot unlock the thread")
 
+#define OMXCAM_ISO_MAP_LENGTH 10
 #define OMXCAM_ISO_MAP(X)                                                      \
   X (ISO_AUTO, 0)                                                              \
   X (ISO_100, 100)                                                             \
@@ -71,6 +72,7 @@ extern "C" {
   X (ISO_640, 640)                                                             \
   X (ISO_800, 800)
 
+#define OMXCAM_EXPOSURE_MAP_LENGTH 15
 #define OMXCAM_EXPOSURE_MAP(X)                                                 \
   X (EXPOSURE_OFF, OMX_ExposureControlOff)                                     \
   X (EXPOSURE_AUTO, OMX_ExposureControlAuto)                                   \
@@ -88,24 +90,28 @@ extern "C" {
   X (EXPOSURE_ANTISHAKE, OMX_ExposureControlAntishake)                         \
   X (EXPOSURE_FIREWORKS, OMX_ExposureControlFireworks)
 
+#define OMXCAM_MIRROR_MAP_LENGTH 4
 #define OMXCAM_MIRROR_MAP(X)                                                   \
   X (MIRROR_NONE, OMX_MirrorNone)                                              \
   X (MIRROR_VERTICAL, OMX_MirrorVertical)                                      \
   X (MIRROR_HORIZONTAL, OMX_MirrorHorizontal)                                  \
   X (MIRROR_BOTH, OMX_MirrorBoth)
 
+#define OMXCAM_ROTATION_MAP_LENGTH 4
 #define OMXCAM_ROTATION_MAP(X)                                                 \
   X (ROTATION_NONE, 0)                                                         \
   X (ROTATION_90, 90)                                                          \
   X (ROTATION_180, 180)                                                        \
   X (ROTATION_270, 270)
 
+#define OMXCAM_METERING_MAP_LENGTH 4
 #define OMXCAM_METERING_MAP(X)                                                 \
   X (METERING_AVERAGE, OMX_MeteringModeAverage)                                \
   X (METERING_SPOT, OMX_MeteringModeSpot)                                      \
   X (METERING_MATRIX, OMX_MeteringModeMatrix)                                  \
   X (METERING_BACKLIT, OMX_MeteringModeBacklit)
 
+#define OMXCAM_WHITE_BALANCE_MAP_LENGTH 10
 #define OMXCAM_WHITE_BALANCE_MAP(X)                                            \
   X (WHITE_BALANCE_OFF, OMX_WhiteBalControlOff)                                \
   X (WHITE_BALANCE_AUTO, OMX_WhiteBalControlAuto)                              \
@@ -118,6 +124,7 @@ extern "C" {
   X (WHITE_BALANCE_FLASH, OMX_WhiteBalControlFlash)                            \
   X (WHITE_BALANCE_HORIZON, OMX_WhiteBalControlHorizon)
 
+#define OMXCAM_IMAGE_FILTER_MAP_LENGTH 25
 #define OMXCAM_IMAGE_FILTER_MAP(X)                                             \
   X (IMAGE_FILTER_NONE, OMX_ImageFilterNone)                                   \
   X (IMAGE_FILTER_NOISE, OMX_ImageFilterNoise)                                 \

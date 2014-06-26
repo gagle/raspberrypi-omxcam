@@ -28,7 +28,7 @@ void on_data (uint8_t* buffer, uint32_t length){
   }
 }
 
-static void signal_handler (int signal){
+void signal_handler (int signal){
   if (omxcam_video_stop ()) log_error ();
 }
 

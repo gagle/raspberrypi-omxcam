@@ -33,7 +33,7 @@ int omxcam__camera_load_drivers (){
   OMX_PARAM_U32TYPE dev_st;
   omxcam__omx_struct_init (dev_st);
   dev_st.nPortIndex = OMX_ALL;
-  //ID for the camera device
+  //ID of the camera device
   dev_st.nU32 = 0;
   if ((error = OMX_SetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamCameraDeviceNumber, &dev_st))){
