@@ -228,6 +228,10 @@ int omxcam__camera_validate (omxcam_camera_settings_t* settings, int video){
     omxcam__error ("invalid 'camera.roi.height' value");
     return -1;
   }
+  if (video && !omxcam__camera_is_valid_framerate (settings->framerate)){
+    omxcam__error ("invalid 'camera.framerate' value");
+    return -1;
+  }
   
   return 0;
 }
@@ -591,6 +595,10 @@ int omxcam__camera_is_valid_color_effects (uint32_t color){
 
 int omxcam__camera_is_valid_roi (uint32_t roi){
   return roi <= 100;
+}
+
+int omxcam__camera_is_valid_framerate (uint32_t framerate){
+  return framerate >= 2;
 }
 
 #define OMXCAM_FN(X, DEF, fn, ret, name, name_upper_case)                      \

@@ -173,7 +173,7 @@ omxcam_roi_t             roi
   uint32_t                 left                  0                           0 .. 100
   uint32_t                 width                 0                           0 .. 100
   uint32_t                 height                0                           0 .. 100
-uint32_t                 framerate               30                          1 ..
+uint32_t                 framerate               30                          2 ..
 omxcam_bool              frame_stabilisation     OMXCAM_FALSE
 ```
 

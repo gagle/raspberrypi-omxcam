@@ -85,7 +85,6 @@ int main (){
   
   settings.on_ready = on_ready;
   settings.on_data = on_data;
-  settings.on_stop = on_stop;
   settings.camera.width = 640;
   settings.camera.height = 480;
   
