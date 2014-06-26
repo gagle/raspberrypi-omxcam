@@ -301,4 +301,4 @@ When capturing YUV images/video, you need to calculate the offset and length of 
 - ___void omxcam_yuv_planes_slice (uint32_t width, omxcam_yuv_planes_t* planes)___  
    Same as `omxcam_yuv_planes()` but used to calculate the offset and length of the planes of a payload buffer.
 
-Look at the [still/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) and [video/raw.c](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/raw/raw.c) examples for further details.
+Look at the [still/yuv](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/still/yuv/yuv.c) and [video/yuv](https://github.com/gagle/raspberrypi-omxcam/blob/master/examples/video/yuv/yuv.c) examples for further details.

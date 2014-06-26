@@ -179,14 +179,17 @@ void omxcam__trace (const char* fmt, ...);
  * Sets an error originated from the EventHandler.
  */
 void omxcam__event_error (omxcam__component_t* component);
+
 /*
  * Creates the event flags handler for the component.
  */
 int omxcam__event_create (omxcam__component_t* component);
+
 /*
  * Destroys the event flags handler for the component.
  */
 int omxcam__event_destroy (omxcam__component_t* component);
+
 /*
  * Sets some events.
  * 
@@ -196,6 +199,7 @@ int omxcam__event_wake (
     omxcam__component_t* component,
     omxcam__event event,
     OMX_ERRORTYPE omx_error);
+    
 /*
  * Retrieve some events.
  *
@@ -242,6 +246,7 @@ int omxcam__exit (int code);
  * handlers are configured, plus other things.
  */
 int omxcam__component_init (omxcam__component_t* component);
+
 /*
  * Deinitializes a component. All its ports are disabled, plus other things.
  */
@@ -369,10 +374,12 @@ const char* omxcam__camera_str_image_filter (omxcam_image_filter image_filter);
  * Sets the default settings for the jpeg encoder.
  */
 void omxcam__jpeg_init (omxcam_jpeg_settings_t* settings);
+
 /*
  * Adds an exif tag to the jpeg metadata.
  */
 int omxcam__jpeg_add_tag (char* key, char* value);
+
 /*
  * Configures the OpenMAX IL image_encode component with the jpeg settings.
  */
@@ -382,6 +389,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings);
  * Sets the default settings for the h264 encoder.
  */
 void omxcam__h264_init (omxcam_h264_settings_t* settings);
+
 /*
  * Configures the OpenMAX IL video_encode component with the h264 settings.
  */

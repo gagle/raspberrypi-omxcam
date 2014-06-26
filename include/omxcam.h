@@ -419,7 +419,7 @@ OMXCAM_EXTERN int omxcam_video_update_on_data (
     void (*on_data)(uint8_t* buffer, uint32_t length));
 
 /*
- * Updates the camera settings. Can be only executed when the camera is running
+ * Updates the camera settings. Can be only executed while the camera is running
  * and it's in video mode.
  */
 OMXCAM_EXTERN int omxcam_video_update_sharpness (int32_t sharpness);
