@@ -19,7 +19,8 @@ void omxcam__error_ (
       fn, file, line);
 }
 
-#define OMXCAM_NAME_FN(_, name, __) case OMXCAM_ ## name: return #name;
+#define OMXCAM_NAME_FN(_, name, __)                                            \
+  case OMXCAM_ ## name: return "OMXCAM_" #name;
 const char* omxcam_error_name (omxcam_errno error){
   switch (error){
     OMXCAM_ERRNO_MAP (OMXCAM_NAME_FN)
@@ -28,7 +29,8 @@ const char* omxcam_error_name (omxcam_errno error){
 }
 #undef OMXCAM_NAME_FN
 
-#define OMXCAM_STRERROR_FN(_, name, msg) case OMXCAM_ ## name: return msg;
+#define OMXCAM_STRERROR_FN(_, name, msg)                                       \
+  case OMXCAM_ ## name: return msg;
 const char* omxcam_strerror (omxcam_errno error){
   switch (error){
     OMXCAM_ERRNO_MAP (OMXCAM_STRERROR_FN)

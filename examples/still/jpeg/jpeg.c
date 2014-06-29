@@ -50,22 +50,24 @@ int main (){
   //Capture an image with default settings
   omxcam_still_init (&settings);
   settings.on_data = on_data;
+  settings.camera.exposure = OMXCAM_EXPOSURE_NIGHT;
   
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
-  //Capture an image with shutter speed 1/4, EV -10 and some EXIF tags
-  //Shutter speed in milliseconds, 1000*(1/4)
-  settings.camera.shutter_speed = 250;
+  //Capture gray image with shutter speed 1/4, EV -10 and some EXIF tags
+  settings.camera.exposure_compensation = -10;
+  //Shutter speed in microseconds, (1/4)*1e6
+  settings.camera.shutter_speed = 250000;
   //Values of color_effects.u and color_effects.v are 128 by default,
   //a gray image
   settings.camera.color_effects.enabled = OMXCAM_TRUE;
   
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
   //See http://www.media.mit.edu/pia/Research/deepview/exif.html#IFD0Tags
-  //for valid keys and their description
+  //for valid keys and their descriptions
   omxcam_exif_tag_t exif_tags[] = {
     //Manufacturer
-    { "IFD0.Make", "Raspberry Pi" }
+    { "IFD0.Make", "omxcam" }
   };
   settings.jpeg.exif_tags = exif_tags;
   settings.jpeg.exif_valid_tags = 1;

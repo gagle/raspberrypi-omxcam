@@ -106,9 +106,9 @@ int main (){
   //2592x1944 by default
   
   settings.on_data = on_data;
-  //Shutter speed in milliseconds, 1000*(1/8)
-  settings.camera.shutter_speed = 125;
   settings.format = OMXCAM_FORMAT_YUV420;
+  //Shutter speed in milliseconds, (1/8)*1e6
+  settings.camera.shutter_speed = 125000;
   settings.camera.width = 1296;
   
   /*

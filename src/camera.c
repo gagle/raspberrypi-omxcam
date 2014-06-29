@@ -241,7 +241,7 @@ int omxcam__camera_set_sharpness (int32_t sharpness){
   OMX_CONFIG_SHARPNESSTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.nSharpness = sharpness;                                                                         \
+  st.nSharpness = sharpness;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonSharpness, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonSharpness: %s",
@@ -256,7 +256,7 @@ int omxcam__camera_set_contrast (int32_t contrast){
   OMX_CONFIG_CONTRASTTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.nContrast = contrast;                                                                         \
+  st.nContrast = contrast;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonContrast, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonContrast: %s",
@@ -271,7 +271,7 @@ int omxcam__camera_set_brightness (uint32_t brightness){
   OMX_CONFIG_BRIGHTNESSTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.nBrightness = brightness;                                                                         \
+  st.nBrightness = brightness;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonBrightness, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonBrightness: %s",
@@ -286,7 +286,7 @@ int omxcam__camera_set_saturation (int32_t saturation){
   OMX_CONFIG_SATURATIONTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.nSaturation = saturation;                                                                         \
+  st.nSaturation = saturation;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonSaturation, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonSaturation: %s",
@@ -323,7 +323,7 @@ int omxcam__camera_set_exposure (omxcam_exposure exposure){
   OMX_CONFIG_EXPOSURECONTROLTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.eExposureControl = exposure;                                                                         \
+  st.eExposureControl = exposure;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonExposure, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonExposure: %s",
@@ -359,7 +359,7 @@ int omxcam__camera_set_mirror (omxcam_mirror mirror, int video){
   OMX_CONFIG_MIRRORTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = video ? 71 : 72;
-  st.eMirror = mirror;                                                                         \
+  st.eMirror = mirror;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonMirror, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonMirror: %s",
@@ -374,7 +374,7 @@ int omxcam__camera_set_rotation (omxcam_rotation rotation, int video){
   OMX_CONFIG_ROTATIONTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = video ? 71 : 72;
-  st.nRotation = rotation;                                                                         \
+  st.nRotation = rotation;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonRotate, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonRotate: %s",
@@ -406,7 +406,7 @@ int omxcam__camera_set_color_denoise (omxcam_bool color_denoise){
   OMX_ERRORTYPE error;
   OMX_CONFIG_BOOLEANTYPE st;
   omxcam__omx_struct_init (st);
-  st.bEnabled = !!color_denoise;                                                                         \
+  st.bEnabled = !!color_denoise;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigStillColourDenoiseEnable, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigStillColourDenoiseEnable: "
@@ -442,7 +442,7 @@ int omxcam__camera_set_white_balance (omxcam_white_balance_t* white_balance){
   OMX_CONFIG_WHITEBALCONTROLTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.eWhiteBalControl = white_balance->mode;                                                                         \
+  st.eWhiteBalControl = white_balance->mode;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonWhiteBalance, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonWhiteBalance: %s",
@@ -469,7 +469,7 @@ int omxcam__camera_set_image_filter (omxcam_image_filter image_filter){
   OMX_CONFIG_IMAGEFILTERTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.eImageFilter = image_filter;                                                                         \
+  st.eImageFilter = image_filter;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonImageFilter, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonImageFilter: %s",
@@ -502,7 +502,7 @@ int omxcam__camera_set_frame_stabilisation (omxcam_bool frame_stabilisation){
   OMX_CONFIG_FRAMESTABTYPE st;
   omxcam__omx_struct_init (st);
   st.nPortIndex = OMX_ALL;
-  st.bStab = !!frame_stabilisation;                                                                         \
+  st.bStab = !!frame_stabilisation;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
       OMX_IndexConfigCommonFrameStabilisation, &st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonFrameStabilisation: "
@@ -544,7 +544,8 @@ int omxcam__camera_configure_omx (
   st.nPortIndex = OMX_ALL;
   st.eMetering = settings->metering;
   st.xEVCompensation = (settings->exposure_compensation << 16)/6;
-  st.nShutterSpeedMsec = settings->shutter_speed*1000;
+  //Despite the name says it's in milliseconds, it's in microseconds
+  st.nShutterSpeedMsec = settings->shutter_speed;
   st.bAutoShutterSpeed = !settings->shutter_speed;
   st.nSensitivity = settings->iso;
   st.bAutoSensitivity = !settings->iso;
@@ -598,7 +599,8 @@ int omxcam__camera_is_valid_roi (uint32_t roi){
 }
 
 int omxcam__camera_is_valid_framerate (uint32_t framerate){
-  return framerate >= 2;
+  //640x480 @90fps is the upper limit, but let the firmware deal with it
+  return framerate >= 1;
 }
 
 #define OMXCAM_FN(X, DEF, fn, ret, name, name_upper_case)                      \

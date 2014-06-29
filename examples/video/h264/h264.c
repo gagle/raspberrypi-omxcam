@@ -85,9 +85,9 @@ int main (){
   omxcam_video_settings_t settings;
   
   //Capture a video of ~2000ms (capture time, not file duration), 640x480 @90fps
+  //Camera modes: http://www.raspberrypi.org/new-camera-mode-released
   omxcam_video_init (&settings);
   settings.on_data = on_data_time;
-  //http://picamera.readthedocs.org/en/release-1.4/fov.html#camera-modes
   settings.camera.width = 640;
   settings.camera.height = 480;
   settings.camera.framerate = 90;

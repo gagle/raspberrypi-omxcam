@@ -153,6 +153,8 @@ extern "C" {
   X (IMAGE_FILTER_COLOUR_BALANCE, OMX_ImageFilterColourBalance)                \
   X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)
 
+#define OMXCAM_SHUTTER_SPEED_AUTO 0
+
 typedef enum {
   OMXCAM_FALSE,
   OMXCAM_TRUE

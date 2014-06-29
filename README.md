@@ -23,7 +23,7 @@ For a global understanding of the camera module check the documentation of the [
 
 When you start the streaming, a new thread is spawned and it's the responsible of emitting the data. You define a buffer callback and you receive the data when it's ready to be consumed, that's all. You don't even need to `malloc()` and `free()` the buffers, just use them. If you need some kind of inter-thread communication, I recommend a lock-free queue. Look at the [concurrency kit](http://concurrencykit.org/) project for more details, especially the `ck_ring_*()` functions.
 
-- [Build steps](#build_steps)
+- [Build](#build)
 - [Error handling](#error_handling)
 - [Camera modes](#camera_modes)
 - [Camera settings](#camera_settings)
@@ -34,8 +34,8 @@ When you start the streaming, a new thread is spawned and it's the responsible o
 
 The [omxcam.h](https://github.com/gagle/raspberrypi-omxcam/blob/master/include/omxcam.h) header file is what you need to include in your projects. All the enumerations, type definitions and prototypes are located here. This README file introduces the library and explains just a few things. For a full reference, please take a look at the header `omxcam.h`.
 
-<a name="build_steps"></a>
-#### Build steps ####
+<a name="build"></a>
+#### Build ####
 
 Two makefiles are provided with each example: `Makefile` and `Makefile-shared`. If you compile an example with the latter makefile you will also need to execute the makefile [./Makefile-shared](https://github.com/gagle/raspberrypi-omxcam/blob/master/Makefile-shared) in order to compile the library as a shared library. This will generate the file `./lib/libomxcam.so`.
 
@@ -67,7 +67,7 @@ If you need to store the library in another place, change the path, use the envi
 All the functions that have a non-void return, return an `int` type: `0` if the function succeeds, `-1` otherwise. If something fails, you can call to `omxcam_last_error()` to get the last error number. You have additional functions such as `omxcam_error_name(omxcam_errno)` which returns the error name, `omxcam_strerror(omxcam_errno)` which returns the string message describing the error and `omxcam_perror()` which formats and prints the last error to the stderr, something similar to this:
 
 ```
-omxcam: ERROR_INIT_CAMERA: cannot initialize the 'camera' component
+omxcam: OMXCAM_ERROR_INIT_CAMERA: cannot initialize the 'camera' component
 ```
 
 You should not get any error. If you receive an error and you are sure that it's not due to bad parameters, you can enable the debugging flag `-DOMXCAM_DEBUG` and recompile the library. An even more specific error message should be printed to the stdout, for example:
@@ -151,7 +151,7 @@ int32_t                  sharpness               0                           -10
 int32_t                  contrast                0                           -100 .. 100
 uint32_t                 brightness              50                          0 .. 100
 int32_t                  saturation              0                           -100 .. 100
-uint32_t                 shutter_speed           125                         0 ..
+uint32_t                 shutter_speed           0 (auto)                    0 ..
 omxcam_iso               iso                     OMXCAM_ISO_AUTO
 omxcam_exposure          exposure                OMXCAM_EXPOSURE_AUTO
 int32_t                  exposure_compensation   0                           -24 .. 24

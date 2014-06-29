@@ -1,10 +1,14 @@
 #include "bench.h"
 
 /*
+Default settings are used. This is not a "real" benchmark since the capture time
+depends on various settings like the shutter speed and scene illuminance. This
+is just a little benchmark to confirm that the library is working as expected.
+
 Results:
 
 In video mode, the closer to 30fps and 1000ms, the better.
-In still mode, the faster, the better.
+In still mode, the faster, the better, being 1fps the minimum desirable.
 
 set up h264: 329 ms
 tear down h264: 51 ms
@@ -17,38 +21,38 @@ uint32_t end;
 uint32_t diff1;
 uint32_t diff2;
 
-uint32_t now (){
+static uint32_t now (){
   struct timespec t;
   clock_gettime (CLOCK_MONOTONIC, &t);
   return t.tv_sec*1000 + t.tv_nsec/1.0e6;
 }
 
-void print_time_video (char* label, uint32_t frames){
+static void print_time_video (char* label, uint32_t frames){
   printf ("%s: %.2f fps (%d ms)\n", label, frames/(diff1/1000.0), diff1);
 }
 
-void print_time_still (char* label){
+/*static void print_time_still (char* label){
   printf ("%s: %.2f fps (%d ms)\n", label, 1000.0/diff1, diff1);
-}
+}*/
 
-int log_error (){
+static int log_error (){
   omxcam_perror ();
   return 1;
 }
 
-void on_ready (){
+static void on_ready (){
   start = now ();
 }
 
-void on_stop (){
+static void on_stop (){
   diff1 = now () - start;
 }
 
-void on_ready_set_up (){
+static void on_ready_set_up (){
   diff1 = now () - start;
 }
 
-void on_stop_tear_down (){
+static void on_stop_tear_down (){
   start = now ();
 }
 

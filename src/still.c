@@ -185,25 +185,26 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   }
   
   //Configure preview port
-  //In theory the fastest resolution and framerate are 1920x1080 @15fps because
+  //In theory the fastest resolution and framerate are 1920x1080 @30fps because
   //these are the default settings for the preview port, so the frames don't
   //need to be resized. In practice, this is not true. The fastest way to
-  //produce stills is setting the lowest resolution, that is, 640x480 @15fps.
-  //The difference between 1920x1080 @15fps and 640x480 @15fps is a speed boost
+  //produce stills is setting the lowest resolution, that is, 640x480 @30fps.
+  //The difference between 1920x1080 @30fps and 640x480 @30fps is a speed boost
   //of ~4%, from ~1083ms to ~1039ms
   port_st.nPortIndex = 70;
   port_st.format.video.nFrameWidth = 640;
   port_st.format.video.nFrameHeight = 480;
   port_st.format.video.eCompressionFormat = OMX_IMAGE_CodingUnused;
   port_st.format.video.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar;
-  //15 << 16 -> 983040
-  port_st.format.video.xFramerate = 983040;
+  //Setting the framerate to 0 unblocks the shutter speed from 66ms to 772ms
+  //The higher the speed, the higher the capture time
+  port_st.format.video.xFramerate = 0;
   port_st.format.video.nStride = 640;
   if ((error = OMX_SetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamPortDefinition, &port_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamPortDefinition: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
   
@@ -264,7 +265,7 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
   if ((error = OMX_SetupTunnel (omxcam__ctx.camera.handle, 70,
       omxcam__ctx.null_sink.handle, 240))){
     omxcam__error ("OMX_SetupTunnel: %s", omxcam__dump_OMX_ERRORTYPE (error));
-    omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
+    omxcam__set_last_error (OMXCAM_ERROR_STILL);
     return -1;
   }
   

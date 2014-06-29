@@ -51,8 +51,8 @@ int main (){
   //2592x1944 by default
   
   settings.on_data = on_data;
-  //Shutter speed in milliseconds, 1000*(1/8)
-  settings.camera.shutter_speed = 125;
+  //Shutter speed in microseconds, (1/8)*1e6
+  settings.camera.shutter_speed = 125000;
   settings.camera.width = 640;
   settings.camera.height = 480;
   
