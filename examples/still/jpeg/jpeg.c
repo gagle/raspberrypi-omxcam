@@ -50,7 +50,6 @@ int main (){
   //Capture an image with default settings
   omxcam_still_init (&settings);
   settings.on_data = on_data;
-  settings.camera.exposure = OMXCAM_EXPOSURE_NIGHT;
   
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
