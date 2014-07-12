@@ -23,6 +23,7 @@ int rgb_video (bench_t* req);
 int rgb_still (bench_t* req);
 
 int yuv_video (bench_t* req);
+int yuv_video_async (bench_t* req);
 int yuv_still (bench_t* req);
 
 #endif

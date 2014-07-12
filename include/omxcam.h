@@ -479,10 +479,8 @@ OMXCAM_EXTERN int omxcam_video_stop_async ();
 
 /*
  * Requests a buffer with video data. When the buffer is ready, the 'on_data'
- * callback is called and the function returns. When 'omxcam_video_stop_async()'
- * is called and after a read is attempted, the 'buffer' argument is a null
- * pointer and the 'length' is 0. If an error occurs, the video is stopped
- * automatically.
+ * callback is called and the function returns. If an error occurs, the video is
+ * stopped automatically.
  *
  * These asynchronous functions don't have any multithread synchronization
  * mechanism, just the required for waiting to the events, they are just a thin

@@ -1304,6 +1304,24 @@ void omxcam__handle_error_async (){
 }
 
 int omxcam_video_read_async (){
+  //Critical section, this function needs to be as fast as possible
+  
+  omxcam__trace ("reading buffer (async)");
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
+  
+  if (!omxcam__ctx.state.running){
+    omxcam__error ("camera is not running");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
+    return omxcam__exit_async (-1);
+  }
+  
+  if (!omxcam__ctx.async){
+    omxcam__error ("video hasn't been started in asynchronous mode");
+    omxcam__set_last_error (OMXCAM_ERROR_NO_ASYNC);
+    return omxcam__exit_async (-1);
+  }
+  
   OMX_ERRORTYPE error;
 
   if ((error = OMX_FillThisBuffer (thread_arg.fill_component->handle,
@@ -1311,14 +1329,14 @@ int omxcam_video_read_async (){
     omxcam__error ("OMX_FillThisBuffer: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
     omxcam__handle_error_async ();
-    return -1;
+    return omxcam__exit_async (-1);
   }
   
   //Wait until it's filled
   if (omxcam__event_wait (thread_arg.fill_component,
       OMXCAM_EVENT_FILL_BUFFER_DONE, 0, 0)){
     omxcam__handle_error_async ();
-    return -1;
+    return omxcam__exit_async (-1);
   }
   
   if (thread_arg.on_data){
