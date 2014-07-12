@@ -6,23 +6,10 @@
 
 #include "omxcam.h"
 
-//If you need to iterate through all the values of a setting, you can use the
-//available mapping macros.
-
-//Edit the following macros to apply all the possible values of a setting.
-#define MAP OMXCAM_IMAGE_FILTER_MAP
-#define MAP_LENGTH OMXCAM_IMAGE_FILTER_MAP_LENGTH
-#define FN omxcam_video_update_image_filter
-
-#define VALUES(_, value) value,
-
-int values[] = {
-  MAP (VALUES)
-};
-
 int fd;
-int current;
-int interval = 1000;
+uint32_t current = 0;
+int timeout = 2000;
+int quit = 0;
 
 int log_error (){
   omxcam_perror ();
@@ -30,10 +17,7 @@ int log_error (){
 }
 
 void signal_handler (int signal){
-  if (FN (values[current])) log_error ();
-  if (++current == MAP_LENGTH){
-    if (omxcam_video_stop ()) log_error ();
-  }
+  quit = 1;
 }
 
 void on_ready (){
@@ -41,30 +25,39 @@ void on_ready (){
   
   struct itimerval timer;
   
-  timer.it_value.tv_sec = interval/1000;
-  timer.it_value.tv_usec = (interval*1000)%1000000;
-  timer.it_interval = timer.it_value;
+  timer.it_value.tv_sec = timeout/1000;
+  timer.it_value.tv_usec = (timeout*1000)%1000000;
+  timer.it_interval.tv_sec = timer.it_interval.tv_usec = 0;
   
   setitimer (ITIMER_REAL, &timer, 0);
 }
 
 void on_data (uint8_t* buffer, uint32_t length){
+  //Append the buffer to the file
   if (pwrite (fd, buffer, length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
-    if (omxcam_video_stop ()) log_error ();
+    if (omxcam_video_stop_async ()) log_error ();
   }
 }
 
 int save (char* filename, omxcam_video_settings_t* settings){
+  printf ("capturing %s\n", filename);
+  
   fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0666);
   if (fd == -1){
     fprintf (stderr, "error: open\n");
     return 1;
   }
   
-  if (omxcam_video_start (settings, OMXCAM_CAPTURE_FOREVER)){
-    return log_error ();
+  if (omxcam_video_start_async (settings)) return log_error ();
+  
+  while (!quit){
+    //When read() is called, the current thread is lockd until 'on_data' is
+    //executed or an error occurs
+    if (omxcam_video_read_async ()) return log_error ();
   }
+  
+  if (omxcam_video_stop_async ()) return log_error ();
   
   //Close the file
   if (close (fd)){
@@ -77,8 +70,9 @@ int save (char* filename, omxcam_video_settings_t* settings){
 
 int main (){
   omxcam_video_settings_t settings;
-  omxcam_video_init (&settings);
   
+  //Capture a video of ~2000ms, 640x480 @30fps
+  omxcam_video_init (&settings);
   settings.on_ready = on_ready;
   settings.on_data = on_data;
   settings.camera.width = 640;

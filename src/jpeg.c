@@ -3,14 +3,41 @@
 
 void omxcam__jpeg_init (omxcam_jpeg_settings_t* settings){
   settings->quality = 75;
-  settings->exif_enable = OMXCAM_TRUE;
-  settings->exif_tags = 0;
-  settings->exif_valid_tags = 0;
+  settings->exif.enabled = OMXCAM_TRUE;
+  settings->exif.tags = 0;
+  settings->exif.valid_tags = 0;
   settings->ijg = OMXCAM_FALSE;
-  settings->thumbnail_enable = OMXCAM_TRUE;
-  settings->thumbnail_width = 64;
-  settings->thumbnail_height = 48;
-  settings->raw_bayer_enable = OMXCAM_FALSE;
+  settings->thumbnail.enabled = OMXCAM_TRUE;
+  settings->thumbnail.width = OMXCAM_THUMBNAIL_WIDTH_AUTO;
+  settings->thumbnail.height = OMXCAM_THUMBNAIL_HEIGHT_AUTO;
+  settings->thumbnail.preview = OMXCAM_FALSE;
+  settings->raw_bayer = OMXCAM_FALSE;
+}
+
+int omxcam__jpeg_validate (omxcam_jpeg_settings_t* settings){
+  if (!omxcam__jpeg_is_valid_quality (settings->quality)){
+    omxcam__error ("invalid 'jpeg.quality' value");
+    return -1;
+  }
+  if (settings->thumbnail.enabled && !settings->thumbnail.preview){
+    if (!omxcam__jpeg_is_valid_thumbnail (settings->thumbnail.width)){
+      omxcam__error ("invalid 'jpeg.thumbnail.width' value");
+      return -1;
+    }
+    if (!omxcam__jpeg_is_valid_thumbnail (settings->thumbnail.height)){
+      omxcam__error ("invalid 'jpeg.thumbnail.height' value");
+      return -1;
+    }
+  }
+  return 0;
+}
+
+int omxcam__jpeg_is_valid_quality (uint32_t quality){
+  return quality >= 1 && quality <= 100;
+}
+
+int omxcam__jpeg_is_valid_thumbnail (uint32_t dimension){
+  return dimension <= 1024;
 }
 
 int omxcam__jpeg_add_tag (char* key, char* value){
@@ -67,7 +94,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   //Disable EXIF tags
   OMX_CONFIG_BOOLEANTYPE exif_st;
   omxcam__omx_struct_init (exif_st);
-  exif_st.bEnabled = settings->exif_enable ? OMXCAM_FALSE : OMXCAM_TRUE;
+  exif_st.bEnabled = !settings->exif.enabled;
   if ((error = OMX_SetParameter (omxcam__ctx.image_encode.handle,
       OMX_IndexParamBrcmDisableEXIF, &exif_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamBrcmDisableEXIF: %s",
@@ -76,7 +103,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   }
   
   //Bayer data
-  if (settings->raw_bayer_enable){
+  if (settings->raw_bayer){
     //The filename is not relevant
     char dummy[] = "dummy";
     struct {
@@ -107,7 +134,7 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
     return -1;
   }
   
-  if (!settings->exif_enable) return 0;
+  if (!settings->exif.enabled) return 0;
   
   //EXIF tags
   //See firmware/documentation/ilcomponents/image_decode.html for valid keys
@@ -125,9 +152,9 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   if (omxcam__jpeg_add_tag ("IFD0.DateTime", timestamp)) return -1;
   
   uint32_t i;
-  for (i=0; i<settings->exif_valid_tags; i++){
-    if (omxcam__jpeg_add_tag (settings->exif_tags[i].key,
-        settings->exif_tags[i].value)){
+  for (i=0; i<settings->exif.valid_tags; i++){
+    if (omxcam__jpeg_add_tag (settings->exif.tags[i].key,
+        settings->exif.tags[i].value)){
       return -1;
     }
   }
@@ -135,10 +162,10 @@ int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings){
   //Thumbnail
   OMX_PARAM_BRCMTHUMBNAILTYPE thumbnail_st;
   omxcam__omx_struct_init (thumbnail_st);
-  thumbnail_st.bEnable = settings->thumbnail_enable;
-  thumbnail_st.bUsePreview = OMX_FALSE;
-  thumbnail_st.nWidth = settings->thumbnail_width;
-  thumbnail_st.nHeight = settings->thumbnail_height;
+  thumbnail_st.bEnable = settings->thumbnail.enabled;
+  thumbnail_st.bUsePreview = settings->thumbnail.preview;
+  thumbnail_st.nWidth = settings->thumbnail.width;
+  thumbnail_st.nHeight = settings->thumbnail.height;
   if ((error = OMX_SetParameter (omxcam__ctx.image_encode.handle,
       OMX_IndexParamBrcmThumbnail, &thumbnail_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamBrcmThumbnail: %s",

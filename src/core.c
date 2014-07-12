@@ -2,12 +2,12 @@
 #include "internal.h"
 
 OMX_ERRORTYPE event_handler (
-    OMX_IN OMX_HANDLETYPE comp,
-    OMX_IN OMX_PTR app_data,
-    OMX_IN OMX_EVENTTYPE event,
-    OMX_IN OMX_U32 data1,
-    OMX_IN OMX_U32 data2,
-    OMX_IN OMX_PTR event_data){
+    OMX_HANDLETYPE comp,
+    OMX_PTR app_data,
+    OMX_EVENTTYPE event,
+    OMX_U32 data1,
+    OMX_U32 data2,
+    OMX_PTR event_data){
   omxcam__component_t* component = (omxcam__component_t*)app_data;
   omxcam__event evt = -1;
   OMX_ERRORTYPE error = OMX_ErrorNone;
@@ -83,9 +83,9 @@ OMX_ERRORTYPE event_handler (
 }
 
 OMX_ERRORTYPE fill_buffer_done (
-    OMX_IN OMX_HANDLETYPE comp,
-    OMX_IN OMX_PTR app_data,
-    OMX_IN OMX_BUFFERHEADERTYPE* buffer){
+    OMX_HANDLETYPE comp,
+    OMX_PTR app_data,
+    OMX_BUFFERHEADERTYPE* buffer){
   omxcam__component_t* component = (omxcam__component_t*)app_data;
   
   omxcam__trace ("event: FillBufferDone");
@@ -255,6 +255,13 @@ int omxcam__exit (int code){
   omxcam__ctx.state.joined = 0;
   omxcam__ctx.state.stopping = 0;
   omxcam__ctx.state.ready = 0;
+  omxcam__ctx.video = 0;
+  return code;
+}
+
+int omxcam__exit_async (int code){
+  omxcam__ctx.async = 0;
+  omxcam__ctx.state.running = 0;
   omxcam__ctx.video = 0;
   return code;
 }

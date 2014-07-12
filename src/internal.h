@@ -102,7 +102,9 @@ typedef struct {
   omxcam__component_t null_sink;
   OMX_BUFFERHEADERTYPE* output_buffer;
   void (*on_stop)();
+  void (*on_data_async)(uint8_t* buffer, uint32_t length);  
   int video;
+  int async;
   struct {
     int running;
     int joined;
@@ -140,16 +142,16 @@ void omxcam__set_last_error (omxcam_errno error);
  * OpenMAX IL event handlers.
  */
 OMX_ERRORTYPE event_handler (
-    OMX_IN OMX_HANDLETYPE comp,
-    OMX_IN OMX_PTR app_data,
-    OMX_IN OMX_EVENTTYPE event,
-    OMX_IN OMX_U32 data1,
-    OMX_IN OMX_U32 data2,
-    OMX_IN OMX_PTR event_data);
+    OMX_HANDLETYPE comp,
+    OMX_PTR app_data,
+    OMX_EVENTTYPE event,
+    OMX_U32 data1,
+    OMX_U32 data2,
+    OMX_PTR event_data);
 OMX_ERRORTYPE fill_buffer_done (
-    OMX_IN OMX_HANDLETYPE comp,
-    OMX_IN OMX_PTR app_data,
-    OMX_IN OMX_BUFFERHEADERTYPE* buffer);
+    OMX_HANDLETYPE comp,
+    OMX_PTR app_data,
+    OMX_BUFFERHEADERTYPE* buffer);
 
 /*
  * OpenMAX IL miscellaneous dump functions.
@@ -234,12 +236,17 @@ int omxcam__component_port_disable (
  * 
  * For example:
  *
- * int omxcam_start_video(...){
+ * int omxcam_video_start(...){
  *   ...
- *   return omxcam__exit (omxcam_stop_video ());
+ *   return omxcam__exit (omxcam_video_stop ());
  * }
  */
 int omxcam__exit (int code);
+
+/*
+ * Same as 'omxcam__exit()' but used with the asynchronous functions.
+ */
+int omxcam__exit_async (int code);
 
 /*
  * Initializes a component. All its ports are enabled and the OpenMAX IL event
@@ -333,9 +340,13 @@ int omxcam__camera_set_roi (omxcam_roi_t* roi);
 int omxcam__camera_set_frame_stabilisation (omxcam_bool frame_stabilisation);
 
 /*
- * Validates the camera settings.
+ * Validates the settings.
  */
+int omxcam__still_validate (omxcam_still_settings_t* settings);
+int omxcam__video_validate (omxcam_video_settings_t* settings);
 int omxcam__camera_validate (omxcam_camera_settings_t* settings, int video);
+int omxcam__jpeg_validate (omxcam_jpeg_settings_t* settings);
+int omxcam__h264_validate (omxcam_h264_settings_t* settings);
 
 /*
  * Validates each camera setting. Returns 1 if it's valid, 0 otherwise.
@@ -385,6 +396,12 @@ int omxcam__jpeg_add_tag (char* key, char* value);
  * Configures the OpenMAX IL image_encode component with the jpeg settings.
  */
 int omxcam__jpeg_configure_omx (omxcam_jpeg_settings_t* settings);
+
+/*
+ * Validates each jpeg setting. Returns 1 if it's valid, 0 otherwise.
+ */
+int omxcam__jpeg_is_valid_quality (uint32_t quality);
+int omxcam__jpeg_is_valid_thumbnail (uint32_t dimension);
 
 /*
  * Sets the default settings for the h264 encoder.

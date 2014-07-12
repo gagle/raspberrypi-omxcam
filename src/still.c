@@ -47,18 +47,24 @@ void omxcam_still_init (omxcam_still_settings_t* settings){
   settings->on_data = 0;
 }
 
+int omxcam__still_validate (omxcam_still_settings_t* settings){
+  if (omxcam__camera_validate (&settings->camera, 0)) return -1;
+  if (omxcam__jpeg_validate (&settings->jpeg)) return -1;
+  return 0;
+}
+
 int omxcam_still_start (omxcam_still_settings_t* settings){
   omxcam__trace ("starting still capture");
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
-  if (!settings->on_data){
-    omxcam__error ("the 'on_data' field must be defined");
-    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+  if (omxcam__ctx.state.running){
+    omxcam__error ("camera is already running");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_RUNNING);
     return -1;
   }
-  if (settings->camera.width < settings->camera.height){
-    omxcam__error ("'camera.width' must be >= than 'camera.height'");
+  
+  if (omxcam__still_validate (settings)){
     omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
     return -1;
   }

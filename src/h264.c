@@ -6,6 +6,10 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings){
   settings->idr_period = 60;
 }
 
+int omxcam__h264_validate (omxcam_h264_settings_t* settings){
+  return 0;
+}
+
 int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   omxcam__trace ("configuring '%s' settings", omxcam__ctx.video_encode.name);
   

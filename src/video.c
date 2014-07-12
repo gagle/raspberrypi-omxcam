@@ -688,6 +688,12 @@ void omxcam_video_init (omxcam_video_settings_t* settings){
   settings->on_stop = 0;
 }
 
+int omxcam__video_validate (omxcam_video_settings_t* settings){
+  if (omxcam__camera_validate (&settings->camera, 1)) return -1;
+  if (omxcam__h264_validate (&settings->h264)) return -1;
+  return 0;
+}
+
 int omxcam_video_start (
     omxcam_video_settings_t* settings,
     uint32_t ms){
@@ -701,7 +707,7 @@ int omxcam_video_start (
     return -1;
   }
   
-  if (omxcam__camera_validate (&settings->camera, 1)){
+  if (omxcam__video_validate (settings)){
     omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
     return -1;
   }
@@ -718,7 +724,6 @@ int omxcam_video_start (
   bg_error = 0;
   
   if (omxcam__init ()) return omxcam__exit (-1);
-  
   if (omxcam__omx_init (settings)) return omxcam__exit (-1);
   
   //Start the background thread
@@ -797,6 +802,12 @@ int omxcam_video_stop (){
   if (!omxcam__ctx.state.running){
     omxcam__error ("camera is not running");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
+    return -1;
+  }
+  
+  if (omxcam__ctx.async){
+    omxcam__error ("video has been started in asynchronous mode");
+    omxcam__set_last_error (OMXCAM_ERROR_ASYNC);
     return -1;
   }
   
@@ -1137,8 +1148,8 @@ int omxcam_video_update_metering (omxcam_metering metering){
 
 int omxcam_video_update_white_balance (
     omxcam_white_balance_t* white_balance){
-  omxcam__trace ("updating 'camera.white_balance': %s (red_gain: %d, blue_gain: "
-      "%d)", omxcam__camera_str_white_balance (white_balance->mode),
+  omxcam__trace ("updating 'camera.white_balance': %s (red_gain: %d, "
+      "blue_gain: %d)", omxcam__camera_str_white_balance (white_balance->mode),
       white_balance->red_gain, white_balance->blue_gain);
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
@@ -1214,6 +1225,107 @@ int omxcam_video_update_frame_stabilisation (
   if (omxcam__video_check_update ()) return -1;
   
   if (omxcam__camera_set_frame_stabilisation (frame_stabilisation)) return -1;
+  
+  return 0;
+}
+
+int omxcam_video_start_async (omxcam_video_settings_t* settings){
+  omxcam__trace ("starting video capture (async)");
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
+  
+  if (omxcam__ctx.state.running){
+    omxcam__error ("camera is already running");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_RUNNING);
+    return -1;
+  }
+  
+  if (omxcam__video_validate (settings)){
+    omxcam__set_last_error (OMXCAM_ERROR_BAD_PARAMETER);
+    return -1;
+  }
+  
+  omxcam__ctx.async = 1;
+  omxcam__ctx.state.running = 1;
+  omxcam__ctx.video = 1;
+  
+  omxcam__ctx.on_stop = settings->on_stop;
+  omxcam__ctx.on_data_async = settings->on_data;
+  
+  if (omxcam__init ()) return omxcam__exit_async (-1);
+  if (omxcam__omx_init (settings)) return omxcam__exit_async (-1);
+  
+  if (settings->on_ready) settings->on_ready ();
+  
+  return 0;
+}
+
+int omxcam_video_stop_async (){
+  omxcam__trace ("stopping video capture (async)");
+  
+  omxcam__set_last_error (OMXCAM_ERROR_NONE);
+  
+  if (!omxcam__ctx.state.running){
+    omxcam__error ("camera is not running");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
+    return omxcam__exit_async (-1);
+  }
+  
+  if (!omxcam__ctx.async){
+    omxcam__error ("video hasn't been started in asynchronous mode");
+    omxcam__set_last_error (OMXCAM_ERROR_NO_ASYNC);
+    return omxcam__exit_async (-1);
+  }
+  
+  if (omxcam__ctx.state.stopping){
+    omxcam__error ("camera is already being stopped");
+    omxcam__set_last_error (OMXCAM_ERROR_CAMERA_STOPPING);
+    return omxcam__exit_async (-1);
+  }
+  
+  omxcam__ctx.state.stopping = 1;
+  if (omxcam__ctx.on_stop) omxcam__ctx.on_stop ();
+  
+  if (omxcam__omx_deinit ()) return omxcam__exit_async (-1);
+  if (omxcam__deinit ()) return omxcam__exit_async (-1);
+  
+  return omxcam__exit_async (0);
+}
+
+void omxcam__handle_error_async (){
+  omxcam__trace ("error while capturing (async)");
+  
+  //Ignore the error
+  omxcam_video_stop_async ();
+  
+  //Save the error after the video deinitialization in order to overwrite
+  //a possible error during this task
+  omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
+}
+
+int omxcam_video_read_async (){
+  OMX_ERRORTYPE error;
+
+  if ((error = OMX_FillThisBuffer (thread_arg.fill_component->handle,
+      omxcam__ctx.output_buffer))){
+    omxcam__error ("OMX_FillThisBuffer: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    omxcam__handle_error_async ();
+    return -1;
+  }
+  
+  //Wait until it's filled
+  if (omxcam__event_wait (thread_arg.fill_component,
+      OMXCAM_EVENT_FILL_BUFFER_DONE, 0, 0)){
+    omxcam__handle_error_async ();
+    return -1;
+  }
+  
+  if (thread_arg.on_data){
+    //Emit the buffer
+    thread_arg.on_data (omxcam__ctx.output_buffer->pBuffer,
+        omxcam__ctx.output_buffer->nFilledLen);
+  }
   
   return 0;
 }

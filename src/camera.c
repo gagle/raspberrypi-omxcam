@@ -117,7 +117,7 @@ void omxcam__camera_init (
   settings->contrast = 0;
   settings->brightness = 50;
   settings->saturation = 0;
-  settings->shutter_speed = 0;
+  settings->shutter_speed = OMXCAM_SHUTTER_SPEED_AUTO;
   settings->iso = OMXCAM_ISO_AUTO;
   settings->exposure = OMXCAM_EXPOSURE_AUTO;
   settings->exposure_compensation = 0;

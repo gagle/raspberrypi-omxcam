@@ -57,7 +57,9 @@ extern "C" {
   X (28, ERROR_SLEEP, "cannot sleep the thread")                               \
   X (29, ERROR_WAKE, "cannot wake the thread")                                 \
   X (30, ERROR_LOCK, "cannot lock the thread")                                 \
-  X (31, ERROR_UNLOCK, "cannot unlock the thread")
+  X (31, ERROR_UNLOCK, "cannot unlock the thread")                             \
+  X (32, ERROR_ASYNC, "capture started in asynchronous mode")                  \
+  X (33, ERROR_NO_ASYNC, "capture started not in asynchronous mode")
 
 #define OMXCAM_ISO_MAP_LENGTH 10
 #define OMXCAM_ISO_MAP(X)                                                      \
@@ -153,6 +155,9 @@ extern "C" {
   X (IMAGE_FILTER_COLOUR_BALANCE, OMX_ImageFilterColourBalance)                \
   X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)
 
+#define OMXCAM_SHUTTER_SPEED_AUTO 0
+#define OMXCAM_THUMBNAIL_WIDTH_AUTO 0
+#define OMXCAM_THUMBNAIL_HEIGHT_AUTO 0
 #define OMXCAM_SHUTTER_SPEED_AUTO 0
 
 typedef enum {
@@ -269,15 +274,24 @@ typedef struct {
 } omxcam_exif_tag_t;
 
 typedef struct {
+  omxcam_bool enabled;
+  omxcam_exif_tag_t* tags;
+  uint32_t valid_tags;
+} omxcam_exif_t;
+
+typedef struct {
+  omxcam_bool enabled;
+  uint32_t width;
+  uint32_t height;
+  omxcam_bool preview;
+} omxcam_thumbnail_t;
+
+typedef struct {
   uint32_t quality;
-  omxcam_bool exif_enable;
-  omxcam_exif_tag_t* exif_tags;
-  uint32_t exif_valid_tags;
+  omxcam_exif_t exif;
   omxcam_bool ijg;
-  omxcam_bool thumbnail_enable;
-  uint32_t thumbnail_width;
-  uint32_t thumbnail_height;
-  omxcam_bool raw_bayer_enable;
+  omxcam_thumbnail_t thumbnail;
+  omxcam_bool raw_bayer;
 } omxcam_jpeg_settings_t;
 
 typedef struct {
@@ -393,7 +407,7 @@ OMXCAM_EXTERN int omxcam_still_start (omxcam_still_settings_t* settings);
 /*
  * Stops the image capture and unblocks the current thread. It is safe to use
  * from anywhere in your code. You can call it from inside the 'on_data'
- * or from another thread.
+ * callback or from another thread.
  */
 OMXCAM_EXTERN int omxcam_still_stop ();
 
@@ -416,7 +430,7 @@ OMXCAM_EXTERN int omxcam_video_start (
 /*
  * Stops the video capture and unblocks the current thread. It is safe to use
  * from anywhere in your code. You can call it from inside the 'on_data'
- * or from another thread.
+ * callback or from another thread.
  */
 OMXCAM_EXTERN int omxcam_video_stop ();
 
@@ -451,6 +465,44 @@ OMXCAM_EXTERN int omxcam_video_update_image_filter (
 OMXCAM_EXTERN int omxcam_video_update_roi (omxcam_roi_t* roi);
 OMXCAM_EXTERN int omxcam_video_update_frame_stabilisation (
     omxcam_bool frame_stabilisation);
+
+/*
+ * Starts the video capture in an asynchronous mode. After this call the video
+ * data is ready to be read.
+ */
+OMXCAM_EXTERN int omxcam_video_start_async (omxcam_video_settings_t* settings);
+
+/*
+ * Stops the video capture in an asynchronous mode.
+ */
+OMXCAM_EXTERN int omxcam_video_stop_async ();
+
+/*
+ * Requests a buffer with video data. When the buffer is ready, the 'on_data'
+ * callback is called and the function returns. When 'omxcam_video_stop_async()'
+ * is called and after a read is attempted, the 'buffer' argument is a null
+ * pointer and the 'length' is 0. If an error occurs, the video is stopped
+ * automatically.
+ *
+ * These asynchronous functions don't have any multithread synchronization
+ * mechanism, just the required for waiting to the events, they are just a thin
+ * wrapper around OpenMAX IL.
+ * 
+ * The general idea for using these functions is:
+ * 
+ * omxcam_video_start_async ()
+ * ...
+ * //When the client needs to read video data
+ * omxcam_video_read_async ()
+ * ...
+ * //When the client wants to stop the video
+ * omxcam_video_stop_async ()
+ *
+ * The client controls the transfer rate and is the responsible of the thread
+ * synchronization in case it needs it. The way 'omxcam_video_read_async()' is
+ * called is completely an independent/decoupled process.
+ */
+OMXCAM_EXTERN int omxcam_video_read_async ();
 
 #ifdef __cplusplus
 }
