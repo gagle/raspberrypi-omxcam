@@ -5,6 +5,8 @@ Default settings are used. This is not a "real" benchmark since the capture time
 depends on various settings like the shutter speed and scene illuminance. This
 is just a little benchmark to confirm that the library is working as expected.
 
+Note: Remove the flag -DOMXCAM_DEBUG from the makefile.
+
 Results:
 
 In video mode, the closer to 30fps and 1000ms, the better.
