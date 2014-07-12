@@ -50,14 +50,6 @@ int main (){
   //Capture an image with default settings
   omxcam_still_init (&settings);
   settings.on_data = on_data;
-  //settings.camera.shutter_speed = 1000*1000;
-  //settings.camera.exposure = OMXCAM_EXPOSURE_NIGHT;
-  settings.camera.shutter_speed = 50000;
-  settings.camera.iso = 200;
-  settings.jpeg.thumbnail.width = 0;
-  settings.jpeg.thumbnail.height = 0;
-  //ettings.camera.width = 320;
-  //settings.camera.height = 240;
   
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
@@ -79,7 +71,7 @@ int main (){
   settings.jpeg.exif.tags = exif_tags;
   settings.jpeg.exif.valid_tags = 1;
   
-  ///if (save ("still-2592x1944.jpg", &settings)) return 1;
+  if (save ("still-2592x1944.jpg", &settings)) return 1;
   
   printf ("ok\n");
   
