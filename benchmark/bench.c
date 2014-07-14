@@ -12,11 +12,13 @@ Results:
 In video mode, the closer to 30fps and 1000ms, the better.
 In still mode, the faster, the better, being 1fps the minimum desirable.
 
-set up h264: 321 ms
-tear down h264: 59 ms
-video rgb: 28.12 fps (1067 ms)
+set up h264: 325 ms
+tear down h264: 55 ms
+set up h264 (async): 322 ms
+tear down h264 (async): 34 ms
+video rgb: 28.14 fps (1066 ms)
 video yuv: 28.14 fps (1066 ms)
-video yuv async: 28.14 fps (1066 ms)
+video yuv (async): 27.83 fps (1078 ms)
 */
 
 uint32_t start;
@@ -75,6 +77,12 @@ int main (){
   printf ("set up h264: %d ms\n", diff1);
   printf ("tear down h264: %d ms\n", diff2);
   
+  start = now ();
+  if (h264_async (&req)) return log_error ();
+  diff2 = now () - start;
+  printf ("set up h264 (async): %d ms\n", diff1);
+  printf ("tear down h264 (async): %d ms\n", diff2);
+  
   /*start = now ();
   if (jpeg (&req)) return log_error ();
   diff2 = now () - start;
@@ -91,7 +99,7 @@ int main (){
   print_time_video ("video yuv", req.frames);
   
   if (yuv_video_async (&req)) return log_error ();
-  print_time_video ("video yuv async", req.frames);
+  print_time_video ("video yuv (async)", req.frames);
   
   /*if (rgb_still (&req)) return log_error ();
   print_time_still ("still rgb");

@@ -26,7 +26,7 @@ static int omxcam__video_change_state (omxcam__state state, int use_encoder){
   if (omxcam__event_wait (&omxcam__ctx.camera, OMXCAM_EVENT_STATE_SET,
       0, &error)){
     if (error == OMX_ErrorInsufficientResources){
-      //It's most likely that the camera is already running by another IL
+      //It's most likely that the camera is already started by another IL
       //client. Very ugly but needs to be done this way in order to set the last
       //error
       return -2;
@@ -1249,13 +1249,8 @@ int omxcam_video_start_async (omxcam_video_settings_t* settings){
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
   
-  omxcam__ctx.on_stop = settings->on_stop;
-  omxcam__ctx.on_data_async = settings->on_data;
-  
   if (omxcam__init ()) return omxcam__exit_async (-1);
   if (omxcam__omx_init (settings)) return omxcam__exit_async (-1);
-  
-  if (settings->on_ready) settings->on_ready ();
   
   return 0;
 }
@@ -1273,7 +1268,7 @@ int omxcam_video_stop_async (){
   
   if (!omxcam__ctx.async){
     omxcam__error ("video hasn't been started in asynchronous mode");
-    omxcam__set_last_error (OMXCAM_ERROR_NO_ASYNC);
+    omxcam__set_last_error (OMXCAM_ERROR_NOT_ASYNC);
     return omxcam__exit_async (-1);
   }
   
@@ -1284,7 +1279,6 @@ int omxcam_video_stop_async (){
   }
   
   omxcam__ctx.state.stopping = 1;
-  if (omxcam__ctx.on_stop) omxcam__ctx.on_stop ();
   
   if (omxcam__omx_deinit ()) return omxcam__exit_async (-1);
   if (omxcam__deinit ()) return omxcam__exit_async (-1);
@@ -1303,7 +1297,7 @@ void omxcam__handle_error_async (){
   omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
 }
 
-int omxcam_video_read_async (){
+int omxcam_video_read_async (omxcam_buffer_t* buffer){
   //Critical section, this function needs to be as fast as possible
   
   omxcam__trace ("reading buffer (async)");
@@ -1318,7 +1312,7 @@ int omxcam_video_read_async (){
   
   if (!omxcam__ctx.async){
     omxcam__error ("video hasn't been started in asynchronous mode");
-    omxcam__set_last_error (OMXCAM_ERROR_NO_ASYNC);
+    omxcam__set_last_error (OMXCAM_ERROR_NOT_ASYNC);
     return omxcam__exit_async (-1);
   }
   
@@ -1339,11 +1333,8 @@ int omxcam_video_read_async (){
     return omxcam__exit_async (-1);
   }
   
-  if (thread_arg.on_data){
-    //Emit the buffer
-    thread_arg.on_data (omxcam__ctx.output_buffer->pBuffer,
-        omxcam__ctx.output_buffer->nFilledLen);
-  }
+  buffer->data = omxcam__ctx.output_buffer->pBuffer;
+  buffer->length = omxcam__ctx.output_buffer->nFilledLen;
   
   return 0;
 }

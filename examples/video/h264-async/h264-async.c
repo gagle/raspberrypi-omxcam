@@ -20,7 +20,7 @@ void signal_handler (int signal){
   quit = 1;
 }
 
-void on_ready (){
+void start_timer (){
   signal (SIGALRM, signal_handler);
   
   struct itimerval timer;
@@ -30,14 +30,6 @@ void on_ready (){
   timer.it_interval.tv_sec = timer.it_interval.tv_usec = 0;
   
   setitimer (ITIMER_REAL, &timer, 0);
-}
-
-void on_data (uint8_t* buffer, uint32_t length){
-  //Append the buffer to the file
-  if (pwrite (fd, buffer, length, 0) == -1){
-    fprintf (stderr, "error: pwrite\n");
-    if (omxcam_video_stop_async ()) log_error ();
-  }
 }
 
 int save (char* filename, omxcam_video_settings_t* settings){
@@ -50,11 +42,20 @@ int save (char* filename, omxcam_video_settings_t* settings){
   }
   
   if (omxcam_video_start_async (settings)) return log_error ();
+  omxcam_buffer_t buffer;
+  
+  start_timer ();
   
   while (!quit){
-    //When read() is called, the current thread is lockd until 'on_data' is
+    //When read() is called, the current thread is locked until 'on_data' is
     //executed or an error occurs
-    if (omxcam_video_read_async ()) return log_error ();
+    if (omxcam_video_read_async (&buffer)) return log_error ();
+    
+    //Append the buffer to the file
+    if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
+      fprintf (stderr, "error: pwrite\n");
+      if (omxcam_video_stop_async ()) log_error ();
+    }
   }
   
   if (omxcam_video_stop_async ()) return log_error ();
@@ -73,8 +74,6 @@ int main (){
   
   //Capture a video of ~2000ms, 640x480 @30fps
   omxcam_video_init (&settings);
-  settings.on_ready = on_ready;
-  settings.on_data = on_data;
   settings.camera.width = 640;
   settings.camera.height = 480;
   

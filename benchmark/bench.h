@@ -17,6 +17,7 @@ typedef struct {
 } bench_t;
 
 int h264 (bench_t* req);
+int h264_async (bench_t* req);
 int jpeg (bench_t* req);
 
 int rgb_video (bench_t* req);

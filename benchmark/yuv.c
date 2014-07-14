@@ -68,9 +68,6 @@ int yuv_video_async (bench_t* req){
   omxcam_video_settings_t settings;
   
   omxcam_video_init (&settings);
-  settings.on_ready = req->on_ready;
-  settings.on_data = on_data_video_async;
-  settings.on_stop = req->on_stop;
   settings.format = OMXCAM_FORMAT_YUV420;
   settings.camera.width = req->width;
   settings.camera.height = req->height;
@@ -81,10 +78,16 @@ int yuv_video_async (bench_t* req){
   total_frames = req->frames;
   
   if (omxcam_video_start_async (&settings)) return -1;
+  omxcam_buffer_t buffer;
+  
+  req->on_ready ();
   
   while (!quit){
-    if (omxcam_video_read_async ()) return -1;
+    if (omxcam_video_read_async (&buffer)) return -1;
+    on_data_video_async (buffer.data, buffer.length);
   }
+  
+  req->on_stop ();
   
   return bg_error;
 }

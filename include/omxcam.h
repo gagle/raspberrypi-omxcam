@@ -59,7 +59,7 @@ extern "C" {
   X (30, ERROR_LOCK, "cannot lock the thread")                                 \
   X (31, ERROR_UNLOCK, "cannot unlock the thread")                             \
   X (32, ERROR_ASYNC, "capture started in asynchronous mode")                  \
-  X (33, ERROR_NO_ASYNC, "capture started not in asynchronous mode")
+  X (33, ERROR_NOT_ASYNC, "capture started not in asynchronous mode")
 
 #define OMXCAM_ISO_MAP_LENGTH 10
 #define OMXCAM_ISO_MAP(X)                                                      \
@@ -214,6 +214,11 @@ typedef enum {
 } omxcam_errno;
 
 #undef OMXCAM_ENUM_FN
+
+typedef struct {
+  uint8_t* data;
+  uint32_t length;
+} omxcam_buffer_t;
 
 typedef struct {
   omxcam_bool enabled;
@@ -500,7 +505,7 @@ OMXCAM_EXTERN int omxcam_video_stop_async ();
  * synchronization in case it needs it. The way 'omxcam_video_read_async()' is
  * called is completely an independent/decoupled process.
  */
-OMXCAM_EXTERN int omxcam_video_read_async ();
+OMXCAM_EXTERN int omxcam_video_read_async (omxcam_buffer_t* buffer);
 
 #ifdef __cplusplus
 }

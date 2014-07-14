@@ -11,3 +11,18 @@ int h264 (bench_t* req){
   
   return omxcam_video_start (&settings, req->ms);
 }
+
+int h264_async (bench_t* req){
+  omxcam_video_settings_t settings;
+  
+  omxcam_video_init (&settings);
+  settings.camera.width = req->width;
+  settings.camera.height = req->height;
+  
+  if (omxcam_video_start_async (&settings)) return -1;
+  
+  req->on_ready ();
+  req->on_stop ();
+  
+  return omxcam_video_stop_async ();
+}

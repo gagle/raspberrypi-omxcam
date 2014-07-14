@@ -102,7 +102,6 @@ typedef struct {
   omxcam__component_t null_sink;
   OMX_BUFFERHEADERTYPE* output_buffer;
   void (*on_stop)();
-  void (*on_data_async)(uint8_t* buffer, uint32_t length);  
   int video;
   int async;
   struct {
