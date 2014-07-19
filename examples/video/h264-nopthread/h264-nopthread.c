@@ -41,7 +41,7 @@ int save (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  if (omxcam_video_start_async (settings)) return log_error ();
+  if (omxcam_video_start_npt (settings)) return log_error ();
   omxcam_buffer_t buffer;
   
   start_timer ();
@@ -49,16 +49,16 @@ int save (char* filename, omxcam_video_settings_t* settings){
   while (!quit){
     //When read() is called, the current thread is locked until 'on_data' is
     //executed or an error occurs
-    if (omxcam_video_read_async (&buffer)) return log_error ();
+    if (omxcam_video_read_npt (&buffer)) return log_error ();
     
     //Append the buffer to the file
     if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
       fprintf (stderr, "error: pwrite\n");
-      if (omxcam_video_stop_async ()) log_error ();
+      if (omxcam_video_stop_npt ()) log_error ();
     }
   }
   
-  if (omxcam_video_stop_async ()) return log_error ();
+  if (omxcam_video_stop_npt ()) return log_error ();
   
   //Close the file
   if (close (fd)){

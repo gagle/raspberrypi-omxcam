@@ -103,7 +103,7 @@ typedef struct {
   OMX_BUFFERHEADERTYPE* output_buffer;
   void (*on_stop)();
   int video;
-  int async;
+  int no_pthread;
   struct {
     int running;
     int joined;
@@ -243,9 +243,9 @@ int omxcam__component_port_disable (
 int omxcam__exit (int code);
 
 /*
- * Same as 'omxcam__exit()' but used with the asynchronous functions.
+ * Same as 'omxcam__exit()' but used with the 'no pthread' functions.
  */
-int omxcam__exit_async (int code);
+int omxcam__exit_npt (int code);
 
 /*
  * Initializes a component. All its ports are enabled and the OpenMAX IL event

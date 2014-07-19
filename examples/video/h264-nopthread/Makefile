@@ -1,4 +1,4 @@
-APP = h264-async
+APP = h264-nopthread
 OMXCAM_HOME = ../../..
 CLEAN = video.h264
 

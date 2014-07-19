@@ -58,8 +58,8 @@ extern "C" {
   X (29, ERROR_WAKE, "cannot wake the thread")                                 \
   X (30, ERROR_LOCK, "cannot lock the thread")                                 \
   X (31, ERROR_UNLOCK, "cannot unlock the thread")                             \
-  X (32, ERROR_ASYNC, "capture started in asynchronous mode")                  \
-  X (33, ERROR_NOT_ASYNC, "capture started not in asynchronous mode")
+  X (32, ERROR_NO_PTHREAD, "capture started in 'no pthread' mode")             \
+  X (33, ERROR_NOT_NO_PTHREAD, "capture started not in 'no pthread' mode")
 
 #define OMXCAM_ISO_MAP_LENGTH 10
 #define OMXCAM_ISO_MAP(X)                                                      \
@@ -472,40 +472,35 @@ OMXCAM_EXTERN int omxcam_video_update_frame_stabilisation (
     omxcam_bool frame_stabilisation);
 
 /*
- * Starts the video capture in an asynchronous mode. After this call the video
+ * Starts the video capture in "no pthread" mode. After this call the video
  * data is ready to be read.
  */
-OMXCAM_EXTERN int omxcam_video_start_async (omxcam_video_settings_t* settings);
+OMXCAM_EXTERN int omxcam_video_start_npt (omxcam_video_settings_t* settings);
 
 /*
- * Stops the video capture in an asynchronous mode.
+ * Stops the video capture in "no pthread" mode.
  */
-OMXCAM_EXTERN int omxcam_video_stop_async ();
+OMXCAM_EXTERN int omxcam_video_stop_npt ();
 
 /*
- * Requests a buffer with video data. When the buffer is ready, the 'on_data'
- * callback is called and the function returns. If an error occurs, the video is
- * stopped automatically.
+ * Fills a buffer with video data. This is a blocking function, that is, the
+ * current thread is blocked until the buffer is filled. If an error occurs, the
+ * video is stopped automatically.
  *
- * These asynchronous functions don't have any multithread synchronization
- * mechanism, just the required for waiting to the events, they are just a thin
- * wrapper around OpenMAX IL.
- * 
- * The general idea for using these functions is:
- * 
- * omxcam_video_start_async ()
- * ...
- * //When the client needs to read video data
- * omxcam_video_read_async ()
- * ...
- * //When the client wants to stop the video
- * omxcam_video_stop_async ()
+ * The "no pthread" functions don't have any multithread synchronization
+ * mechanism, just the minimum required synchronization for communicating with
+ * OpenMAX IL.
  *
- * The client controls the transfer rate and is the responsible of the thread
- * synchronization in case it needs it. The way 'omxcam_video_read_async()' is
- * called is completely an independent/decoupled process.
+ * They are useful when the client needs to request the buffers instead of
+ * providing a callback to the camera to be called in a future, "give me data
+ * and I'll wait for it" instead of "I give you a callback and I'll be doing
+ * other things". The "no pthread" functions are useful when some kind of
+ * inter-thread communication is required, otherwise, with the second approach
+ * some kind of lock-free or blocking queue would be required (consumer-producer
+ * problem). If the camera needs to be controlled by an asynchronous framework,
+ * e.g.: libuv, these functions are very useful.
  */
-OMXCAM_EXTERN int omxcam_video_read_async (omxcam_buffer_t* buffer);
+OMXCAM_EXTERN int omxcam_video_read_npt (omxcam_buffer_t* buffer);
 
 #ifdef __cplusplus
 }

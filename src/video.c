@@ -805,9 +805,9 @@ int omxcam_video_stop (){
     return -1;
   }
   
-  if (omxcam__ctx.async){
-    omxcam__error ("video has been started in asynchronous mode");
-    omxcam__set_last_error (OMXCAM_ERROR_ASYNC);
+  if (omxcam__ctx.no_pthread){
+    omxcam__error ("video has been started in 'no pthread' mode");
+    omxcam__set_last_error (OMXCAM_ERROR_NO_PTHREAD);
     return -1;
   }
   
@@ -1229,8 +1229,8 @@ int omxcam_video_update_frame_stabilisation (
   return 0;
 }
 
-int omxcam_video_start_async (omxcam_video_settings_t* settings){
-  omxcam__trace ("starting video capture (async)");
+int omxcam_video_start_npt (omxcam_video_settings_t* settings){
+  omxcam__trace ("starting video capture (no pthread)");
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
@@ -1245,75 +1245,75 @@ int omxcam_video_start_async (omxcam_video_settings_t* settings){
     return -1;
   }
   
-  omxcam__ctx.async = 1;
+  omxcam__ctx.no_pthread = 1;
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
   
-  if (omxcam__init ()) return omxcam__exit_async (-1);
-  if (omxcam__omx_init (settings)) return omxcam__exit_async (-1);
+  if (omxcam__init ()) return omxcam__exit_npt (-1);
+  if (omxcam__omx_init (settings)) return omxcam__exit_npt (-1);
   
   return 0;
 }
 
-int omxcam_video_stop_async (){
-  omxcam__trace ("stopping video capture (async)");
+int omxcam_video_stop_npt (){
+  omxcam__trace ("stopping video capture (no pthread)");
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (!omxcam__ctx.state.running){
     omxcam__error ("camera is not running");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
-    return omxcam__exit_async (-1);
+    return omxcam__exit_npt (-1);
   }
   
-  if (!omxcam__ctx.async){
-    omxcam__error ("video hasn't been started in asynchronous mode");
-    omxcam__set_last_error (OMXCAM_ERROR_NOT_ASYNC);
-    return omxcam__exit_async (-1);
+  if (!omxcam__ctx.no_pthread){
+    omxcam__error ("video hasn't been started in 'no pthread' mode");
+    omxcam__set_last_error (OMXCAM_ERROR_NOT_NO_PTHREAD);
+    return omxcam__exit_npt (-1);
   }
   
   if (omxcam__ctx.state.stopping){
     omxcam__error ("camera is already being stopped");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_STOPPING);
-    return omxcam__exit_async (-1);
+    return omxcam__exit_npt (-1);
   }
   
   omxcam__ctx.state.stopping = 1;
   
-  if (omxcam__omx_deinit ()) return omxcam__exit_async (-1);
-  if (omxcam__deinit ()) return omxcam__exit_async (-1);
+  if (omxcam__omx_deinit ()) return omxcam__exit_npt (-1);
+  if (omxcam__deinit ()) return omxcam__exit_npt (-1);
   
-  return omxcam__exit_async (0);
+  return omxcam__exit_npt (0);
 }
 
-void omxcam__handle_error_async (){
-  omxcam__trace ("error while capturing (async)");
+static void omxcam__handle_error_npt (){
+  omxcam__trace ("error while capturing (no pthread)");
   
   //Ignore the error
-  omxcam_video_stop_async ();
+  omxcam_video_stop_npt ();
   
   //Save the error after the video deinitialization in order to overwrite
   //a possible error during this task
   omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
 }
 
-int omxcam_video_read_async (omxcam_buffer_t* buffer){
+int omxcam_video_read_npt (omxcam_buffer_t* buffer){
   //Critical section, this function needs to be as fast as possible
   
-  omxcam__trace ("reading buffer (async)");
+  omxcam__trace ("reading buffer (no pthread)");
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);
   
   if (!omxcam__ctx.state.running){
     omxcam__error ("camera is not running");
     omxcam__set_last_error (OMXCAM_ERROR_CAMERA_NOT_RUNNING);
-    return omxcam__exit_async (-1);
+    return omxcam__exit_npt (-1);
   }
   
-  if (!omxcam__ctx.async){
-    omxcam__error ("video hasn't been started in asynchronous mode");
-    omxcam__set_last_error (OMXCAM_ERROR_NOT_ASYNC);
-    return omxcam__exit_async (-1);
+  if (!omxcam__ctx.no_pthread){
+    omxcam__error ("video hasn't been started in 'no pthread' mode");
+    omxcam__set_last_error (OMXCAM_ERROR_NOT_NO_PTHREAD);
+    return omxcam__exit_npt (-1);
   }
   
   OMX_ERRORTYPE error;
@@ -1322,15 +1322,15 @@ int omxcam_video_read_async (omxcam_buffer_t* buffer){
       omxcam__ctx.output_buffer))){
     omxcam__error ("OMX_FillThisBuffer: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
-    omxcam__handle_error_async ();
-    return omxcam__exit_async (-1);
+    omxcam__handle_error_npt ();
+    return omxcam__exit_npt (-1);
   }
   
   //Wait until it's filled
   if (omxcam__event_wait (thread_arg.fill_component,
       OMXCAM_EVENT_FILL_BUFFER_DONE, 0, 0)){
-    omxcam__handle_error_async ();
-    return omxcam__exit_async (-1);
+    omxcam__handle_error_npt ();
+    return omxcam__exit_npt (-1);
   }
   
   buffer->data = omxcam__ctx.output_buffer->pBuffer;

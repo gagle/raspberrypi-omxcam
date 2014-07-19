@@ -259,8 +259,8 @@ int omxcam__exit (int code){
   return code;
 }
 
-int omxcam__exit_async (int code){
-  omxcam__ctx.async = 0;
+int omxcam__exit_npt (int code){
+  omxcam__ctx.no_pthread = 0;
   omxcam__ctx.state.running = 0;
   omxcam__ctx.state.stopping = 0;
   omxcam__ctx.video = 0;
