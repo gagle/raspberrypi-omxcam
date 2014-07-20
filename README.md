@@ -165,8 +165,8 @@ omxcam_bool              color_denoise           OMXCAM_TRUE
 omxcam_metering          metering                OMXCAM_METERING_AVERAGE
 omxcam_white_balance_t   white_balance
   omxcam_white_balance     mode                  OMXCAM_WHITE_BALANCE_AUTO
-  uint32_t                 red_gain              1000                        0 .. 
-  uint32_t                 blue_gain             1000                        0 ..
+  uint32_t                 red_gain              100                         0 .. 
+  uint32_t                 blue_gain             100                         0 ..
 omxcam_image_filter      image_filter            OMXCAM_IMAGE_FILTER_NONE
 omxcam_roi_t             roi
   uint32_t                 top                   0                           0 .. 100

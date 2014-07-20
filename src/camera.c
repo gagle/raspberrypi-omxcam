@@ -129,8 +129,8 @@ void omxcam__camera_init (
   settings->color_denoise = OMXCAM_TRUE;
   settings->metering = OMXCAM_METERING_AVERAGE;
   settings->white_balance.mode = OMXCAM_WHITE_BALANCE_AUTO;
-  settings->white_balance.red_gain = 1000;
-  settings->white_balance.blue_gain = 1000;
+  settings->white_balance.red_gain = 100;
+  settings->white_balance.blue_gain = 100;
   settings->image_filter = OMXCAM_IMAGE_FILTER_NONE;
   settings->roi.top = 0;
   settings->roi.left = 0;
