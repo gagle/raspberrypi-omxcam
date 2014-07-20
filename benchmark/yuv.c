@@ -20,7 +20,7 @@ static void on_data_video (uint8_t* buffer, uint32_t length){
   }
 }
 
-static void on_data_video_async (uint8_t* buffer, uint32_t length){
+static void on_data_video_npt (uint8_t* buffer, uint32_t length){
   current += length;
   
   if (current == frame_size){
@@ -28,7 +28,7 @@ static void on_data_video_async (uint8_t* buffer, uint32_t length){
     
     if (++current_frames == total_frames){
       quit = 1;
-      bg_error = omxcam_video_stop_async ();
+      bg_error = omxcam_video_stop_npt ();
     }
   }
 }
@@ -61,7 +61,7 @@ int yuv_video (bench_t* req){
   return error ? error : bg_error;
 }
 
-int yuv_video_async (bench_t* req){
+int yuv_video_npt (bench_t* req){
   current = 0;
   current_frames = 0;
   
@@ -77,14 +77,14 @@ int yuv_video_async (bench_t* req){
   frame_size = planes.offset_v + planes.length_v;
   total_frames = req->frames;
   
-  if (omxcam_video_start_async (&settings)) return -1;
+  if (omxcam_video_start_npt (&settings)) return -1;
   omxcam_buffer_t buffer;
   
   req->on_ready ();
   
   while (!quit){
-    if (omxcam_video_read_async (&buffer)) return -1;
-    on_data_video_async (buffer.data, buffer.length);
+    if (omxcam_video_read_npt (&buffer)) return -1;
+    on_data_video_npt (buffer.data, buffer.length);
   }
   
   req->on_stop ();

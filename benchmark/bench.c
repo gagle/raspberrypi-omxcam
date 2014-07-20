@@ -12,13 +12,13 @@ Results:
 In video mode, the closer to 30fps and 1000ms, the better.
 In still mode, the faster, the better, being 1fps the minimum desirable.
 
-set up h264: 325 ms
-tear down h264: 55 ms
-set up h264 (async): 322 ms
-tear down h264 (async): 34 ms
-video rgb: 28.14 fps (1066 ms)
-video yuv: 28.14 fps (1066 ms)
-video yuv (async): 27.83 fps (1078 ms)
+set up h264: 323 ms
+tear down h264: 58 ms
+set up h264 (npt): 319 ms
+tear down h264 (npt): 39 ms
+video rgb: 28.17 fps (1065 ms)
+video yuv: 28.17 fps (1065 ms)
+video yuv (npt): 27.86 fps (1077 ms)
 */
 
 uint32_t start;
@@ -78,10 +78,10 @@ int main (){
   printf ("tear down h264: %d ms\n", diff2);
   
   start = now ();
-  if (h264_async (&req)) return log_error ();
+  if (h264_npt (&req)) return log_error ();
   diff2 = now () - start;
-  printf ("set up h264 (async): %d ms\n", diff1);
-  printf ("tear down h264 (async): %d ms\n", diff2);
+  printf ("set up h264 (npt): %d ms\n", diff1);
+  printf ("tear down h264 (npt): %d ms\n", diff2);
   
   /*start = now ();
   if (jpeg (&req)) return log_error ();
@@ -98,8 +98,8 @@ int main (){
   if (yuv_video (&req)) return log_error ();
   print_time_video ("video yuv", req.frames);
   
-  if (yuv_video_async (&req)) return log_error ();
-  print_time_video ("video yuv (async)", req.frames);
+  if (yuv_video_npt (&req)) return log_error ();
+  print_time_video ("video yuv (npt)", req.frames);
   
   /*if (rgb_still (&req)) return log_error ();
   print_time_still ("still rgb");
