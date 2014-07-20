@@ -8,8 +8,8 @@ void omxcam__jpeg_init (omxcam_jpeg_settings_t* settings){
   settings->exif.valid_tags = 0;
   settings->ijg = OMXCAM_FALSE;
   settings->thumbnail.enabled = OMXCAM_TRUE;
-  settings->thumbnail.width = OMXCAM_THUMBNAIL_WIDTH_AUTO;
-  settings->thumbnail.height = OMXCAM_THUMBNAIL_HEIGHT_AUTO;
+  settings->thumbnail.width = OMXCAM_JPEG_THUMBNAIL_WIDTH_AUTO;
+  settings->thumbnail.height = OMXCAM_JPEG_THUMBNAIL_HEIGHT_AUTO;
   settings->thumbnail.preview = OMXCAM_FALSE;
   settings->raw_bayer = OMXCAM_FALSE;
 }

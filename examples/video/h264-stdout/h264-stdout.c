@@ -5,12 +5,6 @@
 #include <stdio.h>
 
 /*
-Captures h264-encoded video at 320x240 @10fps indefinitely and writes the stream
-to the stdout. Press ctrl-c to quit. The low resolution and framerate are ideal
-to stream the content over the internet, the required KB/s are pretty low. It
-depends on the image being captured but around 20KB/s is a good aproximation.
-Make your tests.
-
 Usage:
 
 $ ./h264-stdout > video.h264
@@ -42,9 +36,6 @@ int main (){
   settings.on_data = on_data;
   settings.camera.width = 640;
   settings.camera.height = 480;
-  //settings.camera.width = 320;
-  //settings.camera.height = 240;
-  //settings.camera.framerate = 10;
   
   signal (SIGINT, signal_handler);
   signal (SIGTERM, signal_handler);

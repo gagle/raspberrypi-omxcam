@@ -200,6 +200,16 @@ settings.camera.shutter_speed = 500;
 settings.camera.color_effects = OMXCAM_TRUE;
 ```
 
+The `omxcam_h264_settings_t` struct has the following fields:
+
+```
+type                     name                    default                     range
+----                     ----                    -------                     -----
+uint32_t                 bitrate                 17000000                    1 .. 25000000
+uint32_t                 idr_period              OMXCAM_H264_IDR_PERIOD_OFF  0 ..
+omxcam_bool              sei                     OMXCAM_FALSE
+```
+
 <a name="image_streaming"></a>
 #### Image streaming ####
 

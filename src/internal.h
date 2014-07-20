@@ -412,4 +412,9 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings);
  */
 int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings);
 
+/*
+ * Validates each h264 setting. Returns 1 if it's valid, 0 otherwise.
+ */
+int omxcam__h264_is_valid_bitrate (uint32_t bitrate);
+
 #endif

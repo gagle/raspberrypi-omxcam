@@ -158,8 +158,9 @@ extern "C" {
   X (IMAGE_FILTER_DEINTERLACE_FAST, OMX_ImageFilterDeInterlaceFast)
 
 #define OMXCAM_SHUTTER_SPEED_AUTO 0
-#define OMXCAM_THUMBNAIL_WIDTH_AUTO 0
-#define OMXCAM_THUMBNAIL_HEIGHT_AUTO 0
+#define OMXCAM_JPEG_THUMBNAIL_WIDTH_AUTO 0
+#define OMXCAM_JPEG_THUMBNAIL_HEIGHT_AUTO 0
+#define OMXCAM_H264_IDR_PERIOD_OFF 0
 
 typedef enum {
   OMXCAM_FALSE,
@@ -303,6 +304,7 @@ typedef struct {
 typedef struct {
   uint32_t bitrate;
   uint32_t idr_period;
+  omxcam_bool sei;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \

@@ -45,7 +45,7 @@ int save_time (char* filename, omxcam_video_settings_t* settings){
     return 1;
   }
   
-  //Capture ~2000ms (capture time, not file duration)
+  //Capture ~2000ms
   if (omxcam_video_start (settings, 2000)) return log_error ();
   
   //Close the file
@@ -84,7 +84,7 @@ int main (){
   //1920x1080 @30fps by default
   omxcam_video_settings_t settings;
   
-  //Capture a video of ~2000ms (capture time, not file duration), 640x480 @90fps
+  //Capture a video of ~2000ms, 640x480 @90fps
   //Camera modes: http://www.raspberrypi.org/new-camera-mode-released
   omxcam_video_init (&settings);
   settings.on_data = on_data_time;
