@@ -8,6 +8,8 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings){
   //beginning of the stream
   settings->idr_period = OMXCAM_H264_IDR_PERIOD_OFF;
   settings->sei = OMXCAM_FALSE;
+  settings->eede.enabled = OMXCAM_FALSE;
+  settings->eede.loss_rate = 0;
 }
 
 int omxcam__h264_validate (omxcam_h264_settings_t* settings){
@@ -15,11 +17,19 @@ int omxcam__h264_validate (omxcam_h264_settings_t* settings){
     omxcam__error ("invalid 'h264.bitrate' value");
     return -1;
   }
+  if (!omxcam__h264_is_valid_eede_loss_rate (settings->eede.loss_rate)){
+    omxcam__error ("invalid 'h264.eede.loss_rate' value");
+    return -1;
+  }
   return 0;
 }
 
 int omxcam__h264_is_valid_bitrate (uint32_t bitrate){
   return bitrate >= 1 && bitrate <= 25000000;
+}
+
+int omxcam__h264_is_valid_eede_loss_rate (uint32_t loss_rate){
+  return loss_rate <= 100;
 }
 
 int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
@@ -79,6 +89,31 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
       OMX_IndexParamBrcmVideoAVCSEIEnable, &sei_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamBrcmVideoAVCSEIEnable: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  
+  //EEDE
+  OMX_VIDEO_EEDE_ENABLE eede_st;
+  omxcam__omx_struct_init (eede_st);
+  eede_st.nPortIndex = 201;
+  eede_st.enable = !!settings->eede.enabled;
+  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
+      OMX_IndexParamBrcmEEDEEnable, &eede_st))){
+    omxcam__error ("OMX_SetParameter - "
+        "OMX_IndexParamBrcmEEDEEnable: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  
+  OMX_VIDEO_EEDE_LOSSRATE eede_loss_rate_st;
+  omxcam__omx_struct_init (eede_loss_rate_st);
+  eede_loss_rate_st.nPortIndex = 201;
+  eede_loss_rate_st.loss_rate = settings->eede.loss_rate;
+  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
+      OMX_IndexParamBrcmEEDELossRate, &eede_loss_rate_st))){
+    omxcam__error ("OMX_SetParameter - "
+        "OMX_IndexParamBrcmEEDELossRate: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
     return -1;
   }

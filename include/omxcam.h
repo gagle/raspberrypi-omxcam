@@ -302,9 +302,15 @@ typedef struct {
 } omxcam_jpeg_settings_t;
 
 typedef struct {
+  omxcam_bool enabled;
+  uint32_t loss_rate;
+} omxcam_eede_t;
+
+typedef struct {
   uint32_t bitrate;
   uint32_t idr_period;
   omxcam_bool sei;
+  omxcam_eede_t eede;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \

@@ -208,6 +208,9 @@ type                     name                    default                     ran
 uint32_t                 bitrate                 17000000                    1 .. 25000000
 uint32_t                 idr_period              OMXCAM_H264_IDR_PERIOD_OFF  0 ..
 omxcam_bool              sei                     OMXCAM_FALSE
+omxcam_eede_t            eede
+  omxcam_bool              enabled               OMXCAM_FALSE
+  uint32_t                 loss_rate             0                           0 .. 100
 ```
 
 <a name="image_streaming"></a>
