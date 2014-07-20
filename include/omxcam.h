@@ -153,7 +153,9 @@ extern "C" {
   X (IMAGE_FILTER_COLOUR_POINT, OMX_ImageFilterColourPoint)                    \
   X (IMAGE_FILTER_POSTERISE, OMX_ImageFilterPosterise)                         \
   X (IMAGE_FILTER_COLOUR_BALANCE, OMX_ImageFilterColourBalance)                \
-  X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)
+  X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)                             \
+  X (IMAGE_FILTER_ANAGLYPH, OMX_ImageFilterAnaglyph)                           \
+  X (IMAGE_FILTER_DEINTERLACE_FAST, OMX_ImageFilterDeInterlaceFast)
 
 #define OMXCAM_SHUTTER_SPEED_AUTO 0
 #define OMXCAM_THUMBNAIL_WIDTH_AUTO 0
