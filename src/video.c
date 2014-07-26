@@ -1246,6 +1246,7 @@ int omxcam_video_start_npt (omxcam_video_settings_t* settings){
   }
   
   omxcam__ctx.no_pthread = 1;
+  omxcam__ctx.state.ready = 1;
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
   

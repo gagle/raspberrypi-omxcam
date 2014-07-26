@@ -263,6 +263,7 @@ int omxcam__exit_npt (int code){
   omxcam__ctx.no_pthread = 0;
   omxcam__ctx.state.running = 0;
   omxcam__ctx.state.stopping = 0;
+  omxcam__ctx.state.ready = 0;
   omxcam__ctx.video = 0;
   return code;
 }

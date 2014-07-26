@@ -81,7 +81,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
     return -1;
   }
   
-  //SEI messages
+  //SEI
   OMX_PARAM_BRCMVIDEOAVCSEIENABLETYPE sei_st;
   omxcam__omx_struct_init (sei_st);
   sei_st.nPortIndex = 201;
@@ -100,8 +100,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   eede_st.enable = !!settings->eede.enabled;
   if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
       OMX_IndexParamBrcmEEDEEnable, &eede_st))){
-    omxcam__error ("OMX_SetParameter - "
-        "OMX_IndexParamBrcmEEDEEnable: %s",
+    omxcam__error ("OMX_SetParameter - OMX_IndexParamBrcmEEDEEnable: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
     return -1;
   }
@@ -112,8 +111,7 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   eede_loss_rate_st.loss_rate = settings->eede.loss_rate;
   if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
       OMX_IndexParamBrcmEEDELossRate, &eede_loss_rate_st))){
-    omxcam__error ("OMX_SetParameter - "
-        "OMX_IndexParamBrcmEEDELossRate: %s",
+    omxcam__error ("OMX_SetParameter - OMX_IndexParamBrcmEEDELossRate: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
     return -1;
   }
