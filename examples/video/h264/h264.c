@@ -98,7 +98,7 @@ int main (){
   omxcam_video_init (&settings);
   settings.on_data = on_data_length;
   
-  if (save_length ("video-length-640x480.h264", &settings)) return 1;
+  if (save_length ("video-length-1920x1080.h264", &settings)) return 1;
   
   printf ("ok\n");
   

@@ -94,7 +94,7 @@ int omxcam__event_wait (
   }
   
   if (flags & OMXCAM_EVENT_ERROR){
-    //omxcam__error() was called from the the EventHandler
+    //omxcam__error() was called from the EventHandler
     if (omx_error){
       *omx_error = component->event.omx_error;
     }
