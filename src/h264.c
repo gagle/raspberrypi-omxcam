@@ -13,6 +13,7 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings){
   settings->qp.enabled = OMXCAM_FALSE;
   settings->qp.i = OMXCAM_H264_QP_OFF;
   settings->qp.p = OMXCAM_H264_QP_OFF;
+  settings->profile = OMXCAM_H264_AVC_PROFILE_HIGH;
 }
 
 int omxcam__h264_validate (omxcam_h264_settings_t* settings){
@@ -30,6 +31,10 @@ int omxcam__h264_validate (omxcam_h264_settings_t* settings){
   }
   if (!omxcam__h264_is_valid_quantization (settings->qp.p)){
     omxcam__error ("invalid 'h264.eede.p' value");
+    return -1;
+  }
+  if (!omxcam__h264_is_valid_avc_profile (settings->profile)){
+    omxcam__error ("invalid 'h264.profile' value");
     return -1;
   }
   return 0;
@@ -147,5 +152,39 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
     return -1;
   }
   
+  //AVC Profile
+  OMX_VIDEO_PARAM_AVCTYPE avc_profile_st;
+  omxcam__omx_struct_init (avc_profile_st);
+  avc_profile_st.nPortIndex = 201;
+  if ((error = OMX_GetParameter (omxcam__ctx.video_encode.handle,
+      OMX_IndexParamVideoAvc, &avc_profile_st))){
+    omxcam__error ("OMX_GetParameter - OMX_IndexParamVideoAvc: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  avc_profile_st.eProfile = settings->profile;
+  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
+      OMX_IndexParamVideoAvc, &avc_profile_st))){
+    omxcam__error ("OMX_SetParameter - OMX_IndexParamVideoAvc: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  
   return 0;
 }
+
+#define OMXCAM_FN(X, name, name_upper_case)                                    \
+  int omxcam__h264_is_valid_ ## name (omxcam_ ## name name){                   \
+    switch (name){                                                             \
+      OMXCAM_ ## name_upper_case ## _MAP (X)                                   \
+      default: return 0;                                                       \
+    }                                                                          \
+  }
+
+#define OMXCAM_CASE_FN(_, value)                                               \
+  case value: return 1;
+
+OMXCAM_FN (OMXCAM_CASE_FN, avc_profile, H264_AVC_PROFILE)
+
+#undef OMXCAM_CASE_FN
+#undef OMXCAM_FN

@@ -413,20 +413,16 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings);
 int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings);
 
 /*
+ * Returns the string name of the given h246 setting.
+ */
+const char* omxcam__h264_str_avc_profile (omxcam_avc_profile profile);
+
+/*
  * Validates each h264 setting. Returns 1 if it's valid, 0 otherwise.
  */
 int omxcam__h264_is_valid_bitrate (uint32_t bitrate);
 int omxcam__h264_is_valid_eede_loss_rate (uint32_t loss_rate);
 int omxcam__h264_is_valid_quantization (uint32_t qp);
-
-/*
- * Returns the string name of the AVC profile.
- */
-const char* omxcam__avc_str_profile (omxcam_avc_profile profile);
-
-/*
- * Validates the AVC profile setting. Returns 1 if it's valid, 0 otherwise.
- */
-int omxcam__avc_is_valid_profile (omxcam_avc_profile profile);
+int omxcam__h264_is_valid_avc_profile (omxcam_avc_profile profile);
 
 #endif

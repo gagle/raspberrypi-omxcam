@@ -240,24 +240,6 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
       return -1;
     }
     
-    //Configure AVC Profile
-    OMX_VIDEO_PARAM_AVCTYPE avc_profile_st;
-    omxcam__omx_struct_init (avc_profile_st);
-    avc_profile_st.nPortIndex = 201;
-    if ((error = OMX_GetParameter (omxcam__ctx.video_encode.handle,
-        OMX_IndexParamVideoAvc, &avc_profile_st))){
-      omxcam__error ("OMX_GetParameter - OMX_IndexParamVideoAvc: %s",
-          omxcam__dump_OMX_ERRORTYPE (error));
-      return -1;
-    }
-    avc_profile_st.eProfile = settings->avc_profile;
-    if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
-        OMX_IndexParamVideoAvc, &avc_profile_st))){
-      omxcam__error ("OMX_SetParameter - OMX_IndexParamVideoAvc: %s",
-          omxcam__dump_OMX_ERRORTYPE (error));
-      return -1;
-    }
-    
     //Setup tunnel: camera (video) -> video_encode
     omxcam__trace ("configuring tunnel '%s' -> '%s'", omxcam__ctx.camera.name,
         omxcam__ctx.video_encode.name);
@@ -706,42 +688,11 @@ void omxcam_video_init (omxcam_video_settings_t* settings){
   settings->on_ready = 0;
   settings->on_data = 0;
   settings->on_stop = 0;
-  settings->avc_profile = OMXCAM_AVC_PROFILE_HIGH;
 }
-
-#define OMXCAM_STR(x) #x
-#define OMXCAM_CASE_FN(name, value)                                            \
-  case value: return OMXCAM_STR(OMXCAM_ ## name);
-
-const char* omxcam__avc_str_profile (omxcam_avc_profile profile){
-  switch (profile){
-    OMXCAM_AVC_PROFILE_MAP (OMXCAM_CASE_FN)
-    default: return "unknown OMXCAM_AVC_PROFILE";
-  }
-}
-
-#undef OMXCAM_CASE_FN
-#undef OMXCAM_STR
-
-#define OMXCAM_CASE_FN(_, value)                                               \
-  case value: return 1;
-
-int omxcam__avc_is_valid_profile (omxcam_avc_profile profile){
-  switch (profile){
-    OMXCAM_AVC_PROFILE_MAP (OMXCAM_CASE_FN)
-    default: return 0;
-  }
-}
-
-#undef OMXCAM_CASE_FN
 
 int omxcam__video_validate (omxcam_video_settings_t* settings){
   if (omxcam__camera_validate (&settings->camera, 1)) return -1;
   if (omxcam__h264_validate (&settings->h264)) return -1;
-  if (!omxcam__avc_is_valid_profile (settings->avc_profile)){
-    omxcam__error ("invalid 'avc_profile' value");
-    return -1;
-  }
   return 0;
 }
 
