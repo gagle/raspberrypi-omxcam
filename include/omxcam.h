@@ -157,11 +157,11 @@ extern "C" {
   X (IMAGE_FILTER_ANAGLYPH, OMX_ImageFilterAnaglyph)                           \
   X (IMAGE_FILTER_DEINTERLACE_FAST, OMX_ImageFilterDeInterlaceFast)
 
-#define OMXCAM_H264_PROFILE_MAP_LENGTH 25
-#define OMXCAM_H264_PROFILE_MAP(X)                                             \
-  X (H264_PROFILE_BASELINE, OMX_VIDEO_AVCProfileBaseline)                      \
-  X (H264_PROFILE_MAIN, OMX_VIDEO_AVCProfileMain)                              \
-  X (H264_PROFILE_HIGH, OMX_VIDEO_AVCProfileHigh)
+#define OMXCAM_AVC_PROFILE_MAP_LENGTH 25
+#define OMXCAM_AVC_PROFILE_MAP(X)                                              \
+  X (AVC_PROFILE_BASELINE, OMX_VIDEO_AVCProfileBaseline)                       \
+  X (AVC_PROFILE_MAIN, OMX_VIDEO_AVCProfileMain)                               \
+  X (AVC_PROFILE_HIGH, OMX_VIDEO_AVCProfileHigh)
 
 #define OMXCAM_SHUTTER_SPEED_AUTO 0
 #define OMXCAM_JPEG_THUMBNAIL_WIDTH_AUTO 0
@@ -214,8 +214,8 @@ typedef enum {
 } omxcam_image_filter;
 
 typedef enum {
-  OMXCAM_H264_PROFILE_MAP (OMXCAM_ENUM_FN)
-} omxcam_h264_profile;
+  OMXCAM_AVC_PROFILE_MAP (OMXCAM_ENUM_FN)
+} omxcam_avc_profile;
 
 #undef OMXCAM_ENUM_FN
 
@@ -329,7 +329,6 @@ typedef struct {
   omxcam_bool sei;
   omxcam_eede_t eede;
   omxcam_quantization_t qp;
-  omxcam_h264_profile profile;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \
@@ -347,6 +346,7 @@ typedef struct {
 typedef struct {
   OMXCAM_COMMON_SETTINGS
   omxcam_h264_settings_t h264;
+  omxcam_avc_profile avc_profile;
 } omxcam_video_settings_t;
 
 #undef OMXCAM_COMMON_SETTINGS

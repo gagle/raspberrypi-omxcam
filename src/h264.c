@@ -13,7 +13,6 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings){
   settings->qp.enabled = OMXCAM_FALSE;
   settings->qp.i = OMXCAM_H264_QP_OFF;
   settings->qp.p = OMXCAM_H264_QP_OFF;
-  settings->profile = OMXCAM_H264_PROFILE_HIGH;
 }
 
 int omxcam__h264_validate (omxcam_h264_settings_t* settings){
@@ -148,49 +147,5 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
     return -1;
   }
   
-  //Profile
-  OMX_VIDEO_PARAM_AVCTYPE avc_st;
-  omxcam__omx_struct_init (avc_st);
-  avc_st.nPortIndex = 201;
-  if ((error = OMX_GetParameter (omxcam__ctx.video_encode.handle,
-      OMX_IndexParamVideoAvc, &avc_st))){
-    omxcam__error ("OMX_GetParameter - OMX_IndexParamVideoAvc: %s",
-        omxcam__dump_OMX_ERRORTYPE (error));
-    return -1;
-  }
-  avc_st.eProfile = settings->profile;
-  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
-      OMX_IndexParamVideoAvc, &avc_st))){
-    omxcam__error ("OMX_SetParameter - OMX_IndexParamVideoAvc: %s",
-        omxcam__dump_OMX_ERRORTYPE (error));
-    return -1;
-  }
-  
   return 0;
 }
-
-#define OMXCAM_STR(x) #x
-#define OMXCAM_CASE_FN(name, value)                                            \
-  case value: return OMXCAM_STR(OMXCAM_ ## name);
-
-const char* omxcam__h264_str_profile (omxcam_h264_profile profile){
-  switch (profile){
-    OMXCAM_H264_PROFILE_MAP (OMXCAM_CASE_FN)
-    default: return "unknown OMXCAM_H264_PROFILE";
-  }
-}
-
-#undef OMXCAM_CASE_FN
-#undef OMXCAM_STR
-
-#define OMXCAM_CASE_FN(_, value)                                               \
-  case value: return 1;
-
-int omxcam__h264_is_valid_profile (omxcam_h264_profile profile){
-  switch (profile){
-    OMXCAM_H264_PROFILE_MAP (OMXCAM_CASE_FN)
-    default: return 0;
-  }
-}
-
-#undef OMXCAM_CASE_FN

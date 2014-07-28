@@ -215,7 +215,6 @@ omxcam_quantization_t    qp
   omxcam_bool              enabled               OMXCAM_FALSE
   uint32_t                 i                     OMXCAM_H264_QP_OFF          1 .. 51
   uint32_t                 p                     OMXCAM_H264_QP_OFF          1 .. 51
-omxcam_h264_profile      profile                 OMXCAM_H264_PROFILE_HIGH
 ```
 
 <a name="image_streaming"></a>
