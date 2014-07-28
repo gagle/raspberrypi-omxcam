@@ -417,5 +417,6 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings);
  */
 int omxcam__h264_is_valid_bitrate (uint32_t bitrate);
 int omxcam__h264_is_valid_eede_loss_rate (uint32_t loss_rate);
+int omxcam__h264_is_valid_quantization (uint32_t qp);
 
 #endif

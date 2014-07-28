@@ -222,7 +222,9 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     port_st.format.video.xFramerate = settings->camera.framerate << 16;
     port_st.format.video.nStride = stride;
     //Despite being configured later, these two fields need to be set now
-    port_st.format.video.nBitrate = settings->h264.bitrate;
+    port_st.format.video.nBitrate = settings->h264.qp.enabled
+        ? 0
+        : settings->h264.bitrate;
     port_st.format.video.eCompressionFormat = OMX_VIDEO_CodingAVC;
     if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
         OMX_IndexParamPortDefinition, &port_st))){
@@ -1246,12 +1248,13 @@ int omxcam_video_start_npt (omxcam_video_settings_t* settings){
   }
   
   omxcam__ctx.no_pthread = 1;
-  omxcam__ctx.state.ready = 1;
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
   
   if (omxcam__init ()) return omxcam__exit_npt (-1);
   if (omxcam__omx_init (settings)) return omxcam__exit_npt (-1);
+  
+  omxcam__ctx.state.ready = 1;
   
   return 0;
 }

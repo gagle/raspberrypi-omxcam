@@ -161,6 +161,7 @@ extern "C" {
 #define OMXCAM_JPEG_THUMBNAIL_WIDTH_AUTO 0
 #define OMXCAM_JPEG_THUMBNAIL_HEIGHT_AUTO 0
 #define OMXCAM_H264_IDR_PERIOD_OFF 0
+#define OMXCAM_H264_QP_OFF 0
 
 typedef enum {
   OMXCAM_FALSE,
@@ -307,10 +308,17 @@ typedef struct {
 } omxcam_eede_t;
 
 typedef struct {
+  omxcam_bool enabled;
+  uint32_t i;
+  uint32_t p;
+} omxcam_quantization_t;
+
+typedef struct {
   uint32_t bitrate;
   uint32_t idr_period;
   omxcam_bool sei;
   omxcam_eede_t eede;
+  omxcam_quantization_t qp;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \

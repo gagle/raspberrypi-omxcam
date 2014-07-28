@@ -211,6 +211,10 @@ omxcam_bool              sei                     OMXCAM_FALSE
 omxcam_eede_t            eede
   omxcam_bool              enabled               OMXCAM_FALSE
   uint32_t                 loss_rate             0                           0 .. 100
+omxcam_quantization_t    qp
+  omxcam_bool              enabled               OMXCAM_FALSE
+  uint32_t                 i                     OMXCAM_H264_QP_OFF          1 .. 51
+  uint32_t                 p                     OMXCAM_H264_QP_OFF          1 .. 51
 ```
 
 <a name="image_streaming"></a>
