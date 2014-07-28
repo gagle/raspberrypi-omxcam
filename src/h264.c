@@ -52,8 +52,8 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
   
   OMX_ERRORTYPE error;
   
-  //Bitrate
   if (!settings->qp.enabled){
+    //Bitrate
     OMX_VIDEO_PARAM_BITRATETYPE bitrate_st;
     omxcam__omx_struct_init (bitrate_st);
     bitrate_st.eControlRate = OMX_Video_ControlRateVariable;
@@ -65,20 +65,20 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
           omxcam__dump_OMX_ERRORTYPE (error));
       return -1;
     }
-  }
-  
-  //Quantization parameters
-  OMX_VIDEO_PARAM_QUANTIZATIONTYPE quantization_st;
-  omxcam__omx_struct_init (quantization_st);
-  quantization_st.nPortIndex = 201;
-  //nQpB returns an error, it cannot be modified
-  quantization_st.nQpI = settings->qp.i;
-  quantization_st.nQpP = settings->qp.p;
-  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
-      OMX_IndexParamVideoQuantization, &quantization_st))){
-    omxcam__error ("OMX_SetParameter - OMX_IndexParamVideoQuantization: %s",
-        omxcam__dump_OMX_ERRORTYPE (error));
-    return -1;
+  }else{
+    //Quantization parameters
+    OMX_VIDEO_PARAM_QUANTIZATIONTYPE quantization_st;
+    omxcam__omx_struct_init (quantization_st);
+    quantization_st.nPortIndex = 201;
+    //nQpB returns an error, it cannot be modified
+    quantization_st.nQpI = settings->qp.i;
+    quantization_st.nQpP = settings->qp.p;
+    if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
+        OMX_IndexParamVideoQuantization, &quantization_st))){
+      omxcam__error ("OMX_SetParameter - OMX_IndexParamVideoQuantization: %s",
+          omxcam__dump_OMX_ERRORTYPE (error));
+      return -1;
+    }
   }
   
   //Codec
