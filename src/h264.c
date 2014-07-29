@@ -15,6 +15,7 @@ void omxcam__h264_init (omxcam_h264_settings_t* settings){
   settings->qp.p = OMXCAM_H264_QP_OFF;
   settings->profile = OMXCAM_H264_AVC_PROFILE_HIGH;
   settings->inline_headers = OMXCAM_FALSE;
+  settings->inline_motion_vectors = OMXCAM_FALSE;
 }
 
 int omxcam__h264_validate (omxcam_h264_settings_t* settings){
@@ -180,6 +181,19 @@ int omxcam__h264_configure_omx (omxcam_h264_settings_t* settings){
       OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &headers_st))){
     omxcam__error ("OMX_SetParameter - "
         "OMX_IndexParamBrcmVideoAVCInlineHeaderEnable: %s",
+        omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  
+  //Inline motion vectors
+  OMX_CONFIG_PORTBOOLEANTYPE motion_st;
+  omxcam__omx_struct_init (motion_st);
+  motion_st.nPortIndex = 201;
+  motion_st.bEnabled = !!settings->inline_motion_vectors;
+  if ((error = OMX_SetParameter (omxcam__ctx.video_encode.handle,
+      OMX_IndexParamBrcmVideoAVCInlineVectorsEnable, &motion_st))){
+    omxcam__error ("OMX_SetParameter - "
+        "OMX_IndexParamBrcmVideoAVCInlineVectorsEnable: %s",
         omxcam__dump_OMX_ERRORTYPE (error));
     return -1;
   }

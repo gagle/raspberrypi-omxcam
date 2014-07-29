@@ -331,6 +331,7 @@ typedef struct {
   omxcam_quantization_t qp;
   omxcam_avc_profile profile;
   omxcam_bool inline_headers;
+  omxcam_bool inline_motion_vectors;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \
@@ -338,6 +339,7 @@ typedef struct {
   omxcam_format format;                                                        \
   void (*on_ready)();                                                          \
   void (*on_data)(uint8_t* buffer, uint32_t length);                           \
+  void (*on_motion)(uint8_t* buffer, uint32_t length);                         \
   void (*on_stop)();
 
 typedef struct {

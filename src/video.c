@@ -3,6 +3,8 @@
 
 typedef struct {
   void (*on_data)(uint8_t* buffer, uint32_t length);
+  void (*on_motion)(uint8_t* buffer, uint32_t length);
+  int inline_motion_vectors;
   omxcam__component_t* fill_component;
 } omxcam__thread_arg_t;
 
@@ -110,6 +112,8 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
       settings->camera.height, settings->camera.framerate);
   
   thread_arg.on_data = settings->on_data;
+  thread_arg.on_motion = settings->on_motion;
+  thread_arg.inline_motion_vectors = settings->h264.inline_motion_vectors;
   thread_arg.fill_component = fill_component;
   
   if (omxcam__component_init (&omxcam__ctx.camera)){
@@ -629,6 +633,7 @@ static void* omxcam__video_capture (void* thread_arg){
   int stop = 0;
   OMX_ERRORTYPE error;
   void (*on_data)(uint8_t*, uint32_t);
+  void (*on_motion)(uint8_t*, uint32_t);
   
   running_safe = 1;
   
@@ -643,6 +648,7 @@ static void* omxcam__video_capture (void* thread_arg){
     
     stop = !running;
     on_data = arg->on_data;
+    on_motion = arg->on_motion;
     
     if (pthread_mutex_unlock (&mutex)){
       omxcam__error ("pthread_mutex_unlock");
@@ -665,6 +671,16 @@ static void* omxcam__video_capture (void* thread_arg){
         0, 0)){
       omxcam__thread_handle_error ();
       return (void*)0;
+    }
+    
+    //Check if it's a motion vector
+    if (arg->inline_motion_vectors &&
+        omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO){
+      if (on_motion){
+        on_motion (omxcam__ctx.output_buffer->pBuffer,
+            omxcam__ctx.output_buffer->nFilledLen);
+      }
+      continue;
     }
     
     //The buffers are filled even if there's no callback
