@@ -42,6 +42,9 @@
 #define omxcam__error(message, ...) //Empty
 #endif
 
+#define OMXCAM_STR(x) #x
+#define OMXCAM_STR_VALUE(x) OMXCAM_STR(x)
+
 /*
  * Enumeration with a mapping between all the OpenMAX IL events and a unique
  * number. The id allows them to be bitwise-or'ed, e.g.

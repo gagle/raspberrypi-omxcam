@@ -629,7 +629,6 @@ OMXCAM_FN (OMXCAM_CREATE_FN, OMXCAM_DEFAULT, is_valid, int, image_filter,
 #undef OMXCAM_DEFAULT
 #undef OMXCAM_CREATE_FN
 
-#define OMXCAM_STR(x) #x
 #define OMXCAM_STR_FN(name, value)                                             \
   case value: return OMXCAM_STR(OMXCAM_ ## name);
 #define OMXCAM_DEFAULT(name_upper_case)                                        \
@@ -647,6 +646,5 @@ OMXCAM_FN (OMXCAM_STR_FN, OMXCAM_DEFAULT, str, const char*, image_filter,
 
 #undef OMXCAM_DEFAULT
 #undef OMXCAM_STR_FN
-#undef OMXCAM_STR
 
 #undef OMXCAM_FN

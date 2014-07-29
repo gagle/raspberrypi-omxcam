@@ -330,6 +330,7 @@ typedef struct {
   omxcam_eede_t eede;
   omxcam_quantization_t qp;
   omxcam_avc_profile profile;
+  omxcam_bool inline_headers;
 } omxcam_h264_settings_t;
 
 #define OMXCAM_COMMON_SETTINGS                                                 \
