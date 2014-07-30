@@ -88,6 +88,7 @@ int main (){
   settings.format = OMXCAM_FORMAT_RGB888;
   settings.camera.width = 640;
   settings.camera.height = 480;
+  settings.h264.inline_motion_vectors = OMXCAM_TRUE;
   
   current = 0;
   total = 640*480*3*10;
@@ -104,7 +105,7 @@ int main (){
   current = 0;
   total = 672*480*4*10;
   
-  if (save ("video-672x480.rgba", &settings)) return 1;
+  //if (save ("video-672x480.rgba", &settings)) return 1;
   
   printf ("ok\n");
   

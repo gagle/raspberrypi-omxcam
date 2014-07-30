@@ -108,6 +108,7 @@ typedef struct {
   int video;
   int inline_motion_vectors;
   int no_pthread;
+  int use_encoder;
   struct {
     int running;
     int joined;

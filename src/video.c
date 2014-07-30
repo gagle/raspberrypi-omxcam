@@ -8,7 +8,6 @@ typedef struct {
   omxcam__component_t* fill_component;
 } omxcam__thread_arg_t;
 
-static int use_encoder;
 static int running_safe;
 static int running = 0;
 static int sleeping = 0;
@@ -20,7 +19,7 @@ static pthread_mutex_t mutex_cond;
 static pthread_cond_t cond;
 static omxcam__thread_arg_t thread_arg;
 
-static int omxcam__video_change_state (omxcam__state state, int use_encoder){
+static int omxcam__video_change_state (omxcam__state state){
   if (omxcam__component_change_state (&omxcam__ctx.camera, state)){
     return -1;
   }
@@ -44,7 +43,7 @@ static int omxcam__video_change_state (omxcam__state state, int use_encoder){
     return -1;
   }
   
-  if (!use_encoder) return 0;
+  if (!omxcam__ctx.use_encoder) return 0;
   
   if (omxcam__component_change_state (&omxcam__ctx.video_encode, state)){
     return -1;
@@ -80,24 +79,24 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   switch (settings->format){
     case OMXCAM_FORMAT_RGB888:
-      use_encoder = 0;
+      omxcam__ctx.use_encoder = 0;
       color_format = OMX_COLOR_Format24bitRGB888;
       stride = stride*3;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_RGBA8888:
-      use_encoder = 0;
+      omxcam__ctx.use_encoder = 0;
       color_format = OMX_COLOR_Format32bitABGR8888;
       stride = stride*4;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_YUV420:
-      use_encoder = 0;
+      omxcam__ctx.use_encoder = 0;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       fill_component = &omxcam__ctx.camera;
       break;
     case OMXCAM_FORMAT_H264:
-      use_encoder = 1;
+      omxcam__ctx.use_encoder = 1;
       color_format = OMX_COLOR_FormatYUV420PackedPlanar;
       width = settings->camera.width;
       height = settings->camera.height;
@@ -124,7 +123,8 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_INIT_NULL_SINK);
     return -1;
   }
-  if (use_encoder && omxcam__component_init (&omxcam__ctx.video_encode)){
+  if (omxcam__ctx.use_encoder &&
+      omxcam__component_init (&omxcam__ctx.video_encode)){
     omxcam__set_last_error (OMXCAM_ERROR_INIT_VIDEO_ENCODER);
     return -1;
   }
@@ -207,7 +207,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     return -1;
   }
   
-  if (use_encoder){
+  if (omxcam__ctx.use_encoder){
     omxcam__trace ("configuring '%s' port definition",
         omxcam__ctx.video_encode.name);
     
@@ -269,7 +269,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   //Change to Idle
   int r;
-  if ((r = omxcam__video_change_state (OMXCAM_STATE_IDLE, use_encoder))){
+  if ((r = omxcam__video_change_state (OMXCAM_STATE_IDLE))){
     //If r == -2, the camera is already running by another IL client. Very ugly
     //but needs to be done this way in order to set the last error
     if (r == -1){
@@ -285,7 +285,8 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
-  if (!use_encoder && omxcam__buffer_alloc (&omxcam__ctx.camera, 71)){
+  if (!omxcam__ctx.use_encoder &&
+      omxcam__buffer_alloc (&omxcam__ctx.camera, 71)){
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
@@ -311,7 +312,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     return -1;
   }
   
-  if (use_encoder){
+  if (omxcam__ctx.use_encoder){
     if (omxcam__component_port_enable (&omxcam__ctx.video_encode, 200)){
       omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
       return -1;
@@ -337,7 +338,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   }
   
   //Change to Executing
-  if (omxcam__video_change_state (OMXCAM_STATE_EXECUTING, use_encoder)){
+  if (omxcam__video_change_state (OMXCAM_STATE_EXECUTING)){
     omxcam__set_last_error (OMXCAM_ERROR_EXECUTING);
     return -1;
   }
@@ -369,7 +370,7 @@ static int omxcam__omx_deinit (){
   }
   
   //Change to Idle
-  if (omxcam__video_change_state (OMXCAM_STATE_IDLE, use_encoder)){
+  if (omxcam__video_change_state (OMXCAM_STATE_IDLE)){
     omxcam__set_last_error (OMXCAM_ERROR_IDLE);
     return -1;
   }
@@ -379,7 +380,8 @@ static int omxcam__omx_deinit (){
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
-  if (!use_encoder && omxcam__buffer_free (&omxcam__ctx.camera, 71)){
+  if (!omxcam__ctx.use_encoder &&
+      omxcam__buffer_free (&omxcam__ctx.camera, 71)){
     omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
     return -1;
   }
@@ -407,7 +409,7 @@ static int omxcam__omx_deinit (){
     return -1;
   }
   
-  if (use_encoder){
+  if (omxcam__ctx.use_encoder){
     if (omxcam__component_port_disable (&omxcam__ctx.video_encode, 200)){
       omxcam__set_last_error (OMXCAM_ERROR_VIDEO);
       return -1;
@@ -433,7 +435,7 @@ static int omxcam__omx_deinit (){
   }
   
   //Change to Loaded
-  if (omxcam__video_change_state (OMXCAM_STATE_LOADED, use_encoder)){
+  if (omxcam__video_change_state (OMXCAM_STATE_LOADED)){
     omxcam__set_last_error (OMXCAM_ERROR_LOADED);
     return -1;
   }
@@ -446,7 +448,8 @@ static int omxcam__omx_deinit (){
     omxcam__set_last_error (OMXCAM_ERROR_DEINIT_NULL_SINK);
     return -1;
   }
-  if (use_encoder && omxcam__component_deinit (&omxcam__ctx.video_encode)){
+  if (omxcam__ctx.use_encoder &&
+      omxcam__component_deinit (&omxcam__ctx.video_encode)){
     omxcam__set_last_error (OMXCAM_ERROR_DEINIT_VIDEO_ENCODER);
     return -1;
   }
@@ -674,7 +677,7 @@ static void* omxcam__video_capture (void* thread_arg){
     }
     
     //Check if it's a motion vector
-    if (arg->inline_motion_vectors &&
+    if (omxcam__ctx.use_encoder && arg->inline_motion_vectors &&
         (omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO)){
       if (on_motion){
         on_motion (omxcam__ctx.output_buffer->pBuffer,
