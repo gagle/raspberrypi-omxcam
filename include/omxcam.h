@@ -16,9 +16,6 @@ extern "C" {
 # define OMXCAM_EXTERN //Empty
 #endif
 
-//Handy way to sleep forever while recording a video
-#define OMXCAM_CAPTURE_FOREVER 0
-
 //Error definitions, expand if necessary
 #define OMXCAM_ERRNO_MAP(X)                                                    \
   X (0, ERROR_NONE, "success")                                                 \
@@ -168,6 +165,9 @@ extern "C" {
 #define OMXCAM_JPEG_THUMBNAIL_HEIGHT_AUTO 0
 #define OMXCAM_H264_IDR_PERIOD_OFF 0
 #define OMXCAM_H264_QP_OFF 0
+
+//Handy way to sleep forever while recording a video
+#define OMXCAM_CAPTURE_FOREVER 0
 
 typedef enum {
   OMXCAM_FALSE,
@@ -337,6 +337,7 @@ typedef struct {
 #define OMXCAM_COMMON_SETTINGS                                                 \
   omxcam_camera_settings_t camera;                                             \
   omxcam_format format;                                                        \
+  uint32_t camera_id;                                                          \
   void (*on_ready)();                                                          \
   void (*on_data)(uint8_t* buffer, uint32_t length);                           \
   void (*on_motion)(uint8_t* buffer, uint32_t length);                         \
@@ -531,7 +532,9 @@ OMXCAM_EXTERN int omxcam_video_stop_npt ();
  * problem). If the camera needs to be controlled by an asynchronous framework,
  * e.g.: libuv, these functions are very useful.
  */
-OMXCAM_EXTERN int omxcam_video_read_npt (omxcam_buffer_t* buffer);
+int omxcam_video_read_npt (
+    omxcam_buffer_t* buffer,
+    omxcam_bool* is_motion_vector);
 
 #ifdef __cplusplus
 }

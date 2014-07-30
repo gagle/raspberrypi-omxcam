@@ -1,7 +1,7 @@
 #include "omxcam.h"
 #include "internal.h"
 
-int omxcam__camera_load_drivers (){
+int omxcam__camera_load_drivers (uint32_t camera_id){
   /*
   This is a specific behaviour of the Broadcom's Raspberry Pi OpenMAX IL
   implementation module because the OMX_SetConfig() and OMX_SetParameter() are
@@ -33,8 +33,7 @@ int omxcam__camera_load_drivers (){
   OMX_PARAM_U32TYPE dev_st;
   omxcam__omx_struct_init (dev_st);
   dev_st.nPortIndex = OMX_ALL;
-  //ID of the camera device
-  dev_st.nU32 = 0;
+  dev_st.nU32 = camera_id;
   if ((error = OMX_SetParameter (omxcam__ctx.camera.handle,
       OMX_IndexParamCameraDeviceNumber, &dev_st))){
     omxcam__error ("OMX_SetParameter - OMX_IndexParamCameraDeviceNumber: "

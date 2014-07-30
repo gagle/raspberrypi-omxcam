@@ -106,6 +106,7 @@ typedef struct {
   OMX_BUFFERHEADERTYPE* output_buffer;
   void (*on_stop)();
   int video;
+  int inline_motion_vectors;
   int no_pthread;
   struct {
     int running;

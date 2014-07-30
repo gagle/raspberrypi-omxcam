@@ -129,7 +129,7 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
     return -1;
   }
   
-  if (omxcam__camera_load_drivers ()){
+  if (omxcam__camera_load_drivers (settings->camera_id)){
     omxcam__set_last_error (OMXCAM_ERROR_DRIVERS);
     return -1;
   }
@@ -675,7 +675,7 @@ static void* omxcam__video_capture (void* thread_arg){
     
     //Check if it's a motion vector
     if (arg->inline_motion_vectors &&
-        omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO){
+        (omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO)){
       if (on_motion){
         on_motion (omxcam__ctx.output_buffer->pBuffer,
             omxcam__ctx.output_buffer->nFilledLen);
@@ -699,10 +699,12 @@ static void* omxcam__video_capture (void* thread_arg){
 void omxcam_video_init (omxcam_video_settings_t* settings){
   omxcam__camera_init (&settings->camera, OMXCAM_VIDEO_MAX_WIDTH,
       OMXCAM_VIDEO_MAX_HEIGHT);
-  settings->format = OMXCAM_FORMAT_H264;
   omxcam__h264_init (&settings->h264);
+  settings->format = OMXCAM_FORMAT_H264;
+  settings->camera_id = 0;
   settings->on_ready = 0;
   settings->on_data = 0;
+  settings->on_motion = 0;
   settings->on_stop = 0;
 }
 
@@ -1266,6 +1268,7 @@ int omxcam_video_start_npt (omxcam_video_settings_t* settings){
   omxcam__ctx.no_pthread = 1;
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
+  omxcam__ctx.inline_motion_vectors = settings->h264.inline_motion_vectors;
   
   if (omxcam__init ()) return omxcam__exit_npt (-1);
   if (omxcam__omx_init (settings)) return omxcam__exit_npt (-1);
@@ -1317,7 +1320,9 @@ static void omxcam__handle_error_npt (){
   omxcam__set_last_error (OMXCAM_ERROR_CAPTURE);
 }
 
-int omxcam_video_read_npt (omxcam_buffer_t* buffer){
+int omxcam_video_read_npt (
+    omxcam_buffer_t* buffer,
+    omxcam_bool* is_motion_vector){
   //Critical section, this function needs to be as fast as possible
   
   omxcam__trace ("reading buffer (no pthread)");
@@ -1351,6 +1356,16 @@ int omxcam_video_read_npt (omxcam_buffer_t* buffer){
       OMXCAM_EVENT_FILL_BUFFER_DONE, 0, 0)){
     omxcam__handle_error_npt ();
     return omxcam__exit_npt (-1);
+  }
+  
+  //Check if it's a motion vector
+  if (is_motion_vector){
+    if (omxcam__ctx.inline_motion_vectors &&
+        (omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO)){
+      *is_motion_vector = OMXCAM_TRUE;
+    }else{
+      *is_motion_vector = OMXCAM_FALSE;
+    }
   }
   
   buffer->data = omxcam__ctx.output_buffer->pBuffer;
