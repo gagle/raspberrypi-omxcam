@@ -112,7 +112,8 @@ static int omxcam__omx_init (omxcam_video_settings_t* settings){
   
   thread_arg.on_data = settings->on_data;
   thread_arg.on_motion = settings->on_motion;
-  thread_arg.inline_motion_vectors = settings->h264.inline_motion_vectors;
+  thread_arg.inline_motion_vectors = settings->h264.inline_motion_vectors &&
+      omxcam__ctx.use_encoder;
   thread_arg.fill_component = fill_component;
   
   if (omxcam__component_init (&omxcam__ctx.camera)){
@@ -677,7 +678,7 @@ static void* omxcam__video_capture (void* thread_arg){
     }
     
     //Check if it's a motion vector
-    if (omxcam__ctx.use_encoder && arg->inline_motion_vectors &&
+    if (arg->inline_motion_vectors &&
         (omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO)){
       if (on_motion){
         on_motion (omxcam__ctx.output_buffer->pBuffer,
@@ -1271,10 +1272,12 @@ int omxcam_video_start_npt (omxcam_video_settings_t* settings){
   omxcam__ctx.no_pthread = 1;
   omxcam__ctx.state.running = 1;
   omxcam__ctx.video = 1;
-  omxcam__ctx.inline_motion_vectors = settings->h264.inline_motion_vectors;
   
   if (omxcam__init ()) return omxcam__exit_npt (-1);
   if (omxcam__omx_init (settings)) return omxcam__exit_npt (-1);
+  
+  omxcam__ctx.inline_motion_vectors = settings->h264.inline_motion_vectors &&
+      omxcam__ctx.use_encoder;
   
   omxcam__ctx.state.ready = 1;
   
