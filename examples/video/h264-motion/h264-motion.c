@@ -12,15 +12,15 @@ int log_error (){
   return 1;
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
-  if (pwrite (fd, buffer, length, 0) == -1){
+void on_data (omxcam_buffer_t buffer){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
   }
 }
 
-void on_motion (uint8_t* buffer, uint32_t length){
-  if (pwrite (fd_motion, buffer, length, 0) == -1){
+void on_motion (omxcam_buffer_t buffer){
+  if (pwrite (fd_motion, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite (motion)\n");
     if (omxcam_video_stop ()) log_error ();
   }

@@ -30,7 +30,7 @@ void on_ready (){
   change = now () + 1000 + delay;
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
+void on_data (omxcam_buffer_t buffer){
   int ms = now ();
   
   if (!changed){
@@ -50,7 +50,7 @@ void on_data (uint8_t* buffer, uint32_t length){
   }
   
   //Append the buffer to the file
-  if (pwrite (fd, buffer, length, 0) == -1){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
   }

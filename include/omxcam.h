@@ -123,7 +123,7 @@ extern "C" {
   X (WHITE_BALANCE_FLASH, OMX_WhiteBalControlFlash)                            \
   X (WHITE_BALANCE_HORIZON, OMX_WhiteBalControlHorizon)
 
-#define OMXCAM_IMAGE_FILTER_MAP_LENGTH 25
+#define OMXCAM_IMAGE_FILTER_MAP_LENGTH 27
 #define OMXCAM_IMAGE_FILTER_MAP(X)                                             \
   X (IMAGE_FILTER_NONE, OMX_ImageFilterNone)                                   \
   X (IMAGE_FILTER_NOISE, OMX_ImageFilterNoise)                                 \
@@ -339,8 +339,8 @@ typedef struct {
   omxcam_format format;                                                        \
   uint32_t camera_id;                                                          \
   void (*on_ready)();                                                          \
-  void (*on_data)(uint8_t* buffer, uint32_t length);                           \
-  void (*on_motion)(uint8_t* buffer, uint32_t length);                         \
+  void (*on_data)(omxcam_buffer_t buffer);                                     \
+  void (*on_motion)(omxcam_buffer_t buffer);                                   \
   void (*on_stop)();
 
 typedef struct {
@@ -476,7 +476,7 @@ OMXCAM_EXTERN int omxcam_video_stop ();
  * running.
  */
 OMXCAM_EXTERN int omxcam_video_update_on_data (
-    void (*on_data)(uint8_t* buffer, uint32_t length));
+    void (*on_data)(omxcam_buffer_t buffer));
 
 /*
  * Updates the camera settings. Can be only executed while the camera is running

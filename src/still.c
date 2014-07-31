@@ -380,8 +380,10 @@ int omxcam_still_start (omxcam_still_settings_t* settings){
     
     //Emit the buffer
     if (omxcam__ctx.output_buffer->nFilledLen){
-      settings->on_data (omxcam__ctx.output_buffer->pBuffer,
-          omxcam__ctx.output_buffer->nFilledLen);
+      omxcam_buffer_t buffer;
+      buffer.data = omxcam__ctx.output_buffer->pBuffer;
+      buffer.length = omxcam__ctx.output_buffer->nFilledLen;
+      settings->on_data (buffer);
     }
     
     //When it's the end of the stream, an OMX_EventBufferFlag is emitted in all

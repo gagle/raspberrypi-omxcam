@@ -13,12 +13,12 @@ int log_error (){
 
 int fd;
 
-void on_data (uint8_t* buffer, uint32_t length){
+void on_data (omxcam_buffer_t buffer){
   //Append the buffer to the file
   //Note: Writing the data directly to disk will slow down the capture speed
   //due to the I/O access. A posible workaround is to save the buffers into
   //memory, similar to the YUV example, and then write the whole image to disk
-  if (pwrite (fd, buffer, length, 0) == -1){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_still_stop ()) log_error ();
   }

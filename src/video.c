@@ -2,8 +2,8 @@
 #include "internal.h"
 
 typedef struct {
-  void (*on_data)(uint8_t* buffer, uint32_t length);
-  void (*on_motion)(uint8_t* buffer, uint32_t length);
+  void (*on_data)(omxcam_buffer_t buffer);
+  void (*on_motion)(omxcam_buffer_t buffer);
   int inline_motion_vectors;
   omxcam__component_t* fill_component;
 } omxcam__thread_arg_t;
@@ -636,8 +636,8 @@ static void* omxcam__video_capture (void* thread_arg){
   omxcam__thread_arg_t* arg = (omxcam__thread_arg_t*)thread_arg;
   int stop = 0;
   OMX_ERRORTYPE error;
-  void (*on_data)(uint8_t*, uint32_t);
-  void (*on_motion)(uint8_t*, uint32_t);
+  void (*on_data)(omxcam_buffer_t);
+  void (*on_motion)(omxcam_buffer_t);
   
   running_safe = 1;
   
@@ -681,8 +681,10 @@ static void* omxcam__video_capture (void* thread_arg){
     if (arg->inline_motion_vectors &&
         (omxcam__ctx.output_buffer->nFlags & OMX_BUFFERFLAG_CODECSIDEINFO)){
       if (on_motion){
-        on_motion (omxcam__ctx.output_buffer->pBuffer,
-            omxcam__ctx.output_buffer->nFilledLen);
+        omxcam_buffer_t buffer;
+        buffer.data = omxcam__ctx.output_buffer->pBuffer;
+        buffer.length = omxcam__ctx.output_buffer->nFilledLen;
+        on_motion (buffer);
       }
       continue;
     }
@@ -691,8 +693,10 @@ static void* omxcam__video_capture (void* thread_arg){
     if (!on_data) continue;
     
     //Emit the buffer
-    on_data (omxcam__ctx.output_buffer->pBuffer,
-        omxcam__ctx.output_buffer->nFilledLen);
+    omxcam_buffer_t buffer;
+    buffer.data = omxcam__ctx.output_buffer->pBuffer;
+    buffer.length = omxcam__ctx.output_buffer->nFilledLen;
+    on_data (buffer);
   }
   
   omxcam__trace ("exit thread");
@@ -912,8 +916,7 @@ int omxcam_video_stop (){
   return 0;
 }
 
-int omxcam_video_update_on_data (
-    void (*on_data)(uint8_t* buffer, uint32_t length)){
+int omxcam_video_update_on_data (void (*on_data)(omxcam_buffer_t buffer)){
   omxcam__trace ("updating 'on_data' callback");
   
   omxcam__set_last_error (OMXCAM_ERROR_NONE);

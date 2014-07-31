@@ -17,9 +17,9 @@ int log_error (){
   return 1;
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
+void on_data (omxcam_buffer_t buffer){
   //Write the buffers to the stdout
-  if (write (STDOUT_FILENO, buffer, length) == -1){
+  if (write (STDOUT_FILENO, buffer.data, buffer.length) == -1){
     fprintf (stderr, "error: write\n");
     if (omxcam_video_stop ()) log_error ();
   }

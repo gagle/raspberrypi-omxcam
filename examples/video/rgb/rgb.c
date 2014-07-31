@@ -16,7 +16,8 @@ int log_error (){
   return 1;
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
+void on_data (omxcam_buffer_t buffer){
+  uint32_t length = buffer.length;
   int stop = 0;
   current += length;
   
@@ -26,7 +27,7 @@ void on_data (uint8_t* buffer, uint32_t length){
   }
   
   //Append the buffer to the file
-  if (pwrite (fd, buffer, length, 0) == -1){
+  if (pwrite (fd, buffer.data, length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
     return;
@@ -105,7 +106,7 @@ int main (){
   current = 0;
   total = 672*480*4*10;
   
-  //if (save ("video-672x480.rgba", &settings)) return 1;
+  if (save ("video-672x480.rgba", &settings)) return 1;
   
   printf ("ok\n");
   

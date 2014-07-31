@@ -12,16 +12,16 @@ int log_error (){
   return 1;
 }
 
-void on_data_time (uint8_t* buffer, uint32_t length){
+void on_data_time (omxcam_buffer_t buffer){
   //Append the buffer to the file
-  if (pwrite (fd, buffer, length, 0) == -1){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
   }
 }
 
-void on_data_length (uint8_t* buffer, uint32_t length){
-  current += length;
+void on_data_length (omxcam_buffer_t buffer){
+  current += buffer.length;
   
   //Max file size 2MB
   if (current > 2097152){
@@ -30,7 +30,7 @@ void on_data_length (uint8_t* buffer, uint32_t length){
   }
   
   //Append the buffer to the file
-  if (pwrite (fd, buffer, length, 0) == -1){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
   }
@@ -86,6 +86,7 @@ int main (){
   
   //Capture a video of ~2000ms, 640x480 @90fps
   //Camera modes: http://www.raspberrypi.org/new-camera-mode-released
+  //Note: Encode the file at 30fps
   omxcam_video_init (&settings);
   settings.on_data = on_data_time;
   settings.camera.width = 640;

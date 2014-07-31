@@ -23,19 +23,19 @@ int log_error (){
   return 1;
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
-  current += length;
+void on_data (omxcam_buffer_t buffer){
+  current += buffer.length;
   
   //Append the data to the buffer
-  memcpy (file_buffer + offset_y, buffer + planes_slice.offset_y,
+  memcpy (file_buffer + offset_y, buffer.data + planes_slice.offset_y,
       planes_slice.length_y);
   offset_y += planes_slice.length_y;
   
-  memcpy (file_buffer + offset_u, buffer + planes_slice.offset_u,
+  memcpy (file_buffer + offset_u, buffer.data + planes_slice.offset_u,
       planes_slice.length_u);
   offset_u += planes_slice.length_u;
   
-  memcpy (file_buffer + offset_v, buffer + planes_slice.offset_v,
+  memcpy (file_buffer + offset_v, buffer.data + planes_slice.offset_v,
       planes_slice.length_v);
   offset_v += planes_slice.length_v;
   

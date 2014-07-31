@@ -20,17 +20,17 @@ uint32_t offset_u;
 uint32_t offset_v;
 uint8_t* file_buffer;
 
-void on_data (uint8_t* buffer, uint32_t length){
+void on_data (omxcam_buffer_t buffer){
   //Append the data to the buffers
-  memcpy (file_buffer + offset_y, buffer + yuv_planes_slice.offset_y,
+  memcpy (file_buffer + offset_y, buffer.data + yuv_planes_slice.offset_y,
       yuv_planes_slice.length_y);
   offset_y += yuv_planes_slice.length_y;
   
-  memcpy (file_buffer + offset_u, buffer + yuv_planes_slice.offset_u,
+  memcpy (file_buffer + offset_u, buffer.data + yuv_planes_slice.offset_u,
       yuv_planes_slice.length_u);
   offset_u += yuv_planes_slice.length_u;
   
-  memcpy (file_buffer + offset_v, buffer + yuv_planes_slice.offset_v,
+  memcpy (file_buffer + offset_v, buffer.data + yuv_planes_slice.offset_v,
       yuv_planes_slice.length_v);
   offset_v += yuv_planes_slice.length_v;
 }

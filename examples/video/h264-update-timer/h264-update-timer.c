@@ -23,6 +23,7 @@ int values[] = {
 int fd;
 int current;
 int interval = 1000;
+int stop = 0;
 
 int log_error (){
   omxcam_perror ();
@@ -30,10 +31,17 @@ int log_error (){
 }
 
 void signal_handler (int signal){
-  if (FN (values[current])) log_error ();
-  if (++current == MAP_LENGTH){
+  if (stop){
+    struct itimerval timer;
+    timer.it_value.tv_sec = timer.it_value.tv_usec = 0;
+    timer.it_interval = timer.it_value;
+    setitimer (ITIMER_REAL, &timer, 0);
+  
     if (omxcam_video_stop ()) log_error ();
+    return;
   }
+  if (omxcam_video_update_image_filter (values[current])) log_error ();
+  if (++current == MAP_LENGTH) stop = 1;
 }
 
 void on_ready (){
@@ -48,8 +56,8 @@ void on_ready (){
   setitimer (ITIMER_REAL, &timer, 0);
 }
 
-void on_data (uint8_t* buffer, uint32_t length){
-  if (pwrite (fd, buffer, length, 0) == -1){
+void on_data (omxcam_buffer_t buffer){
+  if (pwrite (fd, buffer.data, buffer.length, 0) == -1){
     fprintf (stderr, "error: pwrite\n");
     if (omxcam_video_stop ()) log_error ();
   }
