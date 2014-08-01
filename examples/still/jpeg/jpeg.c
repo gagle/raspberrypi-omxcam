@@ -57,6 +57,8 @@ int main (){
   //settings.jpeg.thumbnail.width = 0;
   //settings.jpeg.thumbnail.height = 0;
   
+  settings.camera.drc = OMXCAM_DRC_HIGH;
+  
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   
   //Capture gray image with shutter speed 1/4, EV -10 and some EXIF tags

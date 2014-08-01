@@ -371,6 +371,7 @@ int omxcam__camera_is_valid_color_effects (uint32_t color);
 int omxcam__camera_is_valid_metering (omxcam_metering metering);
 int omxcam__camera_is_valid_white_balance (omxcam_white_balance white_balance);
 int omxcam__camera_is_valid_image_filter (omxcam_image_filter image_filter);
+int omxcam__camera_is_valid_drc (omxcam_drc drc);
 int omxcam__camera_is_valid_roi (uint32_t roi);
 int omxcam__camera_is_valid_framerate (uint32_t framerate);
 

@@ -212,6 +212,10 @@ int omxcam__camera_validate (omxcam_camera_settings_t* settings, int video){
     omxcam__error ("invalid 'camera.image_filter' value");
     return -1;
   }
+  if (!omxcam__camera_is_valid_drc (settings->drc)){
+    omxcam__error ("invalid 'camera.drc' value");
+    return -1;
+  }
   if (!omxcam__camera_is_valid_roi (settings->roi.top)){
     omxcam__error ("invalid 'camera.roi.top' value");
     return -1;
@@ -640,6 +644,7 @@ OMXCAM_FN (OMXCAM_CREATE_FN, OMXCAM_DEFAULT, is_valid, int, white_balance,
     WHITE_BALANCE)
 OMXCAM_FN (OMXCAM_CREATE_FN, OMXCAM_DEFAULT, is_valid, int, image_filter,
     IMAGE_FILTER)
+OMXCAM_FN (OMXCAM_CREATE_FN, OMXCAM_DEFAULT, is_valid, int, drc, DRC)
 
 #undef OMXCAM_DEFAULT
 #undef OMXCAM_CREATE_FN
