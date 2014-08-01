@@ -135,6 +135,7 @@ void omxcam__camera_init (
   settings->roi.left = 0;
   settings->roi.width = 100;
   settings->roi.height = 100;
+  settings->drc = OMXCAM_DRC_OFF;
   settings->framerate = 30;
   settings->frame_stabilisation = OMXCAM_FALSE;
 }
@@ -496,6 +497,20 @@ int omxcam__camera_set_roi (omxcam_roi_t* roi){
   return 0;
 }
 
+int omxcam__camera_set_drc (omxcam_drc drc){
+  OMX_ERRORTYPE error;
+  OMX_CONFIG_DYNAMICRANGEEXPANSIONTYPE st;
+  omxcam__omx_struct_init (st);
+  st.eMode = drc;
+  if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
+      OMX_IndexConfigDynamicRangeExpansion, &st))){
+    omxcam__error ("OMX_SetConfig - OMX_IndexConfigDynamicRangeExpansion: "
+        "%s", omxcam__dump_OMX_ERRORTYPE (error));
+    return -1;
+  }
+  return 0;
+}
+
 int omxcam__camera_set_frame_stabilisation (omxcam_bool frame_stabilisation){
   OMX_ERRORTYPE error;
   OMX_CONFIG_FRAMESTABTYPE st;
@@ -532,6 +547,7 @@ int omxcam__camera_configure_omx (
   if (omxcam__camera_set_white_balance (&settings->white_balance)) return -1;
   if (omxcam__camera_set_image_filter (settings->image_filter)) return -1;
   if (omxcam__camera_set_roi (&settings->roi)) return -1;
+  if (!video && omxcam__camera_set_drc (settings->drc)) return -1;
   if (video && omxcam__camera_set_frame_stabilisation (
       settings->frame_stabilisation)){
     return -1;

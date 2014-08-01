@@ -154,6 +154,13 @@ extern "C" {
   X (IMAGE_FILTER_ANAGLYPH, OMX_ImageFilterAnaglyph)                           \
   X (IMAGE_FILTER_DEINTERLACE_FAST, OMX_ImageFilterDeInterlaceFast)
 
+#define OMXCAM_DRC_MAP_LENGTH 4
+#define OMXCAM_DRC_MAP(X)                                                      \
+  X (DRC_OFF, OMX_DynRangeExpOff)                                              \
+  X (DRC_LOW, OMX_DynRangeExpLow)                                              \
+  X (DRC_MEDIUM, OMX_DynRangeExpMedium)                                        \
+  X (DRC_HIGH, OMX_DynRangeExpHigh)
+
 #define OMXCAM_H264_AVC_PROFILE_MAP_LENGTH 3
 #define OMXCAM_H264_AVC_PROFILE_MAP(X)                                         \
   X (H264_AVC_PROFILE_BASELINE, OMX_VIDEO_AVCProfileBaseline)                  \
@@ -214,6 +221,10 @@ typedef enum {
 } omxcam_image_filter;
 
 typedef enum {
+  OMXCAM_DRC_MAP (OMXCAM_ENUM_FN)
+} omxcam_drc;
+
+typedef enum {
   OMXCAM_H264_AVC_PROFILE_MAP (OMXCAM_ENUM_FN)
 } omxcam_avc_profile;
 
@@ -271,6 +282,7 @@ typedef struct {
   omxcam_white_balance_t white_balance;
   omxcam_image_filter image_filter;
   omxcam_roi_t roi;
+  omxcam_drc drc;
   //Used only in video mode
   uint32_t framerate;
   //Used only in video mode
