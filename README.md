@@ -168,6 +168,7 @@ omxcam_white_balance_t   white_balance
   uint32_t                 red_gain              100                         0 .. 
   uint32_t                 blue_gain             100                         0 ..
 omxcam_image_filter      image_filter            OMXCAM_IMAGE_FILTER_NONE
+omxcam_drc               drc                     OMXCAM_DRC_OFF
 omxcam_roi_t             roi
   uint32_t                 top                   0                           0 .. 100
   uint32_t                 left                  0                           0 .. 100

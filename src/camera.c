@@ -558,18 +558,18 @@ int omxcam__camera_configure_omx (
   }
   
   OMX_ERRORTYPE error;
-  OMX_CONFIG_EXPOSUREVALUETYPE st;
-  omxcam__omx_struct_init (st);
-  st.nPortIndex = OMX_ALL;
-  st.eMetering = settings->metering;
-  st.xEVCompensation = (settings->exposure_compensation << 16)/6;
+  OMX_CONFIG_EXPOSUREVALUETYPE exposure_st;
+  omxcam__omx_struct_init (exposure_st);
+  exposure_st.nPortIndex = OMX_ALL;
+  exposure_st.eMetering = settings->metering;
+  exposure_st.xEVCompensation = (settings->exposure_compensation << 16)/6;
   //Despite the name says it's in milliseconds, it's in microseconds
-  st.nShutterSpeedMsec = settings->shutter_speed;
-  st.bAutoShutterSpeed = !settings->shutter_speed;
-  st.nSensitivity = settings->iso;
-  st.bAutoSensitivity = !settings->iso;
+  exposure_st.nShutterSpeedMsec = settings->shutter_speed;
+  exposure_st.bAutoShutterSpeed = !settings->shutter_speed;
+  exposure_st.nSensitivity = settings->iso;
+  exposure_st.bAutoSensitivity = !settings->iso;
   if ((error = OMX_SetConfig (omxcam__ctx.camera.handle,
-      OMX_IndexConfigCommonExposureValue, &st))){
+      OMX_IndexConfigCommonExposureValue, &exposure_st))){
     omxcam__error ("OMX_SetConfig - OMX_IndexConfigCommonExposureValue: "
         "%s", omxcam__dump_OMX_ERRORTYPE (error));
     return -1;

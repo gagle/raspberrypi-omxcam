@@ -52,12 +52,11 @@ int main (){
   settings.on_data = on_data;
   //settings.camera.shutter_speed = 1000*1000;
   //settings.camera.exposure = OMXCAM_EXPOSURE_NIGHT;
-  //settings.camera.shutter_speed = 50000;
-  //settings.camera.iso = 200;
-  //settings.jpeg.thumbnail.width = 0;
-  //settings.jpeg.thumbnail.height = 0;
-  
-  settings.camera.drc = OMXCAM_DRC_HIGH;
+  settings.camera.shutter_speed = 50000;
+  settings.camera.iso = 200;
+  settings.jpeg.thumbnail.width = 0;
+  settings.jpeg.thumbnail.height = 0;
+  settings.camera.image_filter = OMXCAM_IMAGE_FILTER_SHARPEN;
   
   if (save ("still-default-2592x1944.jpg", &settings)) return 1;
   

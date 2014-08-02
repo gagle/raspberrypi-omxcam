@@ -123,36 +123,26 @@ extern "C" {
   X (WHITE_BALANCE_FLASH, OMX_WhiteBalControlFlash)                            \
   X (WHITE_BALANCE_HORIZON, OMX_WhiteBalControlHorizon)
 
-#define OMXCAM_IMAGE_FILTER_MAP_LENGTH 27
+#define OMXCAM_IMAGE_FILTER_MAP_LENGTH 18
 #define OMXCAM_IMAGE_FILTER_MAP(X)                                             \
   X (IMAGE_FILTER_NONE, OMX_ImageFilterNone)                                   \
-  X (IMAGE_FILTER_NOISE, OMX_ImageFilterNoise)                                 \
   X (IMAGE_FILTER_EMBOSS, OMX_ImageFilterEmboss)                               \
   X (IMAGE_FILTER_NEGATIVE, OMX_ImageFilterNegative)                           \
   X (IMAGE_FILTER_SKETCH, OMX_ImageFilterSketch)                               \
   X (IMAGE_FILTER_OILPAINT, OMX_ImageFilterOilPaint)                           \
   X (IMAGE_FILTER_HATCH, OMX_ImageFilterHatch)                                 \
   X (IMAGE_FILTER_GPEN, OMX_ImageFilterGpen)                                   \
-  X (IMAGE_FILTER_ANTIALIAS, OMX_ImageFilterAntialias)                         \
-  X (IMAGE_FILTER_DERING, OMX_ImageFilterDeRing)                               \
   X (IMAGE_FILTER_SOLARIZE, OMX_ImageFilterSolarize)                           \
   X (IMAGE_FILTER_WATERCOLOR, OMX_ImageFilterWatercolor)                       \
   X (IMAGE_FILTER_PASTEL, OMX_ImageFilterPastel)                               \
-  X (IMAGE_FILTER_SHARPEN, OMX_ImageFilterSharpen)                             \
   X (IMAGE_FILTER_FILM, OMX_ImageFilterFilm)                                   \
   X (IMAGE_FILTER_BLUR, OMX_ImageFilterBlur)                                   \
-  X (IMAGE_FILTER_SATURATION, OMX_ImageFilterSaturation)                       \
-  X (IMAGE_FILTER_DEINTERLACE_LINE_DOUBLE,                                     \
-      OMX_ImageFilterDeInterlaceLineDouble)                                    \
-  X (IMAGE_FILTER_DEINTERLACE_ADVANCED, OMX_ImageFilterDeInterlaceAdvanced)    \
   X (IMAGE_FILTER_COLOUR_SWAP, OMX_ImageFilterColourSwap)                      \
   X (IMAGE_FILTER_WASHED_OUT, OMX_ImageFilterWashedOut)                        \
   X (IMAGE_FILTER_COLOUR_POINT, OMX_ImageFilterColourPoint)                    \
   X (IMAGE_FILTER_POSTERISE, OMX_ImageFilterPosterise)                         \
   X (IMAGE_FILTER_COLOUR_BALANCE, OMX_ImageFilterColourBalance)                \
-  X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)                             \
-  X (IMAGE_FILTER_ANAGLYPH, OMX_ImageFilterAnaglyph)                           \
-  X (IMAGE_FILTER_DEINTERLACE_FAST, OMX_ImageFilterDeInterlaceFast)
+  X (IMAGE_FILTER_CARTOON, OMX_ImageFilterCartoon)
 
 #define OMXCAM_DRC_MAP_LENGTH 4
 #define OMXCAM_DRC_MAP(X)                                                      \
